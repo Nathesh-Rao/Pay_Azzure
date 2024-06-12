@@ -66,7 +66,7 @@ class CompletedListController extends GetxController {
       'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID),
       "Trace": "false",
       "AppName": Const.PROJECT_NAME.toString(),
-      "pagesize": int.parse(completedCount),
+      "pagesize": double.parse(completedCount).toInt(),
       "pageno": 1,
     };
 

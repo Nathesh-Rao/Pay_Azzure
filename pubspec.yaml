@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1000
+version: 1.0.1+1001
 
 
 environment:
@@ -60,6 +60,9 @@ dependencies:
   device_info_plus: ^10.1.0
   flutter_file_downloader: ^1.2.1
   material_icons_named: ^3.16.0
+
+  auto_size_text: ^3.0.0
+  intl: ^0.18.0
 
 
   # The following adds the Cupertino Icons font to your application.

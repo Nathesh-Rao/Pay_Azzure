@@ -104,7 +104,7 @@ class CommonMethods {
   static Future<Position?> getCurrentLocation() async {
     final hasPermission = await _handleLocationPermission();
     if (hasPermission)
-      return Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     else
       return null;
   }

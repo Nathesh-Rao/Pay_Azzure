@@ -14,7 +14,7 @@ import 'package:get/get.dart';
 
 class MenuHomePageController extends GetxController {
   InternetConnectivity internetConnectivity = Get.find();
- // var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
+  // var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
   var colorList = ["#EEF2FF", "#FFF9E7", "#F5EBFF", "#FFECF6", "#E5F5FA", "#E6FAF4", "#F7F7F7", "#E8F5F8"];
   var listOfCards = [].obs;
   var actionData = {};
@@ -155,7 +155,7 @@ class MenuHomePageController extends GetxController {
   }
 
   getEncryptedSecretKey(String key) async {
-    var url = Const.getFullARMUrl_HardCoded(ServerConnections.API_GET_ENCRYPTED_SECRET_KEY);
+    var url = Const.getFullARMUrl(ServerConnections.API_GET_ENCRYPTED_SECRET_KEY);
     Map<String, dynamic> body = {"secretkey": key};
     var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
     print("Resp: $resp");
@@ -169,7 +169,7 @@ class MenuHomePageController extends GetxController {
     LoadingScreen.show();
     secretEncryptedKey = await getEncryptedSecretKey(ServerConnections.API_SECRETKEY_GET_PUNCHIN_DATA);
     if (secretEncryptedKey != "") {
-      var url = Const.getFullARMUrl_HardCoded(ServerConnections.API_ARM_EXECUTE);
+      var url = Const.getFullARMUrl(ServerConnections.API_ARM_EXECUTE);
       var body = {
         "SecretKey": secretEncryptedKey,
         "publickey": "AXPKEY000000010003",
@@ -208,7 +208,7 @@ class MenuHomePageController extends GetxController {
     String address = await CommonMethods.getAddressFromLatLng(
         currentLocation!); //currentLocation != null ? await CommonMethods.getAddressFromLatLng(currentLocation) : "";
     print("address: ${address.toString()}");
-    var url = Const.getFullARMUrl_HardCoded(ServerConnections.API_ARM_EXECUTE);
+    var url = Const.getFullARMUrl(ServerConnections.API_ARM_EXECUTE);
     var body = {
       "SecretKey": secretEncryptedKey, //1408279244140740
       "publickey": "AXPKEY000000010002",
@@ -265,7 +265,7 @@ class MenuHomePageController extends GetxController {
         currentLocation!); //currentLocation != null ? await CommonMethods.getAddressFromLatLng(currentLocation) : "";
     print("address: ${address.toString()}");
 
-    var url = Const.getFullARMUrl_HardCoded(ServerConnections.API_ARM_EXECUTE);
+    var url = Const.getFullARMUrl(ServerConnections.API_ARM_EXECUTE);
     var body = {
       "SecretKey": secretEncryptedKey, //1408279244140740
       "publickey": "AXPKEY000000010002",

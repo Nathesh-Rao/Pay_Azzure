@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/CommonMethods.dart';
@@ -15,7 +16,6 @@ import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Models/Me
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Page/MenuMorePage.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Models/FirebaseMessageModel.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetNotification.dart';
-import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetShakeableDialog.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:text_scroll/text_scroll.dart';
@@ -49,28 +50,42 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var willAuth = false;
   var isAuthRequired = false;
   var unread;
+  var toDay;
   final CarouselController carouselController = CarouselController();
 
   DateTime currentBackPressTime = DateTime.now();
 
   ServerConnections serverConnections = ServerConnections();
   AppStorage appStorage = AppStorage();
-  var pageList = [
-    MenuHomePage(),
-    // WebViewActiveList(),
-    MenuActiveListPage(),
-    MenuDashboardPage(),
-    // MenuCalendarPage(),
-    WebViewCalendar(),
-    MenuMorePage(),
-  ];
+
+  late var pageList;
   var list = [WidgetNotification(FirebaseMessageModel("Title 1", "Body 1"))];
 
-  get getPage => pageList[bottomIndex.value];
+  getPage() {
+    if (bottomIndex.value == 0) {
+      return MenuHomePage();
+      // return MenuHomePage();
+    }
+    return pageList[bottomIndex.value];
+  }
 
   LandingPageController() {
+    var dt = DateTime.now();
+    toDay = DateFormat('dd-MMM-yyyy, EEEE').format(dt);
     userName.value = appStorage.retrieveValue(AppStorage.USER_NAME) ?? userName.value;
     userCtrl.text = userName.value;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      pageList = [
+        MenuHomePage(),
+        // WebViewActiveList(),
+        MenuActiveListPage(),
+        MenuDashboardPage(),
+        // MenuCalendarPage(),
+        WebViewCalendar(),
+        MenuMorePage(),
+      ];
+    });
+    showChangePassword_PopUp();
     getBiometricStatus();
   }
 
@@ -215,6 +230,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       return Future.value(false);
     } else {
       if (Get.isSnackbarOpen) Get.back();
+      // SystemNavigator.pop(animated: true);
+      exit(0);
       return Future.value(true);
     }
   }
@@ -329,6 +346,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   signOut() async {
     var body = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
     var url = Const.getFullARMUrl(ServerConnections.API_SIGNOUT);
+
     Get.defaultDialog(
         title: "Log out",
         middleText: "Are you sure you want to log out?",
@@ -587,13 +605,13 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     RegExp regex = RegExp(pattern.toString());
     errOPass.value = errNPass.value = errCNPass.value = '';
     if (oPassCtrl.text.trim().toString() == '') {
-      errOPass.value = "Enter old password";
+      errOPass.value = "Enter Existing password";
       return false;
     }
-    if (!regex.hasMatch(oPassCtrl.text.trim())) {
+    /* if (!regex.hasMatch(oPassCtrl.text.trim())) {
       errOPass.value = "Password should contain upper,lower,digit and Special character";
       return false;
-    }
+    }*/
     if (nPassCtrl.text.trim().toString() == '') {
       errNPass.value = "Enter New password";
       return false;
@@ -611,7 +629,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       return false;
     }
     if (nPassCtrl.text.trim() != cnPassCtrl.text.trim()) {
-      errOPass.value = "Password does not match";
+      errCNPass.value = "Password does not match";
       return false;
     }
     return true;
@@ -665,14 +683,68 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       );
       menuList.add(wid2);
     }
+    if (menuList.length == 1) {
+      menuList.add(ListTile(
+        onTap: () {
+          Get.back();
+          indexChange(0);
+        },
+        leading: Icon(Icons.home_outlined),
+        title: Text("Home"),
+      ));
+      menuList.add(ListTile(
+        onTap: () {
+          Get.back();
+          indexChange(1);
+        },
+        leading: Icon(Icons.view_list_outlined),
+        title: Text("Active List"),
+      ));
+      menuList.add(ListTile(
+        onTap: () {
+          Get.back();
+          indexChange(2);
+        },
+        leading: Icon(Icons.speed_outlined),
+        title: Text("Dashboard"),
+      ));
+      menuList.add(ListTile(
+        onTap: () {
+          Get.back();
+          indexChange(3);
+        },
+        leading: Icon(Icons.calendar_month_outlined),
+        title: Text("Calendar"),
+      ));
+      menuList.add(ListTile(
+        onTap: () {
+          Get.back();
+          indexChange(4);
+        },
+        leading: Icon(Icons.dashboard_customize_outlined),
+        title: Text("More"),
+      ));
+      menuList.add(ListTile(
+        onTap: () {
+          Get.back();
+          signOut();
+        },
+        leading: Icon(Icons.power_settings_new),
+        title: Text("Logout"),
+      ));
+      menuList.add(SizedBox(
+        height: MediaQuery.of(Get.context!).size.height - 540,
+      ));
+    }
     menuList.add(Container(
       height: 70,
       child: Center(
           child: Text(
-        'App Version: ${Const.APP_VERSION}\n© agile-labs.com 2023',
+        'App Version: ${Const.APP_VERSION}\n© agile-labs.com ${DateTime.now().year}',
         textAlign: TextAlign.center,
       )),
     ));
+
     return menuList;
   }
 
@@ -765,92 +837,422 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
-    print('state = $state');
-    if (state == AppLifecycleState.paused) {
-      if (willAuth)
-        isAuthRequired = true;
-      else
-        isAuthRequired = false;
-      if (Get.isDialogOpen!) {
-        Get.back();
-      }
-    }
+    // print('state = $state');
+    // if (state == AppLifecycleState.paused) {
+    //   if (willAuth)
+    //     isAuthRequired = true;
+    //   else
+    //     isAuthRequired = false;
+    //   if (Get.isDialogOpen!) {
+    //     Get.back();
+    //   }
+    // }
     if (state == AppLifecycleState.resumed) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (isAuthRequired && !Get.isDialogOpen!) {
-          isAuthRequired = false;
-          await doTheMergeProcess();
-          notificationPageRefresh.value = true;
-          needRefreshNotification.value = true;
-          var auth = await showBiometricDialog();
+        await doTheMergeProcess();
+        // if (isAuthRequired && !Get.isDialogOpen!) {
+        //   isAuthRequired = false;
+        //   notificationPageRefresh.value = true;
+        //   needRefreshNotification.value = true;
+        //   var auth = await showBiometricDialog();
+        //
+        //   Get.dialog(
+        //     barrierDismissible: false,
+        //     WidgetShakeableDialog(
+        //       child: Dialog(
+        //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+        //         child: Container(
+        //           height: 200,
+        //           width: 300,
+        //           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+        //           child: Center(
+        //             child: Column(
+        //               mainAxisSize: MainAxisSize.min,
+        //               mainAxisAlignment: MainAxisAlignment.center,
+        //               crossAxisAlignment: CrossAxisAlignment.center,
+        //               children: [
+        //                 GestureDetector(
+        //                   onTap: () async {
+        //                     auth = await showBiometricDialog();
+        //                     if (auth) {
+        //                       print(auth);
+        //                       Get.back();
+        //                       auth = false;
+        //                     }
+        //                   },
+        //                   child: Container(
+        //                     color: Colors.transparent,
+        //                     padding: EdgeInsets.all(20),
+        //                     child: Icon(
+        //                       Icons.fingerprint_outlined,
+        //                       color: MyColors.blue2,
+        //                       size: 40,
+        //                     ),
+        //                   ),
+        //                 ),
+        //                 Text("Please Authenticate to access"),
+        //                 SizedBox(height: 20),
+        //                 Row(
+        //                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //                   children: [
+        //                     TextButton(
+        //                         onPressed: () {
+        //                           signOut();
+        //                         },
+        //                         child: Text("Exit")),
+        //                     ElevatedButton(
+        //                         onPressed: () async {
+        //                           auth = await showBiometricDialog();
+        //                           if (auth) {
+        //                             print(auth);
+        //                             Get.back();
+        //                             auth = false;
+        //                           }
+        //                         },
+        //                         child: Text("Try Again"))
+        //                   ],
+        //                 )
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   );
+        //
+        //   if (auth) Get.back();
+        // }
+      });
+    }
+  }
 
-          Get.dialog(
-            barrierDismissible: false,
-            WidgetShakeableDialog(
-              child: Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                child: Container(
-                  height: 200,
-                  width: 300,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Column(
+  showChangePassword_PopUp() async {
+    AppStorage appStorage = AppStorage();
+    var isChangePassword = await appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD);
+    if (isChangePassword.toString().toLowerCase() == "true") {
+      Get.dialog(
+        barrierDismissible: false,
+        PopScope(
+          canPop: false,
+          child: Dialog(
+            child: Padding(
+              padding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 20),
+              child: SingleChildScrollView(
+                child: Obx(() => Column(
                       mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        GestureDetector(
-                          onTap: () async {
-                            auth = await showBiometricDialog();
-                            if (auth) {
-                              print(auth);
-                              Get.back();
-                              auth = false;
-                            }
-                          },
-                          child: Container(
-                            color: Colors.transparent,
-                            padding: EdgeInsets.all(20),
-                            child: Icon(
-                              Icons.fingerprint_outlined,
-                              color: MyColors.blue2,
-                              size: 40,
+                        Center(
+                          child: Text(
+                            "Reset Password",
+                            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: oPassCtrl,
+                          obscureText: !showOldPass.value,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {},
+                          style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+                          decoration: InputDecoration(
+                            labelText: 'Existing Password',
+                            hintText: 'Enter your old password',
+                            errorText: this.evaluteError(errOPass.value),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showOldPass.value ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                showOldPass.toggle();
+                              },
                             ),
                           ),
                         ),
-                        Text("Please Authenticate to access"),
                         SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            TextButton(
-                                onPressed: () {
-                                  signOut();
-                                },
-                                child: Text("Exit")),
-                            ElevatedButton(
-                                onPressed: () async {
-                                  auth = await showBiometricDialog();
-                                  if (auth) {
-                                    print(auth);
-                                    Get.back();
-                                    auth = false;
-                                  }
-                                },
-                                child: Text("Try Again"))
-                          ],
-                        )
+                        TextFormField(
+                          controller: nPassCtrl,
+                          obscureText: !showNewPass.value,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {},
+                          style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+                          decoration: InputDecoration(
+                            labelText: 'New Password',
+                            hintText: 'Enter your new password',
+                            errorText: evaluteError(errNPass.value),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showNewPass.value ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                showNewPass.toggle();
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: cnPassCtrl,
+                          obscureText: !showConNewPass.value,
+                          keyboardType: TextInputType.text,
+                          onChanged: (value) {},
+                          style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+                          decoration: InputDecoration(
+                            labelText: 'Confrmation Password',
+                            hintText: 'Enter your Confrmation password',
+                            errorText: evaluteError(errCNPass.value),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showConNewPass.value ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                showConNewPass.toggle();
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                          SizedBox(
+                            height: 30.0,
+                            width: 100.0,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                //Get.back();
+                                changePasswordCalled();
+                              },
+                              child: Container(
+                                width: 600.0,
+                                height: 30,
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.fromLTRB(3.0, 6.0, 3.0, 3.0),
+                                child: Text(
+                                  'Save',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "nunitoreg"),
+                                ),
+                              ),
+                            ),
+                          )
+                        ]),
+                        SizedBox(height: 10),
                       ],
+                    )),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  showManageWindow({initialIndex = 0}) {
+    oPassCtrl.text = "";
+    nPassCtrl.text = "";
+    cnPassCtrl.text = "";
+
+    return Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+          height: 400,
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: DefaultTabController(
+              length: 2,
+              initialIndex: initialIndex,
+              child: Scaffold(
+                appBar: TabBar(
+                  unselectedLabelColor: Colors.black,
+                  labelColor: Colors.black,
+                  tabs: [
+                    Tab(
+                      text: "User Profile",
                     ),
+                    Tab(text: "Change\nCredentials")
+                  ],
+                ),
+                body: Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20),
+                  child: TabBarView(
+                    children: [userProfile(), userCredentials()],
                   ),
                 ),
               ),
             ),
-          );
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+      transitionCurve: Curves.easeIn,
+    );
+  }
 
-          if (auth) Get.back();
-        }
-      });
-    }
+  userProfile() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(height: 20),
+        TextFormField(
+          readOnly: true,
+          controller: userCtrl,
+          enableInteractiveSelection: false,
+          keyboardType: TextInputType.text,
+          style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+          decoration: const InputDecoration(
+            labelText: 'User Name',
+            hintText: 'User Name',
+          ),
+        ),
+        SizedBox(height: 30),
+        ElevatedButton(
+          onPressed: () {
+            closeProfileDialog();
+          },
+          child: Container(
+            width: 600.0,
+            height: 30,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
+            padding: const EdgeInsets.fromLTRB(3.0, 6.0, 3.0, 3.0),
+            child: Column(children: const [
+              Text(
+                'Cancel',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "nunitoreg"),
+              ),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  userCredentials() {
+    return Obx(() => Column(
+          children: [
+            SizedBox(height: 20),
+            TextFormField(
+              controller: oPassCtrl,
+              obscureText: !showOldPass.value,
+              keyboardType: TextInputType.text,
+              onChanged: (value) {},
+              style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+              decoration: InputDecoration(
+                labelText: 'Old Password',
+                hintText: 'Enter your old password',
+                errorText: evaluteError(errOPass.value),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    showOldPass.value ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    showOldPass.toggle();
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextFormField(
+              controller: nPassCtrl,
+              obscureText: !showNewPass.value,
+              keyboardType: TextInputType.text,
+              onChanged: (value) {},
+              style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+              decoration: InputDecoration(
+                labelText: 'New Password',
+                hintText: 'Enter your new password',
+                errorText: evaluteError(errNPass.value),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    showNewPass.value ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    showNewPass.toggle();
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextFormField(
+              controller: cnPassCtrl,
+              obscureText: !showConNewPass.value,
+              keyboardType: TextInputType.text,
+              onChanged: (value) {},
+              style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
+              decoration: InputDecoration(
+                labelText: 'Confrmation Password',
+                hintText: 'Enter your Confrmation password',
+                errorText: evaluteError(errCNPass.value),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    showConNewPass.value ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    showConNewPass.toggle();
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 30),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              SizedBox(
+                height: 30.0,
+                width: 100.0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    closeProfileDialog();
+                  },
+                  child: Container(
+                    width: 600.0,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(3.0, 6.0, 3.0, 3.0),
+                    child: Column(children: const [
+                      Text('Cancel',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "nunitoreg"))
+                    ]),
+                  ),
+                ),
+              ),
+              Container(
+                width: 15.0,
+              ),
+              SizedBox(
+                height: 30.0,
+                width: 100.0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    changePasswordCalled();
+                  },
+                  child: Container(
+                    width: 600.0,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(5),
+                      ),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(3.0, 6.0, 3.0, 3.0),
+                    child: Text(
+                      'Update',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "nunitoreg"),
+                    ),
+                  ),
+                ),
+              )
+            ]),
+          ],
+        ));
   }
 }

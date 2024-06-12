@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Axpert Flutter 2.1',
+      title: 'Pay Azzure',
       darkTheme: Const.THEMEDATA,
       themeMode: ThemeMode.light,
       theme: Const.THEMEDATA,

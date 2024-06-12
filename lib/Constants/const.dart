@@ -20,7 +20,9 @@ class Const {
   static final String SET_HYBRID_INFO = "/Webservice.asmx/SetHybridInfo";
   static final String SET_HYBRID_NOTIFICATION_INFO = "/Webservice.asmx/SetHybridNotifiInfo";
   static final String LOGOUT_LINK = "webservice.asmx/SignOut";
+
   static String getSQLforClientID(String clientID) => "select * from tblclientMST where " + "clientid = '" + clientID + "'";
+
   static String getFullARMUrl(String Entrypoint) {
     if (ARM_URL == "") {
       var data = AppStorage().retrieveValue(AppStorage.ARM_URL) ?? "";
@@ -29,9 +31,9 @@ class Const {
       return ARM_URL.endsWith("/") ? ARM_URL + Entrypoint : ARM_URL + "/" + Entrypoint;
   }
 
-  static String getFullARMUrl_HardCoded(String Entrypoint) {
-    return "http://20.244.123.19/ARM113/" + Entrypoint;
-  }
+  // static String getFullARMUrl_HardCoded(String Entrypoint) {
+  //   return "http://20.244.123.19/ARM113/" + Entrypoint;
+  // }
 
   static String getFullProjectUrl(String Entrypoint) {
     if (PROJECT_URL == "") {
@@ -49,9 +51,11 @@ class Const {
   //         "clientid = '" + clientID + "'";
 
   static final THEMEDATA = ThemeData.light(useMaterial3: false).copyWith(
-    // useMaterial3: false,
     brightness: Brightness.light,
-    elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(backgroundColor: MaterialStateProperty.all(MyColors.blue2))),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+            backgroundColor: MaterialStateColor.resolveWith((states) => MyColors.blue2),
+            foregroundColor: MaterialStateColor.resolveWith((states) => Colors.white))),
     primaryColor: Color(0xff003AA5),
     scaffoldBackgroundColor: Colors.white,
     colorScheme: ThemeData().colorScheme.copyWith(primary: MyColors.blue2),

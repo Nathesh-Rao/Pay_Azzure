@@ -9,6 +9,7 @@ class AppStorage {
   static const String USER_PASSWORD = "userPass";
   static const String USER_NAME = "UserName";
   static const String USER_GROUP = "UserGroup";
+  static const String USER_CHANGE_PASSWORD = "ChangePassword";
   static const String LAST_LOGIN_DATA = "LastLoginDataMap";
 
   static const String PROJECT_NAME = "ProjectName";
@@ -21,6 +22,7 @@ class AppStorage {
   // static const String WILL_AUTHENTICATE = "WillAuthenticate";
   static const String WILL_AUTHENTICATE_FOR_USER = "WillAuthenticateForUser";
   static const String SHAREDPREF_NAME = "BackgroundMessages";
+  static const String isShowNotifyEnabled = "isShowNotifyEnabled";
   late final box;
 
   AppStorage() {

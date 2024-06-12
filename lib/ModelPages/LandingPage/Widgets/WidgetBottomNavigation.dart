@@ -12,8 +12,7 @@ class AppBottomNavigation extends StatelessWidget {
     return Obx(
       () => Container(
         decoration: BoxDecoration(
-          // border: Border.all(width: 1),
-
+          // border: Border.all(width: 1)
           borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
           boxShadow: [
             BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 1),

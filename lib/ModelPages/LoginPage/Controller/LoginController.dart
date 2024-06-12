@@ -160,7 +160,6 @@ class LoginController extends GetxController {
       //     headers: {"Content-Type": "application/json"}, body: body);
       // var data = serverConnections.parseData(response);
       var response = await serverConnections.postToServer(url: url, body: body);
-
       if (response != "") {
         var json = jsonDecode(response);
         // print(json["result"]["sessionid"].toString());
@@ -168,7 +167,9 @@ class LoginController extends GetxController {
           await appStorage.storeValue(AppStorage.TOKEN, json["result"]["token"].toString());
           await appStorage.storeValue(AppStorage.SESSIONID, json["result"]["sessionid"].toString());
           await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
+          await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
           storeLastLoginData(body);
+          print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
           //Save Data
           if (rememberMe.value) {
             rememberCredentials();
@@ -256,13 +257,15 @@ class LoginController extends GetxController {
     var jsonResp = jsonDecode(connectResp);
     if (jsonResp != "") {
       if (jsonResp['result']['success'].toString() == "true") {
-        Get.offAllNamed(Routes.LandingPage);
+        // Get.offAllNamed(Routes.LandingPage);
       } else {
-        showErrorSnack();
+        var message = jsonResp['result']['message'].toString();
+        showErrorSnack(title: "Error - Connect To Axpert", message: message);
       }
     } else {
       showErrorSnack();
     }
+    Get.offAllNamed(Routes.LandingPage);
   }
 
   _callApiForMobileNotification() async {
@@ -284,6 +287,7 @@ class LoginController extends GetxController {
     var version = packageInfo.version;
     String buildNumber = packageInfo.buildNumber;
     Const.APP_VERSION = version;
+    return version;
   }
 
   void rememberCredentials() {

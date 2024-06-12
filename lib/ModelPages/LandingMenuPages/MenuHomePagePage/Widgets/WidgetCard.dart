@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
@@ -5,6 +6,7 @@ import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Model
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Widgets/WidgetOptionListTile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -22,7 +24,7 @@ class WidgetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       // margin: EdgeInsets.all(10),
-      height: 50,
+      // height: 50,
       decoration: BoxDecoration(
         color: HexColor(menuHomePageController.getCardBackgroundColor(cardModel.colorcode.trim())), // ?? "ffffff"),
         borderRadius: BorderRadius.circular(10),
@@ -48,7 +50,8 @@ class WidgetCard extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                  visible: menuHomePageController.actionData[cardModel.caption] == null && cardModel.moreoption.isEmpty ? false : true,
+                  visible:
+                      menuHomePageController.actionData[cardModel.caption] == null && cardModel.moreoption.isEmpty ? false : true,
                   child: Align(
                       alignment: Alignment.topRight,
                       child: IconButton(
@@ -58,10 +61,12 @@ class WidgetCard extends StatelessWidget {
                 ),
               ],
             ),
-            menuHomePageController.actionData[cardModel.caption] == null ? SizedBox(height: 10) : SizedBox(height: 4),
+            menuHomePageController.actionData[cardModel.caption] == null && cardModel.moreoption.isEmpty
+                ? SizedBox(height: 10)
+                : SizedBox(height: 0),
             Padding(
-              padding: const EdgeInsets.only(top: 5, bottom: 2, right: 5),
-              child: Text(
+              padding: const EdgeInsets.only(top: 0, bottom: 0, right: 5),
+              child: AutoSizeText(
                 cardModel.caption,
                 maxLines: 2,
                 textAlign: TextAlign.left,
@@ -99,9 +104,14 @@ class WidgetCard extends StatelessWidget {
                   height: 50,
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Colors.grey))),
                   child: Center(
-                    child: Text(
-                      cardModel.caption,
-                      style: TextStyle(fontSize: 25),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: FittedBox(
+                        child: Text(
+                          cardModel.caption,
+                          style: TextStyle(fontSize: 25),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -189,6 +199,7 @@ class WidgetCard extends StatelessWidget {
                   : ButtonStyle(padding: MaterialStateProperty.all(EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5))),
               onPressed: menuHomePageController.isShowPunchIn.value
                   ? () {
+                      Get.back();
                       menuHomePageController.onClick_PunchIn();
                     }
                   : null,
@@ -207,6 +218,7 @@ class WidgetCard extends StatelessWidget {
                     : ButtonStyle(padding: MaterialStateProperty.all(EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5))),
                 onPressed: menuHomePageController.isShowPunchOut.value
                     ? () {
+                        Get.back();
                         menuHomePageController.onClick_PunchOut();
                       }
                     : null,

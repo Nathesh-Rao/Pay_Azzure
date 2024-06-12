@@ -8,6 +8,16 @@ class CardModel {
   String moreoption;
   String colorcode;
 
+  CardModel(
+      {this.cardid = "",
+      this.caption = "",
+      this.pagecaption = "",
+      this.displayicon = "",
+      this.stransid = "",
+      this.datasource = "",
+      this.moreoption = "",
+      this.colorcode = ""}); // String title;
+
   CardModel.fromJson(Map<String, dynamic> json)
       : cardid = json['cardid'].toString(),
         caption = json['caption'].toString(),
@@ -16,7 +26,8 @@ class CardModel {
         stransid = json['stransid'].toString(),
         datasource = json['datasource'].toString(),
         moreoption = json['moreoption'] ?? "",
-        colorcode = json['colorcode'].toString();
+        colorcode = json['colorcode'].toString() ?? "";
+  // title = json['title'].toString() ?? "";
 
   // json['colorcode'].toString() == "" ? "#FFECE5" : (json['colorcode'].toString() == "null" ? "#FFECE5" : json['colorcode'].toString());
 
@@ -29,5 +40,6 @@ class CardModel {
         'datasource': datasource,
         'moreoption': moreoption,
         'colorcode': colorcode,
+        // 'title': title,
       };
 }

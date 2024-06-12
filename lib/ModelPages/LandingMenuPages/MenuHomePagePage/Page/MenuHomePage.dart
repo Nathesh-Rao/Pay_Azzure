@@ -26,17 +26,17 @@ class MenuHomePage extends StatelessWidget {
                     : GridView.builder(
                         padding: EdgeInsets.only(left: 10),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, childAspectRatio: isTablet() ? 1.5 : 2.8),
+                            crossAxisSpacing: 20,
+                            mainAxisSpacing: 20,
+                            crossAxisCount: 2,
+                            childAspectRatio: isTablet() ? 1.5 : 2.8),
                         itemCount: menuHomePageController.listOfCards.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
                               captionOnTapFunction(menuHomePageController.listOfCards[index]);
                             },
-                            child: Container(
-                                height: 600,
-                                margin: EdgeInsets.only(top: 10, right: 20, bottom: 10),
-                                child: WidgetCard(menuHomePageController.listOfCards[index])),
+                            child: Container(child: WidgetCard(menuHomePageController.listOfCards[index])),
                           );
                         },
                       ),

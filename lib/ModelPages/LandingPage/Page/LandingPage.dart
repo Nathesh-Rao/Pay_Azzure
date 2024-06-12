@@ -11,7 +11,7 @@ class LandingPage extends StatelessWidget {
   LandingPage({super.key});
 
   final LandingPageController landingPageController = Get.put(LandingPageController());
-  final MenuHomePageController menuHomePageController = Get.find();
+  final MenuHomePageController menuHomePageController = Get.put(MenuHomePageController());
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class LandingPage extends StatelessWidget {
         onWillPop: landingPageController.onWillPop,
         child: Obx(() => menuHomePageController.switchPage.value == true
             ? InApplicationWebViewer(menuHomePageController.webUrl)
-            : landingPageController.getPage),
+            : landingPageController.getPage()),
       ),
     );
   }

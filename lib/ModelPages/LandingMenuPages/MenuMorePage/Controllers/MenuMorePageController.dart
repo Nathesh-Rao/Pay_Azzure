@@ -132,7 +132,7 @@ class MenuMorePageController extends GetxController {
       if (itemModel.url != "") {
         // menuHomePageController.webUrl = Const.getFullProjectUrl(itemModel.url);
         // menuHomePageController.switchPage.value = true;
-        Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(itemModel.url)]);
+        Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(itemModel.url), true]);
       }
     }
   }
