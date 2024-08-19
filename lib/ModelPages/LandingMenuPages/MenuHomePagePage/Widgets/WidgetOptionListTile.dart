@@ -16,7 +16,7 @@ class WidgetOptionListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 60,
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Colors.grey))),
       child: Padding(
         padding: EdgeInsets.only(left: 10, right: 10),
         child: Row(

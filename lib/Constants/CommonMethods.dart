@@ -144,7 +144,7 @@ class LoadingScreen {
 }
 
 showErrorSnack({title = 'Error', message = 'Server busy, Please try again later.'}) {
-  Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
+  Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.redAccent);
 }
 
 showBiometricDialog() async {

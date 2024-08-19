@@ -6,17 +6,21 @@ import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/CardModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/CardOptionModel.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/GridDashboardModel.dart';
+import 'package:axpertflutter/Utils/ServerConnections/ExecuteApi.dart';
 import 'package:axpertflutter/Utils/ServerConnections/InternetConnectivity.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:material_icons_named/material_icons_named.dart';
 
 class MenuHomePageController extends GetxController {
   InternetConnectivity internetConnectivity = Get.find();
-  // var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
-  var colorList = ["#EEF2FF", "#FFF9E7", "#F5EBFF", "#FFECF6", "#E5F5FA", "#E6FAF4", "#F7F7F7", "#E8F5F8"];
+  var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
+  // var colorList = ["#EEF2FF", "#FFF9E7", "#F5EBFF", "#FFECF6", "#E5F5FA", "#E6FAF4", "#F7F7F7", "#E8F5F8"];
   var listOfCards = [].obs;
+  var listOfGridCardItems = [].obs;
   var actionData = {};
   Set setOfDatasource = {};
   var switchPage = false.obs;
@@ -24,6 +28,13 @@ class MenuHomePageController extends GetxController {
   var isShowPunchIn = false.obs;
   var isShowPunchOut = false.obs;
   var recordId = '';
+  var punchInResp = '';
+  var shift_start_time = "Loading..".obs;
+  var shift_end_time = "Loading..".obs;
+  var last_login_date = "Loading..".obs;
+  var last_login_time = "Loading..".obs;
+  var last_login_location = "Loading..".obs;
+  var attendanceVisibility = false.obs;
 
   var isLoading = true.obs;
   ServerConnections serverConnections = ServerConnections();
@@ -33,6 +44,9 @@ class MenuHomePageController extends GetxController {
   MenuHomePageController() {
     body = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
     getCardDetails();
+    getPunchINData();
+    getGridDashboardDetails();
+    getAttendanceDetails();
   }
 
   showMenuDialog(CardModel cardModel) {
@@ -65,10 +79,11 @@ class MenuHomePageController extends GetxController {
   getCardDetails() async {
     isLoading.value = true;
     LoadingScreen.show();
-    var url = Const.getFullARMUrl(ServerConnections.API_GET_HOMEPAGE_CARDS);
+    var url = Const.getFullARMUrl(ServerConnections.API_GET_HOMEPAGE_CARDS_v2);
     var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
     // print(resp);
     if (resp != "") {
+      print("Home card ${resp}");
       var jsonResp = jsonDecode(resp);
       if (jsonResp['result']['success'].toString() == "true") {
         listOfCards.clear();
@@ -94,7 +109,7 @@ class MenuHomePageController extends GetxController {
     //           child: Text("Ok")));
     // }
     await getCardDataSources();
-    listOfCards..sort((a, b) => a.caption.toString().toLowerCase().compareTo(b.caption.toString().toLowerCase()));
+    // listOfCards..sort((a, b) => a.caption.toString().toLowerCase().compareTo(b.caption.toString().toLowerCase()));
     isLoading.value = false;
     LoadingScreen.dismiss();
     return listOfCards;
@@ -155,7 +170,7 @@ class MenuHomePageController extends GetxController {
   }
 
   getEncryptedSecretKey(String key) async {
-    var url = Const.getFullARMUrl(ServerConnections.API_GET_ENCRYPTED_SECRET_KEY);
+    var url = Const.getFullARMUrl(ExecuteApi.API_GET_ENCRYPTED_SECRET_KEY);
     Map<String, dynamic> body = {"secretkey": key};
     var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
     print("Resp: $resp");
@@ -167,19 +182,20 @@ class MenuHomePageController extends GetxController {
   getPunchINData() async {
     var secretEncryptedKey = '';
     LoadingScreen.show();
-    secretEncryptedKey = await getEncryptedSecretKey(ServerConnections.API_SECRETKEY_GET_PUNCHIN_DATA);
+    secretEncryptedKey = await getEncryptedSecretKey(ExecuteApi.API_SECRETKEY_GET_PUNCHIN_DATA);
     if (secretEncryptedKey != "") {
-      var url = Const.getFullARMUrl(ServerConnections.API_ARM_EXECUTE);
+      var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE);
       var body = {
         "SecretKey": secretEncryptedKey,
         "publickey": "AXPKEY000000010003",
         "username": appStorage.retrieveValue(AppStorage.USER_NAME),
-        "Project": "hcmuat", //Const.PROJECT_NAME,
+        "Project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
         "getsqldata": {"username": appStorage.retrieveValue(AppStorage.USER_NAME), "trace": "false"},
         "sqlparams": {}
       };
       var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
-      print(resp);
+      punchInResp = resp;
+      print("ExecuteApi Resp: ${resp}");
       if (resp != "" && !resp.toString().contains("error")) {
         var jsonResp = jsonDecode(resp);
         if (jsonResp['success'].toString() == "true") {
@@ -193,6 +209,8 @@ class MenuHomePageController extends GetxController {
             isShowPunchOut.value = true;
             recordId = firstRowVal['recordid'] ?? '';
           }
+        } else {
+          isShowPunchIn.value = true;
         }
       }
     }
@@ -200,15 +218,16 @@ class MenuHomePageController extends GetxController {
   }
 
   onClick_PunchIn() async {
+    print(punchInResp);
     LoadingScreen.show();
-    var secretEncryptedKey = await getEncryptedSecretKey(ServerConnections.API_SECRETKEY_GET_DO_PUNCHIN);
+    var secretEncryptedKey = await getEncryptedSecretKey(ExecuteApi.API_SECRETKEY_GET_DO_PUNCHIN);
     Position? currentLocation = await CommonMethods.getCurrentLocation();
     var latitude = currentLocation?.latitude ?? "";
     var longitude = currentLocation?.longitude ?? "";
     String address = await CommonMethods.getAddressFromLatLng(
         currentLocation!); //currentLocation != null ? await CommonMethods.getAddressFromLatLng(currentLocation) : "";
     print("address: ${address.toString()}");
-    var url = Const.getFullARMUrl(ServerConnections.API_ARM_EXECUTE);
+    var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE);
     var body = {
       "SecretKey": secretEncryptedKey, //1408279244140740
       "publickey": "AXPKEY000000010002",
@@ -236,13 +255,14 @@ class MenuHomePageController extends GetxController {
     LoadingScreen.dismiss();
 
     if (jsonResp['success'].toString() == "true") {
-      Get.back();
       // var result = jsonResp['result'].toString();
       Get.snackbar("Punch-In success", "",
           backgroundColor: Colors.green,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
           duration: Duration(seconds: 3));
+      isShowPunchIn.value = false;
+      isShowPunchOut.value = true;
       actionData.clear();
       await getCardDataSources();
     } else {
@@ -257,7 +277,7 @@ class MenuHomePageController extends GetxController {
 
   onClick_PunchOut() async {
     LoadingScreen.show();
-    var secretEncryptedKey = await getEncryptedSecretKey(ServerConnections.API_SECRETKEY_GET_DO_PUNCHOUT);
+    var secretEncryptedKey = await getEncryptedSecretKey(ExecuteApi.API_SECRETKEY_GET_DO_PUNCHOUT);
     Position? currentLocation = await CommonMethods.getCurrentLocation();
     var latitude = currentLocation?.latitude ?? "";
     var longitude = currentLocation?.longitude ?? "";
@@ -265,7 +285,7 @@ class MenuHomePageController extends GetxController {
         currentLocation!); //currentLocation != null ? await CommonMethods.getAddressFromLatLng(currentLocation) : "";
     print("address: ${address.toString()}");
 
-    var url = Const.getFullARMUrl(ServerConnections.API_ARM_EXECUTE);
+    var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE);
     var body = {
       "SecretKey": secretEncryptedKey, //1408279244140740
       "publickey": "AXPKEY000000010002",
@@ -290,7 +310,6 @@ class MenuHomePageController extends GetxController {
     var jsonResp = jsonDecode(resp);
 
     if (jsonResp['success'].toString() == "true") {
-      Get.back();
       // var result = jsonResp['result'].toString();
       Get.snackbar("Punch-Out success", "",
           backgroundColor: Colors.green,
@@ -308,5 +327,69 @@ class MenuHomePageController extends GetxController {
           duration: Duration(seconds: 3));
     }
     LoadingScreen.dismiss();
+  }
+
+  void getGridDashboardDetails() async {
+    var body = {
+      "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_DashBoard),
+      "publickey": ExecuteApi.API_PublicKey_DashBoard,
+      "Project": Const.PROJECT_NAME,
+      "getsqldata": {"trace": "false"}
+    };
+    var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
+    if (resp != "") {
+      var jsonResp = jsonDecode(resp);
+      if (jsonResp["success"].toString() == "true") {
+        var listItems = jsonResp["axm_dashboard_shortcutmenu"]["rows"];
+        listOfGridCardItems.clear();
+        for (var items in listItems) {
+          GridDashboardModel newModel = GridDashboardModel.fromJson(items);
+          listOfGridCardItems.add(newModel);
+        }
+      }
+    }
+  }
+
+  generateIcon(model) {
+    var iconName = model.icon;
+    if (iconName.contains("material-icons")) {
+      iconName = iconName.replaceAll("|material-icons", "");
+      return materialIcons[iconName];
+    } else {
+      switch (model.type.trim().toUpperCase()[0]) {
+        case "T":
+          return Icons.assignment;
+        case "I":
+          return Icons.view_list;
+        case "W":
+        case "H":
+          return Icons.code;
+        default:
+          return Icons.access_time;
+      }
+    }
+  }
+
+  void getAttendanceDetails() async {
+    var body = {
+      "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_Attendance),
+      "publickey": ExecuteApi.API_PublicKey_Attendance,
+      "Project": Const.PROJECT_NAME, //"agilepost113",
+      "getsqldata": {"trace": "false"}
+    };
+    var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
+    if (resp != "") {
+      var jsonResp = jsonDecode(resp);
+      if (jsonResp['success'].toString() == "true") {
+        attendanceVisibility.value = true;
+        shift_start_time.value = jsonResp['axm_shift_time']['rows'][0]["shift_start_time"].toString();
+        shift_end_time.value = jsonResp['axm_shift_time']['rows'][0]["shift_end_time"].toString();
+        last_login_date.value = jsonResp['axm_logindetails']['rows'][0]["last_login_date"].toString();
+        last_login_time.value = jsonResp['axm_logindetails']['rows'][0]["last_login_time"].toString();
+        last_login_location.value = jsonResp['axm_logindetails']['rows'][0]["last_login_location"].toString();
+      } else {
+        attendanceVisibility.value = false;
+      }
+    }
   }
 }

@@ -1,15 +1,13 @@
 import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplicationWebView.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Controllers/ListItemDetailsController.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Controllers/PendingListController.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Widgets/WidgetPendingStatusScrollbar.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetLandingAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-
-import '../../../InApplicationWebView/page/InApplicationWebView.dart';
 
 class PendingListItemDetails extends StatelessWidget {
   PendingListItemDetails({super.key});
@@ -465,6 +463,7 @@ class PendingListItemDetails extends StatelessWidget {
                         child: Obx(() => Container(
                               margin: EdgeInsets.only(top: 10),
                               child: TextField(
+                                controller: listItemDetailsController.comments,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     hintText: "Enter Comments",
@@ -573,6 +572,7 @@ class PendingListItemDetails extends StatelessWidget {
                         child: Obx(() => Container(
                               margin: EdgeInsets.only(top: 10),
                               child: TextField(
+                                controller: listItemDetailsController.comments,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     hintText: "Enter Comments",
@@ -681,6 +681,7 @@ class PendingListItemDetails extends StatelessWidget {
                         child: Obx(() => Container(
                               margin: EdgeInsets.only(top: 10),
                               child: TextField(
+                                controller: listItemDetailsController.comments,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     hintText: "Enter Comments",
@@ -803,6 +804,7 @@ class PendingListItemDetails extends StatelessWidget {
                         child: Obx(() => Container(
                               margin: EdgeInsets.only(top: 10),
                               child: TextField(
+                                controller: listItemDetailsController.comments,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     hintText: "Enter Comments",
@@ -879,7 +881,8 @@ class PendingListItemDetails extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 10, left: 10, bottom: 10),
         child: GestureDetector(
-          onTap: () {
+          onTap: () async {
+            await listItemDetailsController.getSendToUsers_List();
             Get.dialog(Dialog(
               child: Container(
                 child: Padding(
@@ -906,11 +909,26 @@ class PendingListItemDetails extends StatelessWidget {
                           listItemDetailsController.pendingTaskModel!.cmsg_appcheck.toString(),
                         )),
                       ),
+                      DropdownButtonHideUnderline(
+                        child: ButtonTheme(
+                          alignedDropdown: true,
+                          child: DropdownButtonFormField(
+                            value: listItemDetailsController.ddSendToUsers_SelectedValue.value,
+                            items: listItemDetailsController.dropdownMenuItem_sendToUsers(),
+                            onChanged: (value) => listItemDetailsController.dropDownItemChanged_SendToUsers(value),
+                            decoration: InputDecoration(prefixIcon: Icon(Icons.person)),
+                            // border: OutlineInputBorder(
+                            //   borderRadius: BorderRadius.circular(10),
+                            // )
+                          ),
+                        ),
+                      ),
                       Visibility(
                         visible: hasComments,
                         child: Obx(() => Container(
                               margin: EdgeInsets.only(top: 10),
                               child: TextField(
+                                controller: listItemDetailsController.comments,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     hintText: "Enter Comments",

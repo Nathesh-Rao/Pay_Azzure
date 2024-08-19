@@ -8,8 +8,10 @@ class VersionUpdateClearOldData {
       AppStorage().remove('LastLoginData');
       AppStorage().remove('WillAuthenticate');
       // AppStorage().remove('WillAuthenticateForUser');
-      var value = AppStorage().retrieveValue(AppStorage.isShowNotifyEnabled) ?? null;
-      if (value == null) await AppStorage().storeValue(AppStorage.isShowNotifyEnabled, true);
+      var nofi = AppStorage().retrieveValue(AppStorage.isShowNotifyEnabled) ?? null;
+      if (nofi == null) await AppStorage().storeValue(AppStorage.isShowNotifyEnabled, true);
+      var log = AppStorage().retrieveValue(AppStorage.isLogEnabled) ?? null;
+      if (log == null) await AppStorage().storeValue(AppStorage.isShowNotifyEnabled, false);
     } catch (e) {}
   }
 }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:text_scroll/text_scroll.dart';
 
 class WidgetCompletedListItem extends StatelessWidget {
   WidgetCompletedListItem(this.completedActiveListModel, {super.key});

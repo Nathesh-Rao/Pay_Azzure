@@ -22,13 +22,13 @@ class _KPIPageState extends State<KPIPage> {
             SizedBox(height: 5),
             Container(
               padding: EdgeInsets.only(left: 40, top: 20, bottom: 20, right: 20),
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
+              decoration:
+                  BoxDecoration(border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CircleAvatar(child: Image.asset('assets/images/axpert.png')),
+                  CircleAvatar(child: Image.asset('assets/images/axAppLogo.png')),
                   SizedBox(width: 20),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -49,8 +49,8 @@ class _KPIPageState extends State<KPIPage> {
             SizedBox(height: 5),
             Container(
               padding: EdgeInsets.only(left: 40, top: 20, bottom: 20, right: 20),
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
+              decoration:
+                  BoxDecoration(border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
               child: Theme(
                 data: ThemeData().copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
@@ -92,8 +92,7 @@ class _KPIPageState extends State<KPIPage> {
                           Text(
                             "Jun 24",
                             style: GoogleFonts.nunito(
-                                textStyle:
-                                    TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('3366FF'))),
+                                textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('3366FF'))),
                           ),
                           SizedBox(height: 10),
                           Text(
@@ -104,8 +103,7 @@ class _KPIPageState extends State<KPIPage> {
                           Text(
                             "04",
                             style: GoogleFonts.nunito(
-                                textStyle:
-                                    TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('E3B113'))),
+                                textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('E3B113'))),
                           ),
                           SizedBox(height: 10),
                           Text(
@@ -116,8 +114,7 @@ class _KPIPageState extends State<KPIPage> {
                           Text(
                             "12",
                             style: GoogleFonts.nunito(
-                                textStyle:
-                                    TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('19AC81'))),
+                                textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('19AC81'))),
                           ),
                           SizedBox(height: 10),
                           Text(
@@ -135,8 +132,8 @@ class _KPIPageState extends State<KPIPage> {
             SizedBox(height: 5),
             Container(
               padding: EdgeInsets.only(left: 40, top: 20, bottom: 20, right: 20),
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
+              decoration:
+                  BoxDecoration(border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
               child: Theme(
                 data: ThemeData().copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
@@ -181,15 +178,14 @@ class _KPIPageState extends State<KPIPage> {
                                 children: [
                                   Text(
                                     "All Tickets",
-                                    style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(fontSize: 12, color: HexColor('495057'))),
+                                    style: GoogleFonts.nunito(textStyle: TextStyle(fontSize: 12, color: HexColor('495057'))),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
                                     "14",
                                     style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(
-                                            fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('3366FF'))),
+                                        textStyle:
+                                            TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('3366FF'))),
                                   ),
                                 ],
                               ),
@@ -208,15 +204,14 @@ class _KPIPageState extends State<KPIPage> {
                                 children: [
                                   Text(
                                     "Completed Task",
-                                    style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(fontSize: 12, color: HexColor('495057'))),
+                                    style: GoogleFonts.nunito(textStyle: TextStyle(fontSize: 12, color: HexColor('495057'))),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
                                     "07",
                                     style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(
-                                            fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('E3B113'))),
+                                        textStyle:
+                                            TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('E3B113'))),
                                   ),
                                 ],
                               ),
@@ -235,15 +230,14 @@ class _KPIPageState extends State<KPIPage> {
                                 children: [
                                   Text(
                                     "Pending Task",
-                                    style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(fontSize: 12, color: HexColor('495057'))),
+                                    style: GoogleFonts.nunito(textStyle: TextStyle(fontSize: 12, color: HexColor('495057'))),
                                   ),
                                   SizedBox(height: 5),
                                   Text(
                                     "07",
                                     style: GoogleFonts.nunito(
-                                        textStyle: TextStyle(
-                                            fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('19AC81'))),
+                                        textStyle:
+                                            TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: HexColor('19AC81'))),
                                   ),
                                 ],
                               ),

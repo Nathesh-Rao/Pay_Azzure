@@ -10,10 +10,8 @@ import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Mod
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Models/PendingProcessFlowModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Models/PendingTaskModel.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 
 class ListItemDetailsController extends GetxController {
   AppStorage appStorage = AppStorage();
@@ -29,6 +27,8 @@ class ListItemDetailsController extends GetxController {
   var selected_processFlow_taskType = ''.obs;
 
   var ddSelectedValue = "Initiator".obs;
+  var ddSendToUsers_SelectedValue = "".obs;
+  var sendToUsersList = [].obs;
 
   fetchDetails({hasArgument = false, PendingProcessFlowModel? pendingProcessFlowModel = null}) async {
     LoadingScreen.show();
@@ -172,7 +172,7 @@ class ListItemDetailsController extends GetxController {
       "TaskType": pendingTaskModel!.tasktype ?? "",
       "Action": "Return",
       "StatusReason": "Performed by user",
-      "StatusText": "'+comments.text'",
+      "StatusText": comments.text,
       "ReturnTo": ddSelectedValue.value
     };
     LoadingScreen.show();
@@ -211,8 +211,8 @@ class ListItemDetailsController extends GetxController {
       "TaskType": pendingTaskModel!.tasktype ?? "",
       "Action": "Send",
       "StatusReason": "Performed by user",
-      "StatusText": "'+comments.text'",
-      "ReturnTo": ""
+      "StatusText": comments.text,
+      "SendTo": ddSendToUsers_SelectedValue
     };
     LoadingScreen.show();
     var url = Const.getFullARMUrl(ServerConnections.API_DO_TASK_ACTIONS);
@@ -274,6 +274,57 @@ class ListItemDetailsController extends GetxController {
 
   dropDownItemChanged(String? value) {
     if (value != null) ddSelectedValue.value = value;
+  }
+
+  dropdownMenuItem_sendToUsers() {
+    List<DropdownMenuItem<String>> myList = [];
+    for (var item in sendToUsersList) {
+      DropdownMenuItem<String> dditem = DropdownMenuItem(
+        value: item.toString(),
+        child: Text(item),
+      );
+      myList.add(dditem);
+    }
+    return myList;
+  }
+
+  dropDownItemChanged_SendToUsers(Object? value) {
+    if (value != null) ddSendToUsers_SelectedValue.value = value.toString();
+  }
+
+  getSendToUsers_List() async {
+    sendToUsersList.clear();
+    var url = Const.getFullARMUrl(ServerConnections.API_GET_SENDTOUSERS);
+    var body = {
+      "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
+      "TaskId": pendingTaskModel!.taskid ?? "",
+      "TaskType": pendingTaskModel!.tasktype ?? "",
+      "TaskName": pendingTaskModel!.taskname ?? "",
+      "KeyValue": pendingTaskModel!.keyvalue ?? ""
+    };
+    var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
+    LoadingScreen.dismiss();
+    if (!resp.toString().contains("error")) {
+      var jsonResp = jsonDecode(resp);
+      if (jsonResp['result']['success'].toString().toLowerCase() == "true") {
+        var jsonData = jsonDecode(resp)['result']['data'] as List;
+        sendToUsersList.clear();
+        for (var item in jsonData) {
+          String val = item["pusername"].toString();
+          sendToUsersList.add(val);
+        }
+        // sendToUsersList..sort((a, b) => a.toString().toLowerCase().compareTo(b.toString().toLowerCase()));
+        if (ddSendToUsers_SelectedValue.value == "") {
+          ddSendToUsers_SelectedValue.value = sendToUsersList[0];
+          dropDownItemChanged_SendToUsers(ddSendToUsers_SelectedValue);
+        }
+      } else {
+        Get.back();
+        showErrorSnack("Oops!", jsonResp['result']['message'].toString());
+      }
+    } else {
+      showErrorSnack("Oops!", "Some Error Occured");
+    }
   }
 
   void historyBtnClicked() {

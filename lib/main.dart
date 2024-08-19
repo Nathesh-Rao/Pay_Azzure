@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/Services/LocationServiceManager/LocationServiceManager.dart';
 import 'package:axpertflutter/Utils/FirebaseHandler/FirebaseMessagesHandler.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:axpertflutter/Utils/ServerConnections/InternetConnectivity.dart';
 import 'package:axpertflutter/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,11 +38,14 @@ Future<void> main() async {
   await FlutterDownloader.initialize(debug: true);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   initialize();
+  // initLocationService();
+  LogService.initLogs();
   await FirebaseMessaging.onMessage.listen(onMessageListener);
   FirebaseMessaging.onBackgroundMessage(onBackgroundMessageListner);
   await FirebaseMessaging.onMessageOpenedApp.listen(onMessageOpenAppListener);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   configureEasyLoading();
+  // configureLogging();
   if (Platform.isAndroid) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
@@ -77,9 +82,22 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.light,
       theme: Const.THEMEDATA,
       initialRoute: Routes.SplashScreen,
-      // initialRoute: Routes.LandingPage,
+      // initialRoute: Routes.SettingsPage,
       getPages: RoutePages.pages,
-      builder: EasyLoading.init(),
+      // builder: EasyLoading.init(),
+      builder: EasyLoading.init(
+        builder: (context, child) {
+          ErrorWidget.builder = (errorDetails) => Scaffold(
+                body: Center(
+                  child: InkWell(
+                      onTap: () => Get.toNamed(Routes.ProjectListingPage),
+                      child: Text("Some Error occurred. \n ${errorDetails.exception.toString()}")),
+                ),
+              );
+          if (child != null) return child;
+          throw StateError('widget is null');
+        },
+      ),
     );
   }
 }

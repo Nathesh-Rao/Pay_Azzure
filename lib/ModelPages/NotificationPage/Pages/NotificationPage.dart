@@ -17,7 +17,7 @@ class NotificationPage extends StatelessWidget {
       flutterLocalNotificationsPlugin.cancelAll();
       landingPageController = Get.find();
     } catch (e) {
-      landingPageController = Get.put(LandingPageController());
+      // landingPageController = Get.put(LandingPageController());
     }
   }
 
@@ -45,8 +45,12 @@ class NotificationPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Notifications"),
-          backgroundColor: Colors.white,
-          foregroundColor: MyColors.blue2,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(gradient: MyColors.updatedUIBackgroundGradient),
+          ),
+          // elevation: 0,
+          // backgroundColor: Colors.white,
+          foregroundColor: MyColors.white1,
           actions: [
             TextButton(
                 onPressed: () {
@@ -72,7 +76,7 @@ class NotificationPage extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 10),
                   child: Text(
                     "Clear All",
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ))
           ],
@@ -90,7 +94,10 @@ class NotificationPage extends StatelessWidget {
     unreadCount = max<int>(unreadCount, val);
 
     if (landingPageController.notificationPageRefresh.value == true) {
-      landingPageController.notificationPageRefresh.value = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        landingPageController.notificationPageRefresh.value = false;
+      });
+
       landingPageController.getNotificationList();
       return ListView.builder(
         itemBuilder: (context, index) {

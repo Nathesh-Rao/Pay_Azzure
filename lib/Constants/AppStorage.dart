@@ -23,6 +23,7 @@ class AppStorage {
   static const String WILL_AUTHENTICATE_FOR_USER = "WillAuthenticateForUser";
   static const String SHAREDPREF_NAME = "BackgroundMessages";
   static const String isShowNotifyEnabled = "isShowNotifyEnabled";
+  static const String isLogEnabled = "isLogEnabled";
   late final box;
 
   AppStorage() {

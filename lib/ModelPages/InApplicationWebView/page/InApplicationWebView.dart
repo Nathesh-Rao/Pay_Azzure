@@ -132,9 +132,9 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
       onWillPop: () async {
         if (await _webViewController.canGoBack()) {
           _webViewController.goBack();
-          return false;
+          return Future.value(false);
         } else {
-          return true;
+          return Future.value(true);
         }
       },
       child: Scaffold(
@@ -148,13 +148,9 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Image.asset(
-                        "assets/images/pay_azzure_text.png",
-                        height: 25,
+                        "assets/images/axAppLogo.png",
+                        // height: 25,
                       ),
-                      // Text(
-                      //   "xpert",
-                      //   style: TextStyle(fontFamily: 'Gellix-Black', color: HexColor("#133884"), fontWeight: FontWeight.bold),
-                      // ),
                     ],
                   ),
                 ),
@@ -174,18 +170,14 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   print("Requested url: ${downloadStartRequest.url.toString()}");
                   _download(downloadStartRequest.url.toString());
                 },
-                onCreateWindow: (controller, createWindowAction) async {
-                  print("Created: ${await controller.getUrl()}");
-                  return Future.value(true);
-                },
-                onProgressChanged: (controller, value) {
-                  print('Progress---: $value : DT ${DateTime.now()}');
-                  if (value == 100) {
-                    setState(() {
-                      _progressBarActive = false;
-                    });
-                  }
-                },
+                // onProgressChanged: (controller, value) {
+                //   print('Progress---: $value : DT ${DateTime.now()}');
+                //   if (value == 100) {
+                //     setState(() {
+                //       _progressBarActive = false;
+                //     });
+                //   }
+                // },
                 shouldOverrideUrlLoading: (controller, navigationAction) async {
                   var uri = navigationAction.request.url!;
                   print("Override url: $uri");

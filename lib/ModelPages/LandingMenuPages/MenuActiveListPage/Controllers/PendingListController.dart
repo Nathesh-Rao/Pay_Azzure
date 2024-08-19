@@ -3,12 +3,11 @@ import 'dart:convert';
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Models/BulkApprovalCountModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Models/PendingListModel.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../Models/BulkApprovalCountModel.dart';
 
 class PendingListController extends GetxController {
   var subPage = true.obs;
@@ -76,13 +75,14 @@ class PendingListController extends GetxController {
       'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID),
       "Trace": "false",
       "AppName": Const.PROJECT_NAME.toString(),
-      "pagesize": int.parse(pendingCount),
+      "pagesize": double.parse(pendingCount).toInt(),
       "pageno": 1,
     };
 
     var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
     if (resp != "") {
       var jsonResp = jsonDecode(resp);
+      print(jsonResp);
       if (jsonResp['result']['message'].toString() == "success") {
         activeList_Main.clear();
         var dataList = jsonResp['result']['pendingtasks'];

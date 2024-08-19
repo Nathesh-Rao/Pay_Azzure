@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:text_scroll/text_scroll.dart';
 
 class WidgetPendingListItem extends StatelessWidget {
   WidgetPendingListItem(this.pendingActiveListModel, {super.key});
@@ -98,7 +97,9 @@ class WidgetPendingListItem extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(Icons.person,),
+                    Icon(
+                      Icons.person,
+                    ),
                     SizedBox(
                       width: 5,
                     ),

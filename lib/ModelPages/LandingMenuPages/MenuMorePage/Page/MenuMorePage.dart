@@ -10,7 +10,8 @@ import 'package:hexcolor/hexcolor.dart';
 
 class MenuMorePage extends StatelessWidget {
   MenuMorePage({super.key});
-  final MenuMorePageController menuMorePageController = Get.put(MenuMorePageController());
+
+  final MenuMorePageController menuMorePageController = Get.find(); //Get.put(MenuMorePageController());
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +96,7 @@ reBuild_old(MenuMorePageController menuMorePageController) {
                       //print("valuen: $mainIndex");
                       return Container(
                         margin: EdgeInsets.only(bottom: 15),
-                        decoration: BoxDecoration(
-                            border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
+                        decoration: BoxDecoration(border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
                         child: Theme(
                           data: ThemeData().copyWith(dividerColor: Colors.transparent),
                           child: ExpansionTile(
@@ -105,8 +105,7 @@ reBuild_old(MenuMorePageController menuMorePageController) {
                               menuMorePageController.fetchList[mainIndex].toString(),
                               textAlign: TextAlign.left,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
-                                  textStyle: TextStyle(color: HexColor("#3E4153"), fontSize: 14, fontWeight: FontWeight.w900)),
+                              style: GoogleFonts.poppins(textStyle: TextStyle(color: HexColor("#3E4153"), fontSize: 14, fontWeight: FontWeight.w900)),
                             ),
                             children: [
                               SizedBox(height: 3),
@@ -128,8 +127,7 @@ reBuild_old(MenuMorePageController menuMorePageController) {
                                 // itemCount: 200,
                                 itemBuilder: (context, index) {
                                   print("value mainIndex, subIndex: $mainIndex $index");
-                                  return getGridItem(
-                                      menuMorePageController, menuMorePageController.getSubmenuItemList(mainIndex)[index], index);
+                                  return getGridItem(menuMorePageController, menuMorePageController.getSubmenuItemList(mainIndex)[index], index);
                                 },
                               )
                             ],
@@ -220,8 +218,7 @@ reBuild(MenuMorePageController menuMorePageController) {
           //print("valuen: $mainIndex");
           return Container(
             margin: EdgeInsets.only(bottom: 10, top: 10),
-            decoration:
-                BoxDecoration(border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(border: Border.all(width: 1, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
             child: Theme(
               data: ThemeData().copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
@@ -230,8 +227,7 @@ reBuild(MenuMorePageController menuMorePageController) {
                   menuMorePageController.fetchList[mainIndex].toString(),
                   textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
-                      textStyle: TextStyle(color: HexColor("#3E4153"), fontSize: 14, fontWeight: FontWeight.w900)),
+                  style: GoogleFonts.poppins(textStyle: TextStyle(color: HexColor("#3E4153"), fontSize: 14, fontWeight: FontWeight.w900)),
                 ),
                 children: [
                   SizedBox(height: 3),
@@ -253,8 +249,7 @@ reBuild(MenuMorePageController menuMorePageController) {
                     // itemCount: 200,
                     itemBuilder: (context, index) {
                       print("value mainIndex, subIndex: $mainIndex $index");
-                      return getGridItem(
-                          menuMorePageController, menuMorePageController.getSubmenuItemList(mainIndex)[index], index);
+                      return getGridItem(menuMorePageController, menuMorePageController.getSubmenuItemList(mainIndex)[index], index);
                     },
                   )
                 ],

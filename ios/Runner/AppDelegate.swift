@@ -2,6 +2,7 @@ import UIKit
 import Flutter
 import FirebaseCore
 import flutter_downloader
+// import background_location_tracker
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -15,6 +16,9 @@ import flutter_downloader
       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
     }
     GeneratedPluginRegistrant.register(with: self)
+//      BackgroundLocationTrackerPlugin.setPluginRegistrantCallback { registry in
+//         GeneratedPluginRegistrant.register(with: registry)
+//     }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

@@ -350,8 +350,10 @@ class AddConnectionController extends GetxController {
       var json = jsonDecode(response);
       if (json["result"]["message"].toString().toLowerCase() == "success")
         return true;
-      else
+      else {
         errName.value = json["result"]["message"].toString();
+        return false;
+      }
     }
     return false;
   }

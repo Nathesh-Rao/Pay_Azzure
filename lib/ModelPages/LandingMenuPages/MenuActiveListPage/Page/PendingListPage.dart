@@ -1,4 +1,6 @@
+import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
+import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Controllers/ListItemDetailsController.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Controllers/PendingListController.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Widgets/WidgetDottedSeparator.dart';
@@ -8,10 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-
-import '../../../../Constants/AppStorage.dart';
-import '../../../../Constants/CommonMethods.dart';
-import '../../../../Constants/const.dart';
 
 class PendingListPage extends StatelessWidget {
   PendingListPage({super.key});
@@ -200,51 +198,55 @@ reBuild(PendingListController pendingListController, BuildContext context) {
               (pendingListController.pending_activeList.length == 0 && !pendingListController.isLoading.value) ? true : false,
           child: WidgetNoDataFound()),
 
-      Expanded(
-          child: ListView.separated(
-              itemBuilder: (context, index) {
-                return ListTile(
-                  onTap: () {
-                    print(pendingListController.pending_activeList[index].toJson());
-                    switch (pendingListController.pending_activeList[index].tasktype.toString().toUpperCase()) {
-                      case "MAKE":
-                        var URL = CommonMethods.activeList_CreateURL_MAKE(pendingListController.pending_activeList[index], index);
-                        if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
-                        break;
-                        break;
-                      case "CHECK":
-                      case "APPROVE":
-                        ListItemDetailsController listItemDetailsController = Get.put(ListItemDetailsController());
-                        listItemDetailsController.openModel = pendingListController.pending_activeList[index];
+      Visibility(
+        visible: pendingListController.pending_activeList.length != 0,
+        child: Expanded(
+            child: ListView.separated(
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    onTap: () {
+                      print(pendingListController.pending_activeList[index].toJson());
+                      switch (pendingListController.pending_activeList[index].tasktype.toString().toUpperCase()) {
+                        case "MAKE":
+                          var URL =
+                              CommonMethods.activeList_CreateURL_MAKE(pendingListController.pending_activeList[index], index);
+                          if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
+                          break;
+                          break;
+                        case "CHECK":
+                        case "APPROVE":
+                          ListItemDetailsController listItemDetailsController = Get.put(ListItemDetailsController());
+                          listItemDetailsController.openModel = pendingListController.pending_activeList[index];
 
-                        Get.toNamed(Routes.ProjectListingPageDetails);
-                        break;
-                      case "":
-                      case "NULL":
-                      case "CACHED SAVE":
-                        var URL =
-                            CommonMethods.activeList_CreateURL_MESSAGE(pendingListController.pending_activeList[index], index);
-                        if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
-                        break;
-                      default:
-                        break;
-                    }
-                  },
-                  title: WidgetPendingListItem(pendingListController.pending_activeList[index]),
-                );
-                // return GestureDetector(
-                //     onTap: () {
-                //       Get.toNamed(Routes.ProjectListingPageDetails);
-                //     },
-                //     child: WidgetListItem(pendingListController.pending_activeList[index]));
-              },
-              separatorBuilder: (context, index) {
-                return Container(
-                  height: 20,
-                  child: WidgetDottedSeparator(),
-                );
-              },
-              itemCount: pendingListController.pending_activeList.length))
+                          Get.toNamed(Routes.ProjectListingPageDetails);
+                          break;
+                        case "":
+                        case "NULL":
+                        case "CACHED SAVE":
+                          var URL =
+                              CommonMethods.activeList_CreateURL_MESSAGE(pendingListController.pending_activeList[index], index);
+                          if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
+                          break;
+                        default:
+                          break;
+                      }
+                    },
+                    title: WidgetPendingListItem(pendingListController.pending_activeList[index]),
+                  );
+                  // return GestureDetector(
+                  //     onTap: () {
+                  //       Get.toNamed(Routes.ProjectListingPageDetails);
+                  //     },
+                  //     child: WidgetListItem(pendingListController.pending_activeList[index]));
+                },
+                separatorBuilder: (context, index) {
+                  return Container(
+                    height: 20,
+                    child: WidgetDottedSeparator(),
+                  );
+                },
+                itemCount: pendingListController.pending_activeList.length)),
+      )
     ],
   );
 }

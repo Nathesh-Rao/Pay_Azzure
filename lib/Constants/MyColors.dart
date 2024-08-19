@@ -59,4 +59,6 @@ class MyColors {
   static const Color buzzilybuttonblue = Color(0xFF006CFF);
   static const Color buzzilytext = Color(0xFF2b282b);
   static const Color buzzilybuttontext = Color(0xFF778085);
+  static const LinearGradient updatedUIBackgroundGradient =
+      LinearGradient(colors: [Color.fromRGBO(55, 100, 252, 1), Color.fromRGBO(151, 100, 218, 1)]);
 }

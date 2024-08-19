@@ -1,4 +1,3 @@
-import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Controllers/CompletedListController.dart';
@@ -151,51 +150,56 @@ class CompletedListPage extends StatelessWidget {
                 : false,
             child: WidgetNoDataFound()),
 
-        Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      print(completedListController.completed_activeList[index].toJson());
-                      switch (completedListController.completed_activeList[index].tasktype.toString().toUpperCase()) {
-                        case "MAKE":
-                          var URL =
-                              CommonMethods.activeList_CreateURL_MAKE(completedListController.completed_activeList[index], index);
-                          if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
-                          break;
-                        case "CHECK":
-                        case "APPROVE":
-                          ListItemDetailsController listItemDetailsController = Get.put(ListItemDetailsController());
-                          listItemDetailsController.openModel = completedListController.completed_activeList[index];
-                          Get.toNamed(Routes.ProjectListingPageDetails);
-                          break;
+        Visibility(
+          visible: completedListController.completed_activeList.length != 0,
+          child: Expanded(
+              child: ListView.separated(
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      onTap: () {
+                        print(completedListController.completed_activeList[index].toJson());
+                        switch (completedListController.completed_activeList[index].tasktype.toString().toUpperCase()) {
+                          case "MAKE":
+                            var URL = CommonMethods.activeList_CreateURL_MAKE(
+                                completedListController.completed_activeList[index], index);
+                            if (!URL.isEmpty)
+                              Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
+                            break;
+                          case "CHECK":
+                          case "APPROVE":
+                            ListItemDetailsController listItemDetailsController = Get.put(ListItemDetailsController());
+                            listItemDetailsController.openModel = completedListController.completed_activeList[index];
+                            Get.toNamed(Routes.ProjectListingPageDetails);
+                            break;
 
-                        case "":
-                        case "NULL":
-                        case "CACHED SAVE":
-                          var URL = CommonMethods.activeList_CreateURL_MESSAGE(
-                              completedListController.completed_activeList[index], index);
-                          if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
-                          break;
-                        default:
-                          break;
-                      }
-                    },
-                    title: WidgetCompletedListItem(completedListController.completed_activeList[index]),
-                  );
-                  // return GestureDetector(
-                  //     onTap: () {
-                  //       Get.toNamed(Routes.ProjectListingPageDetails);
-                  //     },
-                  //     child: WidgetListItem(completedListController.pending_activeList[index]));
-                },
-                separatorBuilder: (context, index) {
-                  return Container(
-                    height: 20,
-                    child: WidgetDottedSeparator(),
-                  );
-                },
-                itemCount: completedListController.completed_activeList.length))
+                          case "":
+                          case "NULL":
+                          case "CACHED SAVE":
+                            var URL = CommonMethods.activeList_CreateURL_MESSAGE(
+                                completedListController.completed_activeList[index], index);
+                            if (!URL.isEmpty)
+                              Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
+                            break;
+                          default:
+                            break;
+                        }
+                      },
+                      title: WidgetCompletedListItem(completedListController.completed_activeList[index]),
+                    );
+                    // return GestureDetector(
+                    //     onTap: () {
+                    //       Get.toNamed(Routes.ProjectListingPageDetails);
+                    //     },
+                    //     child: WidgetListItem(completedListController.pending_activeList[index]));
+                  },
+                  separatorBuilder: (context, index) {
+                    return Container(
+                      height: 20,
+                      child: WidgetDottedSeparator(),
+                    );
+                  },
+                  itemCount: completedListController.completed_activeList.length)),
+        )
       ],
     );
   }

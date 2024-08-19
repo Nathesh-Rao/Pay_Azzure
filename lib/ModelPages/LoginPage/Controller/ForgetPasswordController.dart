@@ -85,7 +85,7 @@ class ForgetPasswordController extends GetxController {
     if (vaidateForm()) {
       LoadingScreen.show();
       Map body = {'email': emailController.text.trim().toString()};
-      var url = Const.getFullARMUrl(ServerConnections.API_FORGETPASSWORD);
+      var url = Const.getFullARMUrl(ServerConnections.API_FORGOTPASSWORD);
       var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body));
       LoadingScreen.dismiss();
       if (resp.toString() != "") {

@@ -10,16 +10,18 @@ import 'package:axpertflutter/ModelPages/InApplicationWebView/page/WebViewCalend
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Page/MenuActiveListPage.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuDashboardPage/Page/MenuDashboardPage.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Page/MenuHomePage.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Controllers/MenuMorePageController.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Models/MenuItemModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Page/MenuMorePage.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/UpdatedHomePage/Page/UpdatedHomePage.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Models/FirebaseMessageModel.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetNotification.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -29,6 +31,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 class LandingPageController extends GetxController with WidgetsBindingObserver {
+  final MenuMorePageController menuMorePageController = Get.put(MenuMorePageController());
   TextEditingController userCtrl = TextEditingController();
   TextEditingController oPassCtrl = TextEditingController();
   TextEditingController nPassCtrl = TextEditingController();
@@ -63,7 +66,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
 
   getPage() {
     if (bottomIndex.value == 0) {
-      return MenuHomePage();
+      return UpdatedHomePage();
       // return MenuHomePage();
     }
     return pageList[bottomIndex.value];
@@ -76,16 +79,18 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     userCtrl.text = userName.value;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       pageList = [
-        MenuHomePage(),
+        // MenuHomePage(),
+        UpdatedHomePage(),
         // WebViewActiveList(),
         MenuActiveListPage(),
         MenuDashboardPage(),
         // MenuCalendarPage(),
         WebViewCalendar(),
-        MenuMorePage(),
+        //MenuMorePage(),
       ];
     });
     showChangePassword_PopUp();
+
     getBiometricStatus();
   }
 
@@ -636,8 +641,6 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   }
 
   getDrawerTileList() {
-    MenuMorePageController menuMorePageController = Get.find();
-
     List<Widget> menuList = [];
     menuList.add(
       Container(
@@ -670,7 +673,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         ),
       ),
     );
-    var index;
+    /*var index;
     var masterIndex = 0;
     for (var item in menuMorePageController.finalMenuHeader) {
       index = 0;
@@ -682,7 +685,10 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         children: getDrawerInnerListTile(menuMorePageController, item, index).toList(),
       );
       menuList.add(wid2);
-    }
+    }*/
+    var a = menuMorePageController.menu_finalList.map(build_innerListTile).toList();
+    menuList.addAll(a);
+
     if (menuList.length == 1) {
       menuList.add(ListTile(
         onTap: () {
@@ -746,6 +752,40 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     ));
 
     return menuList;
+  }
+
+  Widget build_innerListTile(tile, {double leftPadding = 15}) {
+    MenuItemNewmModel model_tile = tile;
+    if (model_tile.childList.isEmpty) {
+      return Visibility(
+        visible: model_tile.visible.toUpperCase() == "T",
+        child: InkWell(
+          onTap: () {
+            menuMorePageController.openItemClick(model_tile);
+            Get.back();
+          },
+          child: ListTile(
+            leading: Icon(menuMorePageController.generateIcon(tile, 1)),
+            contentPadding: EdgeInsets.only(left: leftPadding),
+            title: Text(
+              model_tile.caption,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Visibility(
+        visible: model_tile.visible.toUpperCase() == "T",
+        child: ExpansionTile(
+          leading: Icon(menuMorePageController.generateIcon(tile, 1)),
+          tilePadding: EdgeInsets.only(left: leftPadding, right: 10),
+          title: Text(tile.caption),
+          children: ListTile.divideTiles(
+              context: Get.context,
+              tiles: model_tile.childList.map((tile) => build_innerListTile(tile, leftPadding: leftPadding + 15))).toList(),
+        ),
+      );
+    }
   }
 
   getDrawerInnerListTile(MenuMorePageController menuMorePageController, item, index) {

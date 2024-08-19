@@ -13,7 +13,7 @@ class MenuDashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Visibility(visible: false, child: WidgetSlidingNotificationPanel()),
+        WidgetSlidingNotificationPanel(),
         SizedBox(height: 5),
         Visibility(visible: menuDashboardController.chartList.length == 0 ? true : false, child: WidgetNoDataFound()),
         Expanded(
