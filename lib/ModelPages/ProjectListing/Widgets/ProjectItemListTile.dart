@@ -96,7 +96,7 @@ class ProjectItemListTile extends StatelessWidget {
                 icon: const Icon(Icons.delete, size: 28, color: MyColors.red),
                 tooltip: 'Delete',
                 onPressed: () async {
-                  // addConnectionController.delete(keyValue);
+                  addConnectionController.delete(keyValue);
                 },
               ),
             ])),

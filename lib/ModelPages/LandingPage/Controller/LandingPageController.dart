@@ -130,7 +130,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  "Log in to your Buzzily account using your phone's biometric credentials.",
+                  "Log in to your PayAzzure account using your phone's biometric credentials.",
                   style: GoogleFonts.poppins(
                       textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.grey.shade600)),
                   textAlign: TextAlign.center,

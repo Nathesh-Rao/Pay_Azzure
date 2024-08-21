@@ -311,6 +311,39 @@ class ForgetPassword extends StatelessWidget {
                           ),
                           SizedBox(height: 30),
                           TextField(
+                            controller: forgetPasswordController.userNameController,
+                            textInputAction: TextInputAction.next,
+                            //keyboardType: TextInputType.emailAddress,
+                            //  enabled: false,
+                            decoration: InputDecoration(
+                              hintText: 'User Name',
+                              errorText: forgetPasswordController.errUserName.value == ""
+                                  ? null
+                                  : forgetPasswordController.errUserName.value,
+                              hintStyle: const TextStyle(
+                                fontSize: 15,
+                              ),
+                              filled: true,
+                              fillColor: MyColors.buzzilygrey,
+                              labelStyle: const TextStyle(
+                                fontSize: 15,
+                                fontFamily: 'Proxima_Nova_Regular',
+                              ),
+                              contentPadding: const EdgeInsets.only(left: 10),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: MyColors.white1,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.blueGrey),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
                             controller: forgetPasswordController.emailController,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.emailAddress,

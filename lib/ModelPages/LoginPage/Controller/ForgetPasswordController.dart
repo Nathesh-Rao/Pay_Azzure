@@ -9,10 +9,12 @@ import 'package:get/get.dart';
 
 class ForgetPasswordController extends GetxController {
   TextEditingController emailController = TextEditingController();
+  TextEditingController userNameController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
   ServerConnections serverConnections = ServerConnections();
+  var errUserName = ''.obs;
   var showPass = false.obs;
   var showConPass = false.obs;
   var showOTP = false.obs;
@@ -35,6 +37,10 @@ class ForgetPasswordController extends GetxController {
 
   bool vaidateForm() {
     emailError.value = '';
+    if (userNameController.text.toString().trim() == "") {
+      errUserName.value = "Enter User Name";
+      return false;
+    }
     if (emailController.text.trim() == "") {
       emailError.value = "Please Enter Email ID";
       return false;
@@ -81,7 +87,7 @@ class ForgetPasswordController extends GetxController {
     return true;
   }
 
-  void proceedButtonClicked() async {
+  /*void proceedButtonClicked() async {
     if (vaidateForm()) {
       LoadingScreen.show();
       Map body = {'email': emailController.text.trim().toString()};
@@ -100,6 +106,45 @@ class ForgetPasswordController extends GetxController {
           otpLength.value = jsonMsg["result"]["otplength"];
           OTPSent.value = true;
           startTimer();
+        }
+      }
+    }
+  }*/
+
+  void proceedButtonClicked() async {
+    if (vaidateForm()) {
+      LoadingScreen.show();
+      Map body = {
+        "appname": Const.PROJECT_NAME,
+        "username": userNameController.text.toString().trim(),
+        "usergroup": "Power",
+        'email': emailController.text.trim().toString()
+      };
+      var url = Const.getFullARMUrl(ServerConnections.API_FORGOTPASSWORD);
+      var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body));
+      LoadingScreen.dismiss();
+      if (resp.toString() != "") {
+        var jsonMsg = jsonDecode(resp);
+        print(jsonMsg);
+        if (jsonMsg['result']['success'].toString() == "false") {
+          Get.snackbar("Alert!", jsonMsg['result']['message'],
+              snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
+        } else {
+          Get.defaultDialog(
+              title: "Success",
+              middleText: "  Password is reset and sent to your email  ",
+              confirm: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.back();
+                  },
+                  child: Text("OK")));
+
+          /*  otpAttempts.value = jsonMsg["result"]["otpattemptsleft"];
+          regID.value = jsonMsg["result"]["regid"];
+          otpLength.value = jsonMsg["result"]["otplength"];
+          OTPSent.value = true;
+          startTimer();*/
         }
       }
     }
