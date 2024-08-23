@@ -25,8 +25,7 @@ class SettingsPage extends StatelessWidget {
         children: [
           Container(
             height: 330,
-            decoration: BoxDecoration(
-                gradient: MyColors.updatedUIBackgroundGradient, borderRadius: BorderRadius.vertical(bottom: Radius.circular(0))),
+            decoration: BoxDecoration(color: MyColors.blue2, borderRadius: BorderRadius.vertical(bottom: Radius.circular(0))),
           ),
           SafeArea(
             child: Padding(

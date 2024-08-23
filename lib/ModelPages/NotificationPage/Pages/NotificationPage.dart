@@ -46,7 +46,7 @@ class NotificationPage extends StatelessWidget {
         appBar: AppBar(
           title: Text("Notifications"),
           flexibleSpace: Container(
-            decoration: BoxDecoration(gradient: MyColors.updatedUIBackgroundGradient),
+            decoration: BoxDecoration(color: MyColors.blue2),
           ),
           // elevation: 0,
           // backgroundColor: Colors.white,

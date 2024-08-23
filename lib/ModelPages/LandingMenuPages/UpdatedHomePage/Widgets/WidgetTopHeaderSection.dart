@@ -30,19 +30,20 @@ class WidgetTopHeaderSection extends StatelessWidget {
                   child: Text(
                     "Hello, ${CommonMethods.capitalize(landingPageController.userName.value)}",
                     // + CommonMethods.capitalize(landingPageController.userName.value),
-                    style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+                    style:
+                        GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
                   ),
                 ),
               )),
           Padding(
             padding: EdgeInsets.only(left: 20),
             child: Container(
-              // padding: EdgeInsets.only(top: 1),
-              child: Text(
-                "Agile Labs Pvt. Ltd.",
-                style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 14, color: Colors.white)),
-              ),
-            ),
+                // padding: EdgeInsets.only(top: 1),
+                // child: Text(
+                //   "Agile Labs Pvt. Ltd.",
+                //   style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 14, color: Colors.white)),
+                // ),
+                ),
           ),
           Container(
               width: double.maxFinite,
@@ -58,7 +59,7 @@ class WidgetTopHeaderSection extends StatelessWidget {
                     title: SubstringHighlight(
                       text: item.caption,
                       term: menuMorePageController.searchController.text,
-                      textStyleHighlight: TextStyle(fontWeight:FontWeight.w700),
+                      textStyleHighlight: TextStyle(fontWeight: FontWeight.w700),
                     ), //Text(item.caption),
                   );
                 },

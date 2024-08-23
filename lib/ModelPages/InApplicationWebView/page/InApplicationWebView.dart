@@ -15,6 +15,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:file_downloader_flutter/file_downloader_flutter.dart';
 
 class InApplicationWebViewer extends StatefulWidget {
   InApplicationWebViewer(this.data);
@@ -70,43 +71,50 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
 
   void _download(String url) async {
     if (Platform.isAndroid) {
-      final deviceInfo = await DeviceInfoPlugin().androidInfo;
-      var status;
-      if (deviceInfo.version.sdkInt > 32) {
-        status = await Permission.photos.request().isGranted;
-        print(">32");
-      } else {
-        status = await Permission.storage.request().isGranted;
-      }
-      if (status) {
-        Fluttertoast.showToast(
-            msg: "Download Started...",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green.shade200,
-            textColor: Colors.black,
-            fontSize: 16.0);
-
-        await FileDownloader.downloadFile(
-          url: url,
-          onProgress: (fileName, progress) {
-            // print("On Progressssss");
-          },
-          onDownloadError: (errorMessage) {
-            Get.snackbar("Error", "Download file error " + errorMessage,
-                snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red.shade300, colorText: Colors.white);
-          },
-          onDownloadCompleted: (path) {
-            // print("Download Completed:   $path");
-            //OpenFile.open(path);
-            OpenFile.open(path);
-          },
-        );
-      } else {
-        print('Permission Denied');
+      try {
+        FileDownloaderFlutter().urlFileSaver(url: url);
+      } catch (e) {
+        print(e.toString());
       }
     }
+    // if (Platform.isAndroid) {
+    //   final deviceInfo = await DeviceInfoPlugin().androidInfo;
+    //   var status;
+    //   if (deviceInfo.version.sdkInt > 32) {
+    //     status = await Permission.photos.request().isGranted;
+    //     print(">32");
+    //   } else {
+    //     status = await Permission.storage.request().isGranted;
+    //   }
+    //   if (status) {
+    //     Fluttertoast.showToast(
+    //         msg: "Download Started...",
+    //         toastLength: Toast.LENGTH_SHORT,
+    //         gravity: ToastGravity.BOTTOM,
+    //         timeInSecForIosWeb: 1,
+    //         backgroundColor: Colors.green.shade200,
+    //         textColor: Colors.black,
+    //         fontSize: 16.0);
+    //
+    //     await FileDownloader.downloadFile(
+    //       url: url,
+    //       onProgress: (fileName, progress) {
+    //         // print("On Progressssss");
+    //       },
+    //       onDownloadError: (errorMessage) {
+    //         Get.snackbar("Error", "Download file error " + errorMessage,
+    //             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red.shade300, colorText: Colors.white);
+    //       },
+    //       onDownloadCompleted: (path) {
+    //         // print("Download Completed:   $path");
+    //         //OpenFile.open(path);
+    //         OpenFile.open(path);
+    //       },
+    //     );
+    //   } else {
+    //     print('Permission Denied');
+    //   }
+    // }
     if (Platform.isIOS) {
       var status = await Permission.storage.request().isGranted;
       if (status) {
@@ -170,14 +178,18 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   print("Requested url: ${downloadStartRequest.url.toString()}");
                   _download(downloadStartRequest.url.toString());
                 },
-                // onProgressChanged: (controller, value) {
-                //   print('Progress---: $value : DT ${DateTime.now()}');
-                //   if (value == 100) {
-                //     setState(() {
-                //       _progressBarActive = false;
-                //     });
-                //   }
-                // },
+                onConsoleMessage: (controller, consoleMessage) {
+                  print("Console Message received");
+                  print(consoleMessage.toString());
+                },
+                onProgressChanged: (controller, value) {
+                  print('Progress---: $value : DT ${DateTime.now()}');
+                  if (value == 100) {
+                    setState(() {
+                      _progressBarActive = false;
+                    });
+                  }
+                },
                 shouldOverrideUrlLoading: (controller, navigationAction) async {
                   var uri = navigationAction.request.url!;
                   print("Override url: $uri");

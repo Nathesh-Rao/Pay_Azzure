@@ -1,3 +1,4 @@
+import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/LandingPageController.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetDisplayProfileDetails.dart';
@@ -14,13 +15,7 @@ class WidgetLandingAppBarUpdated extends StatelessWidget implements PreferredSiz
       elevation: 0,
       foregroundColor: Colors.white,
       flexibleSpace: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-          colors: [
-            Color.fromRGBO(55, 100, 252, 1),
-            Color.fromRGBO(151, 100, 218, 1),
-          ],
-        )),
+        decoration: BoxDecoration(color: MyColors.blue2),
       ),
       title: Container(
         child: Row(

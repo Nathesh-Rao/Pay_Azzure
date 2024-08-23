@@ -30,7 +30,7 @@ class UpdatedHomePage extends StatelessWidget {
                     child: Container(
                       // margin: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
-                        gradient: MyColors.updatedUIBackgroundGradient,
+                        color: MyColors.blue2,
                         // borderRadius: BorderRadius.only(bottomRight: Radius.circular(70)),
                       ),
                       child: Column(

@@ -70,6 +70,8 @@ dependencies:
   flutter_typeahead: ^5.2.0
   substring_highlight: ^1.0.33
   location: ^7.0.0
+  file_downloader_flutter: ^0.0.5
+#  simple_downloader: ^0.0.3+1
 #  background_location_tracker: ^1.4.3
 
 
@@ -133,6 +135,7 @@ flutter:
 
 
 #        - asset: assets/fonts/Poppins-Medium.ttf
+
 
 
   #   - family: Trajan Pro
