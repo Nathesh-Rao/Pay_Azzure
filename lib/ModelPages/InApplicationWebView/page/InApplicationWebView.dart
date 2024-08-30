@@ -112,9 +112,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     //       },
     //     );
     //   } else {
-    //     print('Permission Denied');
-    //   }
-    // }
+
     if (Platform.isIOS) {
       var status = await Permission.storage.request().isGranted;
       if (status) {
