@@ -2,6 +2,7 @@ import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/LandingPageController.dart';
 import 'package:axpertflutter/ModelPages/SettingsPage/Controller/SettingsPageController.dart';
 import 'package:axpertflutter/Utils/LogServices/LogService.dart';
@@ -15,6 +16,7 @@ class SettingsPage extends StatelessWidget {
 
   final SettingsPageController settingsPageController = Get.put(SettingsPageController());
   final LandingPageController landingPageController = Get.find();
+  final MenuHomePageController menuHomePageController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -90,22 +92,25 @@ class SettingsPage extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 30),
-                            Column(
+                            Obx(() => Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  CommonMethods.capitalize(landingPageController.userName.value),
+                                  CommonMethods.capitalize(menuHomePageController.client_info_userNickname.value != "" ? menuHomePageController.client_info_userNickname.value : landingPageController.userName.value),
                                   maxLines: 2,
                                   style: GoogleFonts.poppins(
                                       textStyle: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w600)),
                                 ),
-                                Text(
-                                  "Agile Labs Pvt. Ltd.",
-                                  style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 15)),
+                                Visibility(
+                                  visible: menuHomePageController.client_info_companyTitle.value != "",
+                                  child: Text(
+                                    menuHomePageController.client_info_companyTitle.value,
+                                    style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 15)),
+                                  ),
                                 ),
                               ],
-                            )
+                            )),
                           ],
                         ),
                       ),

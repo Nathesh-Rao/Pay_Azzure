@@ -50,6 +50,7 @@ class WidgetUpdatedCards extends StatelessWidget {
                 //   size: 40,
                 // ),
               ),
+              SizedBox(height: 10),
               Text(
                 cardModel.caption,
                 style: GoogleFonts.poppins(
@@ -59,7 +60,7 @@ class WidgetUpdatedCards extends StatelessWidget {
               ),
               SizedBox(height: 5),
               Text(
-                cardModel.pagecaption.toString(),
+                cardModel.carddesc.toString(),
                 style: GoogleFonts.poppins(textStyle: TextStyle(fontSize: 12, color: HexColor("3E4153").withOpacity(0.7))),
                 maxLines: 2,
                 textAlign: TextAlign.center,

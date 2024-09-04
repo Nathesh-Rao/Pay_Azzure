@@ -18,6 +18,7 @@ class UpdatedHomePage extends StatelessWidget {
   final MenuHomePageController menuHomePageController = Get.find();
   final LandingPageController landingPageController = Get.find();
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -42,6 +42,8 @@ class ServerConnections {
   static const String API_GET_BULK_APPROVAL_COUNT = "api/v1/ARMGetBulkApprovalCount";
   static const String API_GET_BULK_ACTIVETASKS = "api/v1/ARMGetBulkActiveTasks";
   static const String API_GET_SENDTOUSERS = "api/v1/ARMGetSendToUsers";
+  static const String API_GET_FILE_BY_RECORDID = "api/v1/GetFileByRecordId";
+
 
   AppStorage appStorage = AppStorage();
 

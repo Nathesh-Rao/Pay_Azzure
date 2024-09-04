@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/LandingPageController.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetDisplayProfileDetails.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +10,9 @@ import 'package:get/get.dart';
 
 class WidgetLandingAppBarUpdated extends StatelessWidget implements PreferredSizeWidget {
   WidgetLandingAppBarUpdated({super.key});
+
   LandingPageController landingPageController = Get.find();
+  MenuHomePageController menuHomePageController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +22,25 @@ class WidgetLandingAppBarUpdated extends StatelessWidget implements PreferredSiz
       flexibleSpace: Container(
         decoration: BoxDecoration(color: MyColors.blue2),
       ),
+      titleSpacing: 5,
       title: Container(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Image.asset(
-              "assets/images/pay_azzure_text.png",
-              // height: 35,
-              // width: 25,
+              "assets/images/axAppLogo.png",
+              height: 40,
+              width: 40,
             ),
+            SizedBox(width: 5),
+            Obx(() => Visibility(
+                  visible: menuHomePageController.client_info_logo_base64String.value != "",
+                  child: Image.memory(
+                    base64Decode(menuHomePageController.client_info_logo_base64String.value),
+                    height: 40,
+                    width: 40,
+                  ),
+                )),
           ],
         ),
       ),

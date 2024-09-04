@@ -19,7 +19,9 @@ import 'package:file_downloader_flutter/file_downloader_flutter.dart';
 
 class InApplicationWebViewer extends StatefulWidget {
   InApplicationWebViewer(this.data);
+
   String data;
+
   @override
   State<InApplicationWebViewer> createState() => _InApplicationWebViewerState();
 }
@@ -27,8 +29,10 @@ class InApplicationWebViewer extends StatefulWidget {
 class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
   dynamic argumentData = Get.arguments;
   MenuHomePageController menuHomePageController = Get.find();
+
   // final Completer<InAppWebViewController> _controller = Completer<InAppWebViewController>();
   late InAppWebViewController _webViewController;
+
   // final _key = UniqueKey();
   var hasAppBar = false;
   bool _progressBarActive = true;
@@ -72,7 +76,10 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
   void _download(String url) async {
     if (Platform.isAndroid) {
       try {
-        FileDownloaderFlutter().urlFileSaver(url: url);
+        print("download Url: $url");
+        String fname = url.split('/').last.split('.').first;
+        print("download FileName: $fname");
+        FileDownloaderFlutter().urlFileSaver(url: url,fileName: fname);
       } catch (e) {
         print(e.toString());
       }
@@ -179,6 +186,15 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                 onConsoleMessage: (controller, consoleMessage) {
                   print("Console Message received");
                   print(consoleMessage.toString());
+                  if (consoleMessage.toString().contains("axm_mainpageloaded")) {
+                    try {
+                      if (menuHomePageController.switchPage.value == true) {
+                        menuHomePageController.switchPage.toggle();
+                      } else {
+                        Get.back();
+                      }
+                    } catch (e) {}
+                  }
                 },
                 onProgressChanged: (controller, value) {
                   print('Progress---: $value : DT ${DateTime.now()}');

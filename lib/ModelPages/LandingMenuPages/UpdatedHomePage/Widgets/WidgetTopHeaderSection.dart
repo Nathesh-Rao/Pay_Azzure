@@ -1,5 +1,6 @@
 import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Controllers/MenuMorePageController.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Models/MenuItemModel.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/LandingPageController.dart';
@@ -15,6 +16,7 @@ class WidgetTopHeaderSection extends StatelessWidget {
 
   final LandingPageController landingPageController = Get.find();
   final MenuMorePageController menuMorePageController = Get.find();
+  final MenuHomePageController menuHomePageController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +25,38 @@ class WidgetTopHeaderSection extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Obx(() => Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Container(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Text(
-                    "Hello, ${CommonMethods.capitalize(landingPageController.userName.value)}",
-                    // + CommonMethods.capitalize(landingPageController.userName.value),
-                    style:
-                        GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          Obx(() => Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Visibility(
+                    visible: menuHomePageController.client_info_companyTitle.value != "",
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Container(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Text(
+                          menuHomePageController.client_info_companyTitle.value,
+                          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Container(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Text(
+                        "Hello, ${CommonMethods.capitalize(menuHomePageController.client_info_userNickname.value != "" ? menuHomePageController.client_info_userNickname.value : landingPageController.userName.value)}",
+                        // + CommonMethods.capitalize(landingPageController.userName.value),
+                        style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: menuHomePageController.client_info_companyTitle.value != "" ? FontWeight.w500 : FontWeight.w700)),
+                      ),
+                    ),
+                  )
+                ],
               )),
           Padding(
             padding: EdgeInsets.only(left: 20),

@@ -112,14 +112,14 @@ class AddConnectionController extends GetxController {
         //check whether the entered Connection name is proper
         Future<bool> isValidConnName = validateConnectionName(baseUrl);
         if (await isValidConnName) {
-          projectModel = ProjectModel(conNameController.text.trim(), webUrlController.text.trim(), armUrlController.text.trim(),
-              conCaptionController.text.trim());
-          conNameController.text = "";
+          projectModel = ProjectModel(
+              conNameController.text.trim(), webUrlController.text.trim(), armUrlController.text.trim(), conCaptionController.text.trim());
+          /*conNameController.text = "";
           webUrlController.text = "";
           armUrlController.text = "";
-          conCaptionController.text = "";
+          conCaptionController.text = "";*/
           var json = projectModel.toJson();
-          saveDatAndRedirect(projectModel, json, isQr: true);
+          saveDatAndRedirect(projectModel, json, isQr: isQr);
         }
       }
       LoadingScreen.dismiss();
@@ -149,13 +149,13 @@ class AddConnectionController extends GetxController {
       } else {
         //project name is different from previous
         deleteExistingProjectWithProjectName(tempProjectName);
-        createFreshNewProject(projectModel, json);
-        projectListingController.needRefresh.value = true;
+        bool isSaved = createFreshNewProject(projectModel, json);
+        projectListingController.needRefresh.value = isSaved;
       }
     } else {
       //create a fresh one
-      createFreshNewProject(projectModel, json, isQr: isQr);
-      projectListingController.needRefresh.value = true;
+      bool isSaved = createFreshNewProject(projectModel, json, isQr: isQr);
+      projectListingController.needRefresh.value = isSaved;
     }
   }
 
@@ -168,20 +168,23 @@ class AddConnectionController extends GetxController {
       appStorage.storeValue(projectModel.projectname, json);
       appStorage.storeValue(AppStorage.PROJECT_LIST, jsonEncode(projectList));
       Get.back(result: "{refresh:true}");
+      return true;
     } else {
       projectList = jsonDecode(storedList);
       if (projectList.contains(projectModel.projectname)) {
-        Get.snackbar("Element already exists", "", snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar("Element already exists", "", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
         if (isQr) {
           Timer(Duration(seconds: 2), () {
             qrViewController!.resumeCamera();
           });
         }
+        return false;
       } else {
         projectList.add(projectModel.projectname);
         appStorage.storeValue(projectModel.projectname, json);
         appStorage.storeValue(AppStorage.PROJECT_LIST, jsonEncode(projectList));
         Get.back(result: "{refresh:true}");
+        return true;
       }
     }
   }

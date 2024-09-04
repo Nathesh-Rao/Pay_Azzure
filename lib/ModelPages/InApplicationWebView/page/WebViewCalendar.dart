@@ -4,7 +4,7 @@ import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplication
 import 'package:flutter/material.dart';
 
 class WebViewCalendar extends StatefulWidget {
-  final String weburl = Const.getFullProjectUrl('aspx/AxMain.aspx?pname=hMy%20Calendar&authKey=AXPERT-') +
+  final String weburl = Const.getFullProjectUrl('aspx/AxMain.aspx?pname=dcalendar&authKey=AXPERT-') +
       AppStorage().retrieveValue(AppStorage.SESSIONID);
 
   WebViewCalendar();
