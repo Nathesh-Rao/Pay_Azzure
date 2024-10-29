@@ -226,11 +226,15 @@ class MenuMorePageController extends GetxController {
     //To get the parent tree reverse the Map
     final reverseM = LinkedHashMap.fromEntries(map_menulist.entries.toList().reversed);
     reverseM.forEach((key, value) {
-      MenuItemNewmModel md = value;
-      var parent = md.parent;
-      if (parent != "") {
-        reverseM[parent].childList.insert(0, md);
-        keysToRemove.add(key);
+      try {
+        MenuItemNewmModel md = value;
+        var parent = md.parent;
+        if (parent != "") {
+          reverseM[parent].childList.insert(0, md);
+          keysToRemove.add(key);
+        }
+      } catch (e) {
+        print(e);
       }
     });
 

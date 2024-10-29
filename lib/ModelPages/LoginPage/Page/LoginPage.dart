@@ -357,7 +357,7 @@ class _LoginPageState extends State<LoginPage> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text(
-                                "Version: ${snapshot.data}_testRelease2",
+                                "Version: ${snapshot.data}_testRelease3",
                                 style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                         color: MyColors.buzzilyblack,

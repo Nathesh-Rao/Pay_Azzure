@@ -415,7 +415,7 @@ class MenuHomePageController extends GetxController {
         }
       }
     }
-    getImageFlieByRecordId(cl_recId, cl_imagePath);
+    if (!cl_recId.isEmpty && !cl_imagePath.isEmpty) getImageFlieByRecordId(cl_recId, cl_imagePath);
   }
 
   getImageFlieByRecordId(recID, filePath) async {
