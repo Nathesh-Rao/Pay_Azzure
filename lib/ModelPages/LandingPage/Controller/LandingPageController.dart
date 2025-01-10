@@ -30,6 +30,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:text_scroll/text_scroll.dart';
 
+import '../../LandingMenuPages/MenuHomePagePage/Models/BannerModel.dart';
+import '../Widgets/WidgetBanner.dart';
+
 class LandingPageController extends GetxController with WidgetsBindingObserver {
   final MenuMorePageController menuMorePageController = Get.put(MenuMorePageController());
   TextEditingController userCtrl = TextEditingController();
@@ -55,6 +58,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var unread;
   var toDay;
   final CarouselController carouselController = CarouselController();
+  final CarouselController carouselController_banner = CarouselController();
+  var carouselBannerIndex = 0.obs;
 
   DateTime currentBackPressTime = DateTime.now();
 
@@ -92,6 +97,51 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     showChangePassword_PopUp();
 
     getBiometricStatus();
+    getBannerDetailList();
+  }
+  var list_bannerItem = [].obs;
+  getBannerDetailList() async {
+    try {
+      list_bannerItem.clear();
+      var baseUrl = Const.PROJECT_URL;
+      baseUrl += baseUrl.endsWith("/") ? "" : "/";
+      var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
+      // url = "https://demo.agilecloud.biz/mainpagebanner.json";
+      final data = await serverConnections.getFromServer(url: url, show_errorSnackbar: false);
+      if (data != null && data != "") {
+        print("getBannerDetails1: $data");
+        var jsonResp = jsonDecode(data);
+        if (jsonResp.length > 0) {
+          list_bannerItem.clear();
+          for (var item in jsonResp) {
+            list_bannerItem.add(WidgetBanner(BannerModel.fromJson(item, baseUrl)));
+          }
+        }
+      } else {
+        if (Const.PROJECT_URL.endsWith("/")) {
+          var URL = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.length - 1);
+          baseUrl = URL.substring(0, URL.lastIndexOf('/'));
+        } else {
+          baseUrl = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.lastIndexOf('/'));
+        }
+
+        baseUrl += baseUrl.endsWith("/") ? "" : "/";
+        var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
+        final data = await serverConnections.getFromServer(url: url, show_errorSnackbar: false);
+        if (data != null && data != "") {
+          print("getBannerDetails2: $data");
+          var jsonResp = jsonDecode(data);
+          if (jsonResp.length > 0) {
+            list_bannerItem.clear();
+            for (var item in jsonResp) {
+              list_bannerItem.add(WidgetBanner(BannerModel.fromJson(item, baseUrl)));
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   getBiometricStatus() async {

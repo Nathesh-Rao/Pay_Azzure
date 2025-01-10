@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.2+1001
+version: 11.3.0+2
 
 
 environment:
@@ -56,7 +56,7 @@ dependencies:
   otp_text_field: ^1.1.3
   package_info_plus: ^4.2.0
   permission_handler: ^11.0.1
-  platform_device_id: ^1.0.1
+#  platform_device_id: ^1.0.1
   qr_code_scanner: ^1.0.1
   scan: ^1.6.0
   scrollable_positioned_list: ^0.3.8
@@ -73,10 +73,19 @@ dependencies:
   file_downloader_flutter: ^0.0.5
 #  simple_downloader: ^0.0.3+1
 #  background_location_tracker: ^1.4.3
-
+  platform_device_id:
+    git:
+      url: https://github.com/faridfedora/platform_device_id_kotlin_updated.git
+      ref: master
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+dependency_overrides:
+  flutter_inappwebview_ios:
+    git:
+      url: https://github.com/andychucs/flutter_inappwebview.git
+      ref: master
+      path: flutter_inappwebview_ios
 
 
 dev_dependencies:

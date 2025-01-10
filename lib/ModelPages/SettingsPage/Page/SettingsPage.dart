@@ -92,25 +92,29 @@ class SettingsPage extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 30),
-                            Obx(() => Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  CommonMethods.capitalize(menuHomePageController.client_info_userNickname.value != "" ? menuHomePageController.client_info_userNickname.value : landingPageController.userName.value),
-                                  maxLines: 2,
-                                  style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w600)),
-                                ),
-                                Visibility(
-                                  visible: menuHomePageController.client_info_companyTitle.value != "",
-                                  child: Text(
-                                    menuHomePageController.client_info_companyTitle.value,
-                                    style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 15)),
+                            Obx(() => Flexible(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        CommonMethods.capitalize(menuHomePageController.client_info_userNickname.value != ""
+                                            ? menuHomePageController.client_info_userNickname.value
+                                            : landingPageController.userName.value),
+                                        maxLines: 2,
+                                        style: GoogleFonts.poppins(
+                                            textStyle: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w600)),
+                                      ),
+                                      Visibility(
+                                        visible: menuHomePageController.client_info_companyTitle.value != "",
+                                        child: Text(
+                                          menuHomePageController.client_info_companyTitle.value,
+                                          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 15)),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            )),
+                                )),
                           ],
                         ),
                       ),

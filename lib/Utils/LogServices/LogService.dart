@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
@@ -46,6 +48,7 @@ class LogService {
   }
 
   static writeLog({String message = ""}) async {
+    _logWithColor(message, yellow);
     if (Const.isLogEnabled) {
       final file = await _localFile();
       var formatedDateTime = DateFormat("dd-MMM-yyyy HH:mm:ss:SSS").format(DateTime.now());
@@ -54,6 +57,8 @@ class LogService {
       } catch (e) {}
     }
   }
+
+  static const String yellow = '\u001B[33m';
 
   static clearLog() async {
     try {
@@ -64,5 +69,51 @@ class LogService {
         initLogs();
       }
     } catch (e) {}
+  }
+
+  // Experimental------------->
+  static writeLogAdv({
+    // LogType logType = LogType.REGULAR,
+    String message = '',
+  }) async {
+    if (Const.isLogEnabled) {
+      final file = await _localFile();
+      var formatedDateTime = DateFormat("dd-MMM-yyyy HH:mm:ss:SSS").format(DateTime.now());
+      try {
+        await file.writeAsString('$formatedDateTime: $log\n', mode: FileMode.append);
+      } catch (e) {}
+    }
+
+    _logWithColor(message, yellow);
+  }
+
+  static void _logWithColor(String message, String colorCode) {
+    print('$colorCode$message\u001B[0m');
+  }
+
+  String formatApiLog({
+    required String method,
+    required String url,
+    required String apiName,
+    required Map<String, dynamic> requestBody,
+    required int statusCode,
+    required Map<String, dynamic> responseBody,
+  }) {
+    String line = '═' * 70;
+    String boxLine = '─' * 70;
+
+    return '''
+╔$line╗
+║${'API CALL'.padLeft(36).padRight(70)}║
+╟$boxLine╢
+║ [${method.toUpperCase()}] URL: $url
+║ API Name: $apiName
+║ Request Body:
+║ ${requestBody.toString().split('\n').join('\n║ ')}
+║ Status Code: $statusCode
+║ Response:
+║ ${responseBody.toString().split('\n').join('\n║ ')}
+╚$line╝
+  ''';
   }
 }

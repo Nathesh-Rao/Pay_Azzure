@@ -1,15 +1,20 @@
 import 'package:axpertflutter/Constants/CommonMethods.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/UpdatedHomePage/Widgets/WidgetAttendancePanel.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/UpdatedHomePage/Widgets/WidgetQuickAccessPanel.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/UpdatedHomePage/Widgets/WidgetShortcutPanels.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/UpdatedHomePage/Widgets/WidgetTopHeaderSection.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/LandingPageController.dart';
+import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetBannerSliding.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetSlidingNotification.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../LandingPage/Widgets/WidgetKPIPanel.dart';
+import '../Widgets/WidgetAttendancePanel.dart';
+import '../Widgets/WidgetMenuFolderPanels.dart';
+import '../Widgets/WidgetQuickAccessPanel.dart';
+import '../Widgets/WidgetShortcutPanels.dart';
+import '../Widgets/WidgetTopHeaderSection.dart';
 
 class UpdatedHomePage extends StatelessWidget {
   UpdatedHomePage({super.key});
@@ -18,10 +23,11 @@ class UpdatedHomePage extends StatelessWidget {
   final MenuHomePageController menuHomePageController = Get.find();
   final LandingPageController landingPageController = Get.find();
 
-
   @override
   Widget build(BuildContext context) {
+    LogService.writeLog(message: "[>] UpdatedHomePage");
     return Scaffold(
+      // backgroundColor: MyColors.blue2,
       backgroundColor: Colors.grey.shade100,
       body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
@@ -31,7 +37,7 @@ class UpdatedHomePage extends StatelessWidget {
                     child: Container(
                       // margin: EdgeInsets.only(left: 10, right: 10),
                       decoration: BoxDecoration(
-                        color: MyColors.blue2,
+                        gradient: MyColors.updatedUIBackgroundGradient,
                         // borderRadius: BorderRadius.only(bottomRight: Radius.circular(70)),
                       ),
                       child: Column(
@@ -49,13 +55,20 @@ class UpdatedHomePage extends StatelessWidget {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                WidgetSlidingNotificationPanel(),
+                //Banner panel
+                WidgetBannerSlidingPanel(),
+
+                //WidgetSlidingNotificationPanel(),
+                //KPI panel
+                // Widgetkpipanel(),
                 //Attendance
                 WidgetAttendancePanel(),
                 //Quick Links
                 WidgetQuickAccessPanel(),
-                //add your panel here
+                //Home configuration panels
+                WidgetMenuFolderPanels(),
 
+                //add your panel here
                 //Till here
                 //keep it as it is
                 SizedBox(height: 100),
