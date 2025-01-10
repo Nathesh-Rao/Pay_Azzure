@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../LogServices/LogService.dart';
+
 class ServerConnections {
   static var client = http.Client();
   InternetConnectivity internetConnectivity = Get.find();
@@ -43,7 +45,7 @@ class ServerConnections {
   static const String API_GET_BULK_ACTIVETASKS = "api/v1/ARMGetBulkActiveTasks";
   static const String API_GET_SENDTOUSERS = "api/v1/ARMGetSendToUsers";
   static const String API_GET_FILE_BY_RECORDID = "api/v1/GetFileByRecordId";
-
+  static const String BANNER_JSON_NAME = "mainpagebanner.json";
 
   AppStorage appStorage = AppStorage();
 
@@ -75,22 +77,34 @@ class ServerConnections {
         var response = await client.post(Uri.parse(url), headers: header, body: body);
         // print("API_RESPONSE_DATA: $API_NAME: ${response.body}\n");
         // print("");
-        if (response.statusCode == 200) return response.body;
+        if (response.statusCode == 200) {
+          LogService.writeLog(
+              message:
+                  "[^] [POST] URL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+          return response.body;
+        }
+        ;
         if (response.statusCode == 404) {
           print("API_ERROR: $API_NAME: ${response.body}");
           Get.snackbar("Error " + response.statusCode.toString(), "Invalid Url",
               snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
         } else {
+          LogService.writeLog(
+              message:
+                  "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
           if (response.statusCode == 400) {
             return response.body;
           } else {
             print("API_ERROR: $API_NAME: ${response.body}");
+
             Get.snackbar("Error " + response.statusCode.toString(), "Internal server error",
                 snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
           }
         }
       } catch (e) {
         print("API_ERROR: $API_NAME: ${e.toString()}");
+        LogService.writeLog(message: "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nError: ${e.toString()}");
+
         Get.snackbar("Error ", e.toString(),
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
       }
@@ -121,25 +135,36 @@ class ServerConnections {
   //   }
   // }
 
-  getFromServer({String url = '', var header = ''}) async {
+  getFromServer({String url = '', var header = '', var show_errorSnackbar = true}) async {
+    var API_NAME = url.substring(url.lastIndexOf("/") + 1, url.length);
+
     try {
       if (url == '') url = _baseUrl;
-      var API_NAME = url.substring(url.lastIndexOf("/") + 1, url.length);
       if (header == '') header = {"Content-Type": "application/json"};
       print("Get Url: $url");
       var response = await client.get(Uri.parse(url), headers: header);
-      if (response.statusCode == 200) return response.body;
+      if (response.statusCode == 200) {
+        LogService.writeLog(
+            message: "[^] [GET] URL:$url\nAPI_NAME: $API_NAME\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+        return response.body;
+      }
+      ;
       if (response.statusCode == 404) {
         if (API_NAME.toString().toLowerCase() == "ARMAppStatus".toLowerCase()) {
-          showErrorSnack(title: "Error!", message: "Invalid ARM URL");
+          showErrorSnack(title: "Error!", message: "Invalid ARM URL", show_errorSnackbar: show_errorSnackbar);
         } else {
-          showErrorSnack(title: "Error " + response.statusCode.toString(), message: "Invalid Url");
+          showErrorSnack(
+              title: "Error " + response.statusCode.toString(), message: "Invalid Url", show_errorSnackbar: show_errorSnackbar);
         }
       } else {
+        LogService.writeLog(
+            message:
+                "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
         Get.snackbar("Error " + response.statusCode.toString(), "Internal server error",
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
       }
     } catch (e) {
+      LogService.writeLog(message: "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nError: ${e.toString()}");
       Get.snackbar("Error ", e.toString(),
           snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
     }

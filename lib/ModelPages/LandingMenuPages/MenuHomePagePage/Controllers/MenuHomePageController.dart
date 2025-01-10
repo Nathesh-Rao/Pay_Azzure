@@ -15,6 +15,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:material_icons_named/material_icons_named.dart';
 
+import '../../UpdatedHomePage/Widgets/WidgetMenuFolderPanelItem.dart';
+import '../Models/MenuFolderModel.dart';
+
 class MenuHomePageController extends GetxController {
   InternetConnectivity internetConnectivity = Get.find();
   var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
@@ -22,6 +25,7 @@ class MenuHomePageController extends GetxController {
   // var colorList = ["#EEF2FF", "#FFF9E7", "#F5EBFF", "#FFECF6", "#E5F5FA", "#E6FAF4", "#F7F7F7", "#E8F5F8"];
   var listOfCards = [].obs;
   var listOfGridCardItems = [].obs;
+  var map_dataSource = {};
   var actionData = {};
   Set setOfDatasource = {};
   var switchPage = false.obs;
@@ -52,8 +56,28 @@ class MenuHomePageController extends GetxController {
     getClientInfo();
     getCardDetails();
     getPunchINData();
-    getGridDashboardDetails();
+    getShorcutMenuDashboardDetails();
     getAttendanceDetails();
+  }
+  void getShorcutMenuDashboardDetails() async {
+    var body = {
+      // "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_DashBoard),
+      "publickey": ExecuteApi.API_PublicKey_DashBoard,
+      "Project": Const.PROJECT_NAME,
+      "getsqldata": {"trace": "false"}
+    };
+    var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
+    if (resp != "") {
+      var jsonResp = jsonDecode(resp);
+      if (jsonResp["success"].toString() == "true") {
+        var listItems = jsonResp["axm_dashboard_shortcutmenu"]["rows"];
+        listOfshortcutCardItems.clear();
+        for (var items in listItems) {
+          ShortcutMenuDashboardModel newModel = ShortcutMenuDashboardModel.fromJson(items);
+          listOfshortcutCardItems.add(newModel);
+        }
+      }
+    }
   }
 
   showMenuDialog(CardModel cardModel) {
@@ -89,19 +113,31 @@ class MenuHomePageController extends GetxController {
     var url = Const.getFullARMUrl(ServerConnections.API_GET_HOMEPAGE_CARDS_v2);
     var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
     // print(resp);
+    // LogService.writeLog(message: "[-] UpdatedHomePage => CardDetails > API_GET_HOMEPAGE_CARDS_v2 - body: $body ");
+    // LogService.writeLog(message: "[-] UpdatedHomePage => CardDetails > API_GET_HOMEPAGE_CARDS_v2 - resp: $resp ");
+
     if (resp != "") {
       print("Home card ${resp}");
       var jsonResp = jsonDecode(resp);
       if (jsonResp['result']['success'].toString() == "true") {
-        listOfCards.clear();
-        var dataList = jsonResp['result']['data'];
+        listOfOptionCards.clear();
+        var dataList = jsonResp['result']['menu option'];
         for (var item in dataList) {
           CardModel cardModel = CardModel.fromJson(item);
-          listOfCards.add(cardModel);
-          setOfDatasource.add(item['datasource'].toString());
+          listOfOptionCards.add(cardModel);
+          //setOfDatasource.add(item['datasource'].toString());
+          if (cardModel.datasource != "") map_dataSource[cardModel.caption] = cardModel.datasource;
         }
+
+        var menuFolderList = [];
+        var data_menuFolder = jsonResp['result']['menu folder'];
+        for (var item in data_menuFolder) {
+          MenuFolderModel menuFolderModel = MenuFolderModel.fromJson(item);
+          menuFolderList.add(menuFolderModel);
+        }
+        parseMenuFolderData(menuFolderList);
       } else {
-        //error
+        // LogService.writeLog(message: "[ERROR] UpdatedHomePage => CardDetails > API_GET_HOMEPAGE_CARDS_v2 - Response is empty ");
       }
     }
     // if (listOfCards.length == 0) {
@@ -119,7 +155,20 @@ class MenuHomePageController extends GetxController {
     // listOfCards..sort((a, b) => a.caption.toString().toLowerCase().compareTo(b.caption.toString().toLowerCase()));
     isLoading.value = false;
     LoadingScreen.dismiss();
-    return listOfCards;
+    return listOfOptionCards;
+  }
+
+  void parseMenuFolderData(List menuFolderList) {
+    var map_folderList = {};
+    for (var item in menuFolderList) {
+      var folderName = item.groupfolder;
+      List<MenuFolderModel> list = [];
+      list = map_folderList[folderName] ?? [];
+      list.add(item);
+      map_folderList[folderName] = list;
+    }
+    list_menuFolderData.value = map_folderList;
+    print("list_menuFolderData: ${list_menuFolderData.toString()}");
   }
 
   getCardDataSources() async {
@@ -162,7 +211,10 @@ class MenuHomePageController extends GetxController {
       print("hit $btnType");
       print("pname: $btnOpen");
       if (btnType.toLowerCase() == "button" && btnOpen != "") {
-        webUrl = Const.getFullProjectUrl("aspx/AxMain.aspx?authKey=AXPERT-") + appStorage.retrieveValue(AppStorage.SESSIONID) + "&pname=" + btnOpen;
+        webUrl = Const.getFullProjectUrl("aspx/AxMain.aspx?authKey=AXPERT-") +
+            appStorage.retrieveValue(AppStorage.SESSIONID) +
+            "&pname=" +
+            btnOpen;
         switchPage.toggle();
       } else {}
     }
@@ -261,7 +313,10 @@ class MenuHomePageController extends GetxController {
     if (jsonResp['success'].toString() == "true") {
       // var result = jsonResp['result'].toString();
       Get.snackbar("Punch-In success", "",
-          backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 3));
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 3));
       isShowPunchIn.value = false;
       isShowPunchOut.value = true;
       actionData.clear();
@@ -269,7 +324,10 @@ class MenuHomePageController extends GetxController {
     } else {
       // var errMessage = jsonResp['message'].toString();
       Get.snackbar("Error", jsonResp['message'].toString(),
-          backgroundColor: Colors.redAccent, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 3));
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 3));
     }
   }
 
@@ -310,13 +368,19 @@ class MenuHomePageController extends GetxController {
     if (jsonResp['success'].toString() == "true") {
       // var result = jsonResp['result'].toString();
       Get.snackbar("Punch-Out success", "",
-          backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 3));
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 3));
       actionData.clear();
       await getCardDataSources();
     } else {
       // var errMessage = jsonResp['message'].toString();
       Get.snackbar("Error", jsonResp['message'].toString(),
-          backgroundColor: Colors.redAccent, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 3));
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 3));
     }
     LoadingScreen.dismiss();
   }
@@ -335,7 +399,7 @@ class MenuHomePageController extends GetxController {
         var listItems = jsonResp["axm_dashboard_shortcutmenu"]["rows"];
         listOfGridCardItems.clear();
         for (var items in listItems) {
-          GridDashboardModel newModel = GridDashboardModel.fromJson(items);
+          ShortcutMenuDashboardModel newModel = ShortcutMenuDashboardModel.fromJson(items);
           listOfGridCardItems.add(newModel);
         }
       }
@@ -433,5 +497,48 @@ class MenuHomePageController extends GetxController {
         client_info_logo_base64String.value = jsonResp['base64'] ?? "";
       }
     }
+  }
+
+  // merge------->
+  captionOnTapFunction(transid) {
+    var link_id = transid;
+    var validity = false;
+    if (link_id.toLowerCase().startsWith('h')) {
+      if (link_id.toLowerCase().contains("hp")) {
+        link_id = link_id.toLowerCase().replaceAll("hp", "h");
+      }
+      validity = true;
+    } else {
+      if (link_id.toLowerCase().startsWith('i')) {
+        validity = true;
+      } else {
+        if (link_id.toLowerCase().startsWith('t')) {
+          validity = true;
+        } else
+          validity = false;
+      }
+    }
+    if (validity) {
+      // LogService.writeLog(message: "[i] FolderPanel : Open in webview {$link_id}");
+
+      openBtnAction("button", link_id);
+    }
+  }
+
+  var listOfOptionCards = [].obs;
+  var list_menuFolderData = {}.obs;
+  var listOfshortcutCardItems = [].obs;
+
+  getMenuFolderPanelWidgetList() {
+    var panelModel = list_menuFolderData;
+    var keys = panelModel.keys.toList();
+    List<Widget> panelWidgets = List.generate(
+        keys.length,
+        (index) => WidgetMenuFolderPanelItem(
+              keyname: keys[index],
+              panelItems: panelModel[keys[index]]!,
+            ));
+
+    return panelWidgets;
   }
 }

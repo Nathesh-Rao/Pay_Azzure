@@ -37,7 +37,7 @@ class MyColors {
   static const Color teal = Color(0xFFB2DFDB);
   static const Color teal1 = Color(0xFF0288D1);
   static const Color green = Color(0xFF4CAF50);
-
+  static const Color color_grey = Color(0xFFF6F7F8);
   static const Color dialogheaderback = Color(0xFF5b538c);
   static const Color headerback = Color(0xFF164A41);
   static const Color headerback1 = Color(0xFF164A41);

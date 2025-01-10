@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class WidgetQuickAccessGridItems extends StatelessWidget {
   WidgetQuickAccessGridItems(this.model, {super.key});
-  final GridDashboardModel model;
+  final ShortcutMenuDashboardModel model;
   final MenuHomePageController menuHomePageController = Get.find();
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class WidgetQuickAccessGridItems extends StatelessWidget {
                   badgeStyle: badge.BadgeStyle(
                       shape: badge.BadgeShape.circle,
                       elevation: 10,
-                      padding: EdgeInsets.only(left: 8,right: 8,top: 4,bottom: 4),
+                      padding: EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
                       badgeColor: Colors.white,
                       borderSide: BorderSide(width: 1, color: MyColors.blue2)),
                   badgeContent: Text(
