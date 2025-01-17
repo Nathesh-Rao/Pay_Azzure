@@ -57,8 +57,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var isAuthRequired = false;
   var unread;
   var toDay;
-  final CarouselController carouselController = CarouselController();
-  final CarouselController carouselController_banner = CarouselController();
+  final CarouselSliderController carouselController = CarouselSliderController();
+  final CarouselSliderController carouselController_banner = CarouselSliderController();
   var carouselBannerIndex = 0.obs;
 
   DateTime currentBackPressTime = DateTime.now();

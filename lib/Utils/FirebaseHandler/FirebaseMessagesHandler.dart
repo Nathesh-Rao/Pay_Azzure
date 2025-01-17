@@ -33,8 +33,10 @@ initialize() async {
 
   AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
-    onDidReceiveLocalNotification: onDidReceiveLocalNotification,
-  );
+      //todo need to update the old method that removed
+      //below method been removed from the package's latest version
+      // onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+      );
   InitializationSettings initializationSettings =
       InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsDarwin);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
