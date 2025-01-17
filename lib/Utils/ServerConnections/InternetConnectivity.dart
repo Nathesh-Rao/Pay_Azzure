@@ -14,10 +14,10 @@ class InternetConnectivity extends GetxController {
 
   Future<bool> check() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
+    if (connectivityResult.contains(ConnectivityResult.mobile)) {
       isConnected.value = true;
       return true;
-    } else if (connectivityResult == ConnectivityResult.wifi) {
+    } else if (connectivityResult.contains(ConnectivityResult.wifi)) {
       isConnected.value = true;
       return true;
     }
@@ -58,8 +58,8 @@ class InternetConnectivity extends GetxController {
 
   connectivity_listen() async {
     await Connectivity().onConnectivityChanged.listen(
-      (ConnectivityResult result) async {
-        if (result == ConnectivityResult.mobile || result == ConnectivityResult.wifi) {
+      (List<ConnectivityResult> result) async {
+        if (result.contains(ConnectivityResult.mobile) || result.contains(ConnectivityResult.wifi)) {
           isConnected.value = true;
         } else {
           isConnected.value = false;
