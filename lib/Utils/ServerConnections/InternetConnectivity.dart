@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -15,7 +14,6 @@ class InternetConnectivity extends GetxController {
 
   Future<bool> check() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-
     if (connectivityResult.contains(ConnectivityResult.mobile)) {
       isConnected.value = true;
       return true;
@@ -61,7 +59,6 @@ class InternetConnectivity extends GetxController {
   connectivity_listen() async {
     await Connectivity().onConnectivityChanged.listen(
       (List<ConnectivityResult> result) async {
-        log(result.length.toString());
         if (result.contains(ConnectivityResult.mobile) || result.contains(ConnectivityResult.wifi)) {
           isConnected.value = true;
         } else {
