@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 11.3.0+4
+version: 11.3.0+6
 
 
 environment:
@@ -23,9 +23,9 @@ dependencies:
   connectivity_plus: ^6.1.2
   device_info_plus: ^11.2.1
   encrypt: ^5.0.3
-  firebase_auth: ^5.4.0
-  firebase_core: ^3.10.0
-  firebase_messaging: ^15.2.0
+  firebase_auth: ^4.9.0
+  firebase_core: ^2.19.0
+  firebase_messaging: ^14.7.1
   flutter_downloader: ^1.11.6
   flutter_easyloading: ^3.0.5
   flutter_file_downloader: ^2.0.0
@@ -71,7 +71,8 @@ dependencies:
   substring_highlight: ^1.0.33
   location: ^7.0.0
   file_downloader_flutter: ^0.0.5
-#  simple_downloader: ^0.0.3+1
+
+  #  simple_downloader: ^0.0.3+1
 #  background_location_tracker: ^1.4.3
   platform_device_id:
     git:
