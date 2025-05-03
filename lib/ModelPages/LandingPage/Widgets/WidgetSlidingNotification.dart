@@ -27,7 +27,7 @@ class WidgetSlidingNotificationPanel extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Card(
             elevation: 5,
-            shadowColor: MyColors.buzzilygrey,
+            shadowColor: MyColors.color_grey,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
             child: Container(
               height: MediaQuery.of(context).size.height * .15,
@@ -51,7 +51,7 @@ class WidgetSlidingNotificationPanel extends StatelessWidget {
                         items: landingPageController.list.length > 5
                             ? landingPageController.list.sublist(0, 5)
                             : landingPageController.list,
-                        carouselController: landingPageController.carouselController,
+                        carouselController: landingPageController.carouselController_notify,
                         options: CarouselOptions(
                           initialPage: landingPageController.carouselIndex.value,
                           height: double.maxFinite,
@@ -75,7 +75,7 @@ class WidgetSlidingNotificationPanel extends StatelessWidget {
                               .entries
                               .map((entry) {
                             return GestureDetector(
-                              onTap: () => landingPageController.carouselController.animateToPage(entry.key),
+                              onTap: () => landingPageController.carouselController_notify.animateToPage(entry.key),
                               child: Container(
                                 width: 10.0,
                                 height: 10.0,

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/KPIListCardModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +8,7 @@ import '../../../../../../Constants/Routes.dart';
 import '../../../../../../Constants/Const.dart';
 import '../../../../../../Utils/LogServices/LogService.dart';
 import '../../../../../../Utils/ServerConnections/InternetConnectivity.dart';
+import '../../Models/KPIListCardModel.dart';
 import '../../Models/UpdatedHomeCardDataModel.dart';
 
 class WidgetKPIPanelSlider extends StatelessWidget {

@@ -3,8 +3,7 @@ import 'dart:math';
 
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Extensions.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/MenuIconsModel.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/UpdatedHomeCardDataModel.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Constants/Const.dart';
-import '../../../Controllers/MenuHomePageController.dart';
+import '../../../MenuHomePagePage/Controllers/MenuHomePageController.dart';
+import '../../Models/MenuIconsModel.dart';
+import '../../Models/UpdatedHomeCardDataModel.dart';
 
 class WidgetMenuIcons extends StatefulWidget {
   const WidgetMenuIcons({super.key});

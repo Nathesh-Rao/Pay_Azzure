@@ -3,6 +3,8 @@ import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:flutter/material.dart';
 
 class Const {
+  static DateTime DEMO_END_DATE = DateTime(2025, 2, 8);
+  static String RELEASE_ID = "_testRelease300425";
   static String DEVICE_ID = "";
   static String PROJECT_URL = ""; //"https://app.buzzily.com/Run";
   static String PROJECT_NAME = "axpertqa11";
@@ -20,6 +22,9 @@ class Const {
   static final String SET_HYBRID_INFO = "/Webservice.asmx/SetHybridInfo";
   static final String SET_HYBRID_NOTIFICATION_INFO = "/Webservice.asmx/SetHybridNotifiInfo";
   static final String LOGOUT_LINK = "webservice.asmx/SignOut";
+  //NOTE BottomBar Items urls
+  static final String BOTTOMBAR_CALENDAR = 'aspx/AxMain.aspx?pname=dcalendar&authKey=AXPERT-';
+  static final String BOTTOMBAR_ANALYTICS = 'aspx/AxMain.aspx?pname=danalytics&authKey=AXPERT-';
   static bool isLogEnabled = false;
 
   static String getSQLforClientID(String clientID) => "select * from tblclientMST where " + "clientid = '" + clientID + "'";
@@ -55,8 +60,8 @@ class Const {
     brightness: Brightness.light,
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-            backgroundColor: MaterialStateColor.resolveWith((states) => MyColors.blue2),
-            foregroundColor: MaterialStateColor.resolveWith((states) => Colors.white))),
+            backgroundColor: WidgetStateColor.resolveWith((states) => MyColors.blue2),
+            foregroundColor: WidgetStateColor.resolveWith((states) => Colors.white))),
     primaryColor: Color(0xff003AA5),
     scaffoldBackgroundColor: Colors.white,
     colorScheme: ThemeData().colorScheme.copyWith(primary: MyColors.blue2),

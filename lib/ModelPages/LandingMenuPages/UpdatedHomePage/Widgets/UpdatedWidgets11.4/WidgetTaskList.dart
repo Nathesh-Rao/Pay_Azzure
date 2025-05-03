@@ -1,11 +1,12 @@
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/TaskListModel.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/UpdatedHomeCardDataModel.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Constants/MyColors.dart';
+import '../../Models/TaskListModel.dart';
+import '../../Models/UpdatedHomeCardDataModel.dart';
 
 class WidgetTaskList extends StatefulWidget {
   const WidgetTaskList({super.key});

@@ -16,7 +16,7 @@ class MenuHomePage extends StatelessWidget {
       children: [
         WidgetSlidingNotificationPanel(),
         Obx(() => Visibility(
-            visible: (menuHomePageController.listOfCards.length == 0 && !menuHomePageController.isLoading.value) ? true : false,
+            visible: (menuHomePageController.listOfOptionCards.length == 0 && !menuHomePageController.isLoading.value) ? true : false,
             child: WidgetNoDataFound())),
         Expanded(
           child: Obx(() => Padding(
@@ -30,13 +30,13 @@ class MenuHomePage extends StatelessWidget {
                             mainAxisSpacing: 20,
                             crossAxisCount: 2,
                             childAspectRatio: isTablet() ? 1.5 : 2.8),
-                        itemCount: menuHomePageController.listOfCards.length,
+                        itemCount: menuHomePageController.listOfOptionCards.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              captionOnTapFunction(menuHomePageController.listOfCards[index]);
+                              captionOnTapFunction(menuHomePageController.listOfOptionCards[index]);
                             },
-                            child: Container(child: WidgetCard(menuHomePageController.listOfCards[index])),
+                            child: Container(child: WidgetCard(menuHomePageController.listOfOptionCards[index])),
                           );
                         },
                       ),

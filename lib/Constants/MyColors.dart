@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -6,7 +8,10 @@ class MyColors {
   static const Color white2 = Color(0xFFFFFFFF);
   static const Color blue1 = Color(0xFF006cff);
   static const Color yellow_background = Color(0xFFe498a0);
-
+  static const Color baseBlue = Color(0xff3764FC);
+  static const Color baseYellow = Color(0xffF79E02);
+  static const Color baseRed = Color(0xffDD2025);
+  static const Color basegray = Color(0xffDEDEDE);
   // static const Color blue2 = Color(0xFF2a2b8f);
   static const Color blue2 = Color(0xFFa81f2c);
   static const Color blue3 = Color(0xFF4fc3f7);
@@ -34,6 +39,7 @@ class MyColors {
   static const Color grey6 = Color(0xFF999999);
   static const Color grey7 = Color(0xFFb3b3b3);
   static const Color grey8 = Color(0xFFf6f7f9);
+  static const Color grey9 = Color(0xFF575E65);
   static const Color teal = Color(0xFFB2DFDB);
   static const Color teal1 = Color(0xFF0288D1);
   static const Color green = Color(0xFF4CAF50);
@@ -59,5 +65,41 @@ class MyColors {
   static const Color buzzilybuttonblue = Color(0xFF006CFF);
   static const Color buzzilytext = Color(0xFF2b282b);
   static const Color buzzilybuttontext = Color(0xFF778085);
+
+  static const Color white3 = Color(0xffECECEC);
+  static const Color text1 = Color(0xff626262);
+  static const Color text2 = Color(0xff919191);
   static const LinearGradient updatedUIBackgroundGradient = LinearGradient(colors: [blue2, blue2]);
+
+  static const LinearGradient subBGGradientVertical =
+      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
+    Color(0xff3764FC),
+    Color(0xff9764DA),
+  ]);
+
+  static const LinearGradient subBGGradientHorizontal = LinearGradient(colors: [
+    Color(0xff3764FC),
+    Color(0xff9764DA),
+  ]);
+  //------random- color------>
+  static Color getRandomColor() {
+    List<Color> colors = [
+      Colors.purple,
+      Colors.green,
+      Colors.amber,
+      Colors.red,
+      Colors.indigo,
+      Colors.blue,
+      Colors.orange,
+      Colors.cyan,
+      Colors.teal,
+      Colors.lime,
+      Colors.brown,
+      Colors.pink,
+      Colors.deepOrange,
+      Colors.lightGreen,
+      Colors.deepPurple,
+    ];
+    return colors[Random().nextInt(colors.length)];
+  }
 }

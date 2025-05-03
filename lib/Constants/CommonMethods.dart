@@ -31,7 +31,7 @@ class CommonMethods {
     return result;
   }
 
-  static String activeList_CreateURL_MAKE(activeList, int index) {
+  static String activeList_CreateURL_MAKE(activeList) {
     var url = "";
     if (activeList.recordid.toString().toLowerCase() == "" || activeList.recordid.toString().toLowerCase() == "null") {
       url = "aspx/AxMain.aspx?pname=t" +
@@ -53,7 +53,9 @@ class CommonMethods {
     return url;
   }
 
-  static String activeList_CreateURL_MESSAGE(activeList, int index) {
+  static String activeList_CreateURL_MESSAGE(
+    activeList,
+  ) {
     var url = "";
     var msgType = activeList.msgtype.toString().toUpperCase().trim();
     if (msgType == "MESSAGE" ||

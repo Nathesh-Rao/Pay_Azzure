@@ -1,5 +1,4 @@
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/BannerCardModel.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Constants/MyColors.dart';
+import '../../Models/BannerCardModel.dart';
 import '../../Models/UpdatedHomeCardDataModel.dart';
 
 class WidgetBannerCard extends StatelessWidget {

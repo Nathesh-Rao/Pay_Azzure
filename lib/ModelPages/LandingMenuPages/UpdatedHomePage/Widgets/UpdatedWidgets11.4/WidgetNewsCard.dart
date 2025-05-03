@@ -1,4 +1,3 @@
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/NewsCardModel.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Constants/MyColors.dart';
 import '../../../../../../Constants/Const.dart';
-import '../../../Controllers/MenuHomePageController.dart';
+import '../../../MenuHomePagePage/Controllers/MenuHomePageController.dart';
+import '../../Models/NewsCardModel.dart';
 import '../../Models/UpdatedHomeCardDataModel.dart';
 
 class WidgetNewsCard extends StatefulWidget {

@@ -7,12 +7,14 @@ import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetLandingAppBar
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../LandingMenuPages/MenuActiveListPage/Controllers/UpdatedActiveTaskListController/ActiveTaskListController.dart';
+
 class LandingPage extends StatelessWidget {
   LandingPage({super.key});
 
   final LandingPageController landingPageController = Get.find();
   final MenuHomePageController menuHomePageController = Get.put(MenuHomePageController());
-
+  final ActiveTaskListController _c = Get.put(ActiveTaskListController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,18 +23,21 @@ class LandingPage extends StatelessWidget {
       drawer: WidgetDrawer(),
       bottomNavigationBar: AppBottomNavigation(),
       body: WillPopScope(
-          onWillPop: landingPageController.onWillPop,
-          child: Obx(() => Stack(
-                children: [
-                  landingPageController.getPage(),
-                  Visibility(visible: menuHomePageController.switchPage.value, child: InApplicationWebViewer(menuHomePageController.webUrl))
-                ],
-              ))
-          /* menuHomePageController.switchPage.value == true
+        onWillPop: landingPageController.onWillPop,
+        child: Obx(
+          () => Stack(
+            children: [
+              landingPageController.getPage(),
+              Visibility(
+                  visible: menuHomePageController.switchPage.value, child: InApplicationWebViewer(menuHomePageController.webUrl))
+            ],
+          ),
+        ),
+        /* menuHomePageController.switchPage.value == true
                 ? InApplicationWebViewer(menuHomePageController.webUrl)
                 : landingPageController.getPage(),
             ),*/
-          ),
+      ),
     );
   }
 }

@@ -1,12 +1,12 @@
 import 'package:axpertflutter/Constants/Extensions.dart';
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/ActivityListModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Constants/MyColors.dart';
-import '../../../Controllers/MenuHomePageController.dart';
+import '../../../MenuHomePagePage/Controllers/MenuHomePageController.dart';
+import '../../Models/ActivityListModel.dart';
 import '../../Models/UpdatedHomeCardDataModel.dart';
 
 class WidgetActivityList extends StatelessWidget {

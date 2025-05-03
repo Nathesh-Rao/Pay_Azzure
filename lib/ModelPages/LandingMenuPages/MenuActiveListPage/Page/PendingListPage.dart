@@ -208,8 +208,9 @@ reBuild(PendingListController pendingListController, BuildContext context) {
                       print(pendingListController.pending_activeList[index].toJson());
                       switch (pendingListController.pending_activeList[index].tasktype.toString().toUpperCase()) {
                         case "MAKE":
-                          var URL =
-                              CommonMethods.activeList_CreateURL_MAKE(pendingListController.pending_activeList[index], index);
+                          var URL = CommonMethods.activeList_CreateURL_MAKE(
+                            pendingListController.pending_activeList[index],
+                          );
                           if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
                           break;
                           break;
@@ -223,8 +224,7 @@ reBuild(PendingListController pendingListController, BuildContext context) {
                         case "":
                         case "NULL":
                         case "CACHED SAVE":
-                          var URL =
-                              CommonMethods.activeList_CreateURL_MESSAGE(pendingListController.pending_activeList[index], index);
+                          var URL = CommonMethods.activeList_CreateURL_MESSAGE(pendingListController.pending_activeList[index]);
                           if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
                           break;
                         default:

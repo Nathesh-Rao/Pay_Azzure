@@ -1,4 +1,3 @@
-import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/UpdatedHomePage/Models/KPIListCardModel.dart';
 import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,8 +7,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../../Constants/MyColors.dart';
 import '../../../../../../Constants/Const.dart';
-import '../../../../../LandingPage/Widgets/WidgetKPIPanel.dart';
-import '../../../Controllers/MenuHomePageController.dart';
+
+import '../../../MenuHomePagePage/Controllers/MenuHomePageController.dart';
+import '../../Models/KPIListCardModel.dart';
 import '../../Models/MenuIconsModel.dart';
 import '../../Models/UpdatedHomeCardDataModel.dart';
 
@@ -29,7 +29,8 @@ class _WidgetKPIListState extends State<WidgetKPIList> {
           visible: menuHomePageController.kpiListCardData.isNotEmpty,
           child: Column(
             children: List.generate(menuHomePageController.kpiListCardData.length, (index) {
-              List<Color> colors = List.generate(menuHomePageController.kpiListCardData[index].carddata.length, (index) => MyColors.getRandomColor());
+              List<Color> colors = List.generate(
+                  menuHomePageController.kpiListCardData[index].carddata.length, (index) => MyColors.getRandomColor());
               return KPICardsPanel(card: menuHomePageController.kpiListCardData[index], colors: colors);
             }),
           ),
@@ -81,17 +82,20 @@ class _KPICardsPanelState extends State<KPICardsPanel> {
       if (isSeeMore) {
         card_height = (widget.card.carddata.length > 10 ? card_heightAfterExpand : _getHeight_card(widget.card.carddata.length));
       } else {
-        scrollController.animateTo(scrollController.position.minScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+        scrollController.animateTo(scrollController.position.minScrollExtent,
+            duration: Duration(milliseconds: 300), curve: Curves.decelerate);
         card_height = card_heightBeforeExpand;
       }
     });
   }
 
   void _onClickSeeAll(cardData, {required String cardName}) async {
-    await Get.bottomSheet(ignoreSafeArea: true, QuickLinksBottomSheet(cardData, cardName: cardName, colors: widget.colors)).then((_) {
+    await Get.bottomSheet(ignoreSafeArea: true, QuickLinksBottomSheet(cardData, cardName: cardName, colors: widget.colors))
+        .then((_) {
       if (isSeeMore) {
         setState(() {
-          scrollController.animateTo(scrollController.position.minScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+          scrollController.animateTo(scrollController.position.minScrollExtent,
+              duration: Duration(milliseconds: 300), curve: Curves.decelerate);
           isSeeMore = !isSeeMore;
           card_height = card_heightBeforeExpand;
 
@@ -319,7 +323,7 @@ _getHeight_card(itemCount) {
   double itemHeight = 50;
   double spacing = 5 * (rowCount - 1);
 
-  return (rowCount * (itemHeight + spacing ))+ 150;
+  return (rowCount * (itemHeight + spacing)) + 150;
 }
 
 class QuickLinksBottomSheet extends StatelessWidget {
@@ -334,7 +338,8 @@ class QuickLinksBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: menuIconsData.length > 9 ? Get.height * 0.75 : Get.height / 2.5,
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
       child: Column(
         children: [
           Padding(

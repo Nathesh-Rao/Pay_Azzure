@@ -9,6 +9,8 @@ import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../Utils/LogServices/LogService.dart';
+
 class PendingListController extends GetxController {
   var subPage = true.obs;
   var needRefresh = true.obs;
@@ -222,7 +224,7 @@ class PendingListController extends GetxController {
       if (jsonResp['result']['message'].toString() == "success") {
         bulkApprovalCount_list.clear();
         var dataList = jsonResp['result']['data'];
-
+        LogService.writeLog(message: "getBulkApprovalCount=> $dataList");
         for (var item in dataList) {
           BulkApprovalCountModel bulkApprovalCountModel = BulkApprovalCountModel.fromJson(item);
           bulkApprovalCount_list.add(bulkApprovalCountModel);
@@ -271,19 +273,54 @@ class PendingListController extends GetxController {
     bulkApproval_activeList.refresh();
   }
 
-  doBulkApprove() {
+  TextEditingController bulkCommentController = TextEditingController();
+  Future doBulkApprove() async {
     var list_taskId = "";
     for (var item in bulkApproval_activeList) {
       if (item.bulkApprove_isSelected.value == true)
         list_taskId.isEmpty ? list_taskId += item.taskid : list_taskId += "," + item.taskid;
     }
+
     print("list_taskId: $list_taskId");
+
     if (list_taskId.isEmpty) {
       Get.snackbar("Oops!", "Select atleast one task for approval.",
           backgroundColor: Colors.redAccent,
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
           duration: Duration(seconds: 3));
+    } else if (bulkCommentController.text.isEmpty) {
+      Get.snackbar("Comment is required", "Try again with proper Comment",
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 3));
+    } else {
+      var url = Const.getFullARMUrl(ServerConnections.API_POST_BULK_DO_BULK_ACTION);
+      var body = {
+        "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
+        "AxSessionId": "lqkrqbrwa3v3c2nmhq1dm1sk",
+        "Trace": "true",
+        "TaskId": list_taskId,
+        "taskType": "APPROVE",
+        "action": "BULKAPPROVE",
+        "statusText": bulkCommentController.text,
+        "AppName": Const.PROJECT_NAME.toString(),
+        "user": appStorage.retrieveValue(AppStorage.USER_NAME)
+      };
+      var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body), isBearer: true);
+
+      print(resp);
+      var jsonResp = jsonDecode(resp);
+      // print(jsonResp['result']['success']);
+      if (jsonResp["result"]["success"].toString() == "true") {
+        Get.back();
+        Get.snackbar("Bulk Approval success", "All ${list_taskId.split(",").length} tasks approved",
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            duration: Duration(seconds: 3));
+      }
     }
   }
 }

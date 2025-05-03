@@ -71,7 +71,10 @@ dependencies:
   substring_highlight: ^1.0.33
   location: ^7.0.0
   file_downloader_flutter: ^0.0.5
-
+  timeago: ^3.7.0
+  #  flutter_local_network_ios: ^0.0.1
+  flutter_expanded_tile: ^0.4.0
+  app_settings: ^6.1.1
   #  simple_downloader: ^0.0.3+1
 #  background_location_tracker: ^1.4.3
   platform_device_id:

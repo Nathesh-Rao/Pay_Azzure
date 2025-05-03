@@ -30,11 +30,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:text_scroll/text_scroll.dart';
 
+import '../../LandingMenuPages/MenuActiveListPage/Page/UpdatedMenuListPage/ActiveListPage.dart';
 import '../../LandingMenuPages/MenuHomePagePage/Models/BannerModel.dart';
 import '../Widgets/WidgetBanner.dart';
 
 class LandingPageController extends GetxController with WidgetsBindingObserver {
   final MenuMorePageController menuMorePageController = Get.put(MenuMorePageController());
+
   TextEditingController userCtrl = TextEditingController();
   TextEditingController oPassCtrl = TextEditingController();
   TextEditingController nPassCtrl = TextEditingController();
@@ -48,6 +50,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var userName = 'Demo'.obs; //update with user name
   var bottomIndex = 0.obs;
   var carouselIndex = 0.obs;
+  var carouselBannerIndex = 0.obs;
   var needRefreshNotification = false.obs;
   var notificationPageRefresh = false.obs;
   var showBadge = false.obs;
@@ -57,9 +60,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var isAuthRequired = false;
   var unread;
   var toDay;
-  final CarouselSliderController carouselController = CarouselSliderController();
+  final CarouselSliderController carouselController_notify = CarouselSliderController();
   final CarouselSliderController carouselController_banner = CarouselSliderController();
-  var carouselBannerIndex = 0.obs;
 
   DateTime currentBackPressTime = DateTime.now();
 
@@ -68,6 +70,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
 
   late var pageList;
   var list = [WidgetNotification(FirebaseMessageModel("Title 1", "Body 1"))];
+  var list_bannerItem = [].obs;
 
   getPage() {
     if (bottomIndex.value == 0) {
@@ -84,69 +87,33 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     userCtrl.text = userName.value;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       pageList = [
-        // MenuHomePage(),
         UpdatedHomePage(),
-        // WebViewActiveList(),
-        MenuActiveListPage(),
+        // MenuActiveListPage(),
+        ActiveListPage(),
         MenuDashboardPage(),
-        // MenuCalendarPage(),
-        WebViewCalendar(),
+
+        ///NOTE Pass a [ValueKey] with a unique identifier to force widget rebuilds.
+        //NOTE to open the WebViewCalendar page
+        WebViewFromBottomBar(
+          key: ValueKey(Const.BOTTOMBAR_CALENDAR),
+          url: Const.BOTTOMBAR_CALENDAR,
+        ),
+        //NOTE to open the WebViewAnalytics page
+        WebViewFromBottomBar(
+          key: ValueKey(Const.BOTTOMBAR_ANALYTICS),
+          url: Const.BOTTOMBAR_ANALYTICS,
+        ),
         //MenuMorePage(),
       ];
     });
     showChangePassword_PopUp();
-
     getBiometricStatus();
     getBannerDetailList();
-  }
-  var list_bannerItem = [].obs;
-  getBannerDetailList() async {
-    try {
-      list_bannerItem.clear();
-      var baseUrl = Const.PROJECT_URL;
-      baseUrl += baseUrl.endsWith("/") ? "" : "/";
-      var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
-      // url = "https://demo.agilecloud.biz/mainpagebanner.json";
-      final data = await serverConnections.getFromServer(url: url, show_errorSnackbar: false);
-      if (data != null && data != "") {
-        print("getBannerDetails1: $data");
-        var jsonResp = jsonDecode(data);
-        if (jsonResp.length > 0) {
-          list_bannerItem.clear();
-          for (var item in jsonResp) {
-            list_bannerItem.add(WidgetBanner(BannerModel.fromJson(item, baseUrl)));
-          }
-        }
-      } else {
-        if (Const.PROJECT_URL.endsWith("/")) {
-          var URL = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.length - 1);
-          baseUrl = URL.substring(0, URL.lastIndexOf('/'));
-        } else {
-          baseUrl = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.lastIndexOf('/'));
-        }
-
-        baseUrl += baseUrl.endsWith("/") ? "" : "/";
-        var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
-        final data = await serverConnections.getFromServer(url: url, show_errorSnackbar: false);
-        if (data != null && data != "") {
-          print("getBannerDetails2: $data");
-          var jsonResp = jsonDecode(data);
-          if (jsonResp.length > 0) {
-            list_bannerItem.clear();
-            for (var item in jsonResp) {
-              list_bannerItem.add(WidgetBanner(BannerModel.fromJson(item, baseUrl)));
-            }
-          }
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   getBiometricStatus() async {
     var willAuthLocal = await getWillBiometricAuthenticateForThisUser(userName.value);
-    if (willAuthLocal == null) {
+    if (willAuthLocal == null || willAuthLocal == false) {
       Get.bottomSheet(
         PopScope(
           canPop: false,
@@ -180,7 +147,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  "Log in to your PayAzzure account using your phone's biometric credentials.",
+                  "Log into your project account using your phone's biometric credentials..",
                   style: GoogleFonts.poppins(
                       textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.grey.shade600)),
                   textAlign: TextAlign.center,
@@ -206,7 +173,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                       setWillBiometricAuthenticateForThisUser(userName.value, false);
                       willAuth = false;
                     },
-                    style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((states) => Colors.grey.shade300)),
+                    style: ButtonStyle(backgroundColor: WidgetStateColor.resolveWith((states) => Colors.grey.shade300)),
                     child: Container(
                       width: 300,
                       child: Center(child: Text("Skip for now")),
@@ -287,7 +254,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       if (Get.isSnackbarOpen) Get.back();
       // SystemNavigator.pop(animated: true);
       exit(0);
-      return Future.value(true);
+      // return Future.value(true);
     }
   }
 
@@ -433,7 +400,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
             },
             child: Text("Yes")),
         cancel: ElevatedButton(
-            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey)),
+            style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.grey)),
             onPressed: () {
               Get.back();
             },
@@ -692,15 +659,17 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
 
   getDrawerTileList() {
     List<Widget> menuList = [];
+
     menuList.add(
       Container(
         height: 70,
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.7)))),
+        decoration: BoxDecoration(
+            color: Colors.grey.shade400, border: Border(bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.7)))),
         child: Row(
           children: [
             SizedBox(width: 30),
             Image.asset(
-              'assets/images/axAppLogo.png',
+              'assets/images/axpert_03.png',
               width: 40,
             ),
             SizedBox(width: 25),
@@ -741,6 +710,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
 
     if (menuList.length == 1) {
       menuList.add(ListTile(
+        tileColor: Colors.white,
         onTap: () {
           Get.back();
           indexChange(0);
@@ -749,6 +719,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         title: Text("Home"),
       ));
       menuList.add(ListTile(
+        tileColor: Colors.white,
         onTap: () {
           Get.back();
           indexChange(1);
@@ -757,6 +728,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         title: Text("Active List"),
       ));
       menuList.add(ListTile(
+        tileColor: Colors.white,
         onTap: () {
           Get.back();
           indexChange(2);
@@ -765,6 +737,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         title: Text("Dashboard"),
       ));
       menuList.add(ListTile(
+        tileColor: Colors.white,
         onTap: () {
           Get.back();
           indexChange(3);
@@ -773,14 +746,25 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         title: Text("Calendar"),
       ));
       menuList.add(ListTile(
+        tileColor: Colors.white,
         onTap: () {
           Get.back();
           indexChange(4);
+        },
+        leading: Icon(Icons.analytics_outlined),
+        title: Text("Analytics"),
+      ));
+      menuList.add(ListTile(
+        tileColor: Colors.white,
+        onTap: () {
+          Get.back();
+          indexChange(5);
         },
         leading: Icon(Icons.dashboard_customize_outlined),
         title: Text("More"),
       ));
       menuList.add(ListTile(
+        tileColor: Colors.white,
         onTap: () {
           Get.back();
           signOut();
@@ -793,6 +777,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       ));
     }
     menuList.add(Container(
+      color: Colors.white,
       height: 70,
       child: Center(
           child: Text(
@@ -815,6 +800,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
             Get.back();
           },
           child: ListTile(
+            tileColor: Colors.white,
             leading: Icon(menuMorePageController.generateIcon(tile, 1)),
             contentPadding: EdgeInsets.only(left: leftPadding),
             title: Text(
@@ -827,6 +813,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       return Visibility(
         visible: model_tile.visible.toUpperCase() == "T",
         child: ExpansionTile(
+          backgroundColor: Colors.white,
+          collapsedBackgroundColor: Colors.white70,
           leading: Icon(menuMorePageController.generateIcon(tile, 1)),
           tilePadding: EdgeInsets.only(left: leftPadding, right: 10),
           title: Text(tile.caption),
@@ -842,7 +830,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     List<Widget> innerTile = [];
     innerTile.add(Container(
       height: 1,
-      color: Colors.grey.withOpacity(0.1),
+      color: Colors.white,
+      // color: Colors.grey.withOpacity(0.1),
     ));
     for (MenuItemModel subMenu in menuMorePageController.finalHeadingWiseData[item] ?? [])
       innerTile.add(InkWell(
@@ -1087,8 +1076,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                           onChanged: (value) {},
                           style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
                           decoration: InputDecoration(
-                            labelText: 'Confirmation Password',
-                            hintText: 'Enter your Confirmation password',
+                            labelText: 'Confrmation Password',
+                            hintText: 'Enter your Confrmation password',
                             errorText: evaluteError(errCNPass.value),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -1344,5 +1333,49 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
             ]),
           ],
         ));
+  }
+
+  getBannerDetailList() async {
+    try {
+      list_bannerItem.clear();
+      var baseUrl = Const.PROJECT_URL;
+      baseUrl += baseUrl.endsWith("/") ? "" : "/";
+      var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
+      // url = "https://demo.agilecloud.biz/mainpagebanner.json";
+      final data = await serverConnections.getFromServer(url: url, show_errorSnackbar: false);
+      if (data != null && data != "") {
+        print("getBannerDetails1: $data");
+        var jsonResp = jsonDecode(data);
+        if (jsonResp.length > 0) {
+          list_bannerItem.clear();
+          for (var item in jsonResp) {
+            list_bannerItem.add(WidgetBanner(BannerModel.fromJson(item, baseUrl)));
+          }
+        }
+      } else {
+        if (Const.PROJECT_URL.endsWith("/")) {
+          var URL = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.length - 1);
+          baseUrl = URL.substring(0, URL.lastIndexOf('/'));
+        } else {
+          baseUrl = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.lastIndexOf('/'));
+        }
+
+        baseUrl += baseUrl.endsWith("/") ? "" : "/";
+        var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
+        final data = await serverConnections.getFromServer(url: url, show_errorSnackbar: false);
+        if (data != null && data != "") {
+          print("getBannerDetails2: $data");
+          var jsonResp = jsonDecode(data);
+          if (jsonResp.length > 0) {
+            list_bannerItem.clear();
+            for (var item in jsonResp) {
+              list_bannerItem.add(WidgetBanner(BannerModel.fromJson(item, baseUrl)));
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
