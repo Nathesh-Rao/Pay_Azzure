@@ -64,7 +64,7 @@ class MenuHomePageController extends GetxController {
     _getCardsWithData();
     //NOTE---------------------->
     //getCardDetails();
-    getPunchINData();
+    // getPunchINData();
     getShorcutMenuDashboardDetails();
     getAttendanceDetails();
   }

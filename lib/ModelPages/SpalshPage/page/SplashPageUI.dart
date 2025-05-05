@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/VersionUpdateClearOldData.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/ProjectListing/Model/ProjectModel.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../../../Utils/LogServices/LogService.dart';
+import '../../location_permission.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -21,10 +28,11 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   void initState() {
+    LogService.writeLog(message: "[>] SplashPage");
     super.initState();
     _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 800));
     _animationController.forward();
- VersionUpdateClearOldData.clearAllOldData();
+    VersionUpdateClearOldData.clearAllOldData();
     checkIfDeviceSupportBiometric();
     Future.delayed(Duration(milliseconds: 1800), () {
       _animationController.stop();
@@ -46,8 +54,35 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     });
   }
 
+  _askLocationPermission() async {
+    if (Platform.isAndroid) {
+      var permission = await Permission.locationAlways.request();
+
+      // print("Location Permission: ${permission}");
+      LogService.writeLog(message: "[i] SplashPage \nScope: askLocationPermission() : $permission ");
+      if (permission != PermissionStatus.granted) {
+        Get.to(RequestLocationPage());
+      }
+    }
+    if (Platform.isIOS) {
+      await Geolocator.requestPermission();
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _askLocationPermission();
+      // await ensureLocalNetworkPermission();
+    });
     return Scaffold(
       body: Stack(
         children: [
@@ -76,15 +111,17 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
   }
 
- void checkIfDeviceSupportBiometric() async {
+  void checkIfDeviceSupportBiometric() async {
     final LocalAuthentication auth = LocalAuthentication();
     final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
     final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
-    print("canAuthenticate: $canAuthenticate");
+    LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
     if (canAuthenticate) {
       final List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
-      print("List: $availableBiometrics");
-      // if (availableBiometrics.contains(BiometricType.fingerprint) ||
+      LogService.writeLog(
+          message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
+
+      // if (availableBiometrics.contains (BiometricType.fingerprint) ||
       //     availableBiometrics.contains(BiometricType.weak) ||
       //     availableBiometrics.contains(BiometricType.strong))
       if (availableBiometrics.isNotEmpty) {
