@@ -1,9 +1,11 @@
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
-import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/Constants/Const.dart';
 import 'package:axpertflutter/ModelPages/AddConnection/Controllers/AddConnectionController.dart';
+import 'package:axpertflutter/ModelPages/AddConnection/Controllers/ProjectController.dart';
 import 'package:axpertflutter/ModelPages/ProjectListing/Model/ProjectModel.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,25 +13,27 @@ class ProjectItemListTile extends StatelessWidget {
   String? keyValue;
   final AppStorage appStorage = AppStorage();
 
-  ProjectItemListTile(String value) {
-    keyValue = value;
-    var jsonProject = appStorage.retrieveValue(keyValue ?? "");
-    projectModel = ProjectModel.fromJson(jsonProject);
+  ProjectItemListTile(ProjectModel value) {
+    projectModel = value;
   }
   ProjectModel? projectModel;
   AddConnectionController addConnectionController = Get.find();
+  ProjectController projectController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        appStorage.storeValue(AppStorage.CACHED, projectModel!.projectname);
+        await appStorage.storeValue(AppStorage.CACHED, projectModel!.projectCaption);
+        await appStorage.storeValue(projectModel!.projectCaption, projectModel);
         Const.PROJECT_NAME = projectModel!.projectname;
         Const.PROJECT_URL = projectModel!.web_url;
         Const.ARM_URL = projectModel!.arm_url;
         await appStorage.storeValue(AppStorage.PROJECT_NAME, projectModel!.projectname);
         await appStorage.storeValue(AppStorage.PROJECT_URL, projectModel!.web_url);
         await appStorage.storeValue(AppStorage.ARM_URL, projectModel!.arm_url);
+        LogService.writeLog(message: "[i] ProjectListingPage\nSelected Project : ${projectModel!.projectname}");
+
         Get.offAllNamed(Routes.Login);
       },
       child: Card(
@@ -38,16 +42,14 @@ class ProjectItemListTile extends StatelessWidget {
         shadowColor: MyColors.white1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
+          side: BorderSide(width: 1, color: Colors.grey.shade300),
         ),
         child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 5),
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
               CircleAvatar(
-                backgroundColor: MyColors.yellow_background,
-                child: Text(
-                  projectModel!.projectname.characters.first.toUpperCase(),
-                  style: TextStyle(color: Colors.black),
-                ),
+                backgroundColor: MyColors.blue2,
+                child: Text(projectModel!.projectname.characters.first.toUpperCase()),
               ),
               Container(
                   height: 60,
@@ -88,7 +90,8 @@ class ProjectItemListTile extends StatelessWidget {
                 icon: const Icon(Icons.edit_sharp, size: 28, color: MyColors.green),
                 tooltip: 'Edit',
                 onPressed: () async {
-                  addConnectionController.edit(keyValue);
+                  // addConnectionController.edit(keyValue);
+                  projectController.edit(projectModel!);
                   // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EditWelcomeSmallScreen(weburllist[i], armurllist[i], connectionnamelist[i], connectioncaptionlist[i], i)));
                 },
               ),
@@ -96,7 +99,9 @@ class ProjectItemListTile extends StatelessWidget {
                 icon: const Icon(Icons.delete, size: 28, color: MyColors.red),
                 tooltip: 'Delete',
                 onPressed: () async {
-                  addConnectionController.delete(keyValue);
+                  LogService.writeLog(message: "[i] ProjectListingPage\n${projectModel!.projectname} Project Deleted");
+                  // addConnectionController.delete(keyValue);
+                  projectController.delete(projectModel!);
                 },
               ),
             ])),

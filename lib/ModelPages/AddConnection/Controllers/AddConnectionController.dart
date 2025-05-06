@@ -112,8 +112,8 @@ class AddConnectionController extends GetxController {
         //check whether the entered Connection name is proper
         Future<bool> isValidConnName = validateConnectionName(baseUrl);
         if (await isValidConnName) {
-          projectModel = ProjectModel(
-              conNameController.text.trim(), webUrlController.text.trim(), armUrlController.text.trim(), conCaptionController.text.trim());
+          projectModel = ProjectModel(DateTime.now().toString(), conNameController.text.trim(), webUrlController.text.trim(),
+              armUrlController.text.trim(), conCaptionController.text.trim());
           /*conNameController.text = "";
           webUrlController.text = "";
           armUrlController.text = "";
@@ -172,7 +172,8 @@ class AddConnectionController extends GetxController {
     } else {
       projectList = jsonDecode(storedList);
       if (projectList.contains(projectModel.projectname)) {
-        Get.snackbar("Element already exists", "", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+        Get.snackbar("Element already exists", "",
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
         if (isQr) {
           Timer(Duration(seconds: 2), () {
             qrViewController!.resumeCamera();
