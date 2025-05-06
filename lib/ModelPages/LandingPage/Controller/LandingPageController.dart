@@ -1087,8 +1087,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                           onChanged: (value) {},
                           style: const TextStyle(fontFamily: "nunitobold", fontSize: 14.0),
                           decoration: InputDecoration(
-                            labelText: 'Confrmation Password',
-                            hintText: 'Enter your Confrmation password',
+                            labelText: 'Confirmation Password',
+                            hintText: 'Enter your Confirmation password',
                             errorText: evaluteError(errCNPass.value),
                             suffixIcon: IconButton(
                               icon: Icon(

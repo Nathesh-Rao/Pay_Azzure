@@ -33,6 +33,8 @@ initialize() async {
 
   AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
   DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
+      //todo need to update the old method that removed
+      //below method been removed from the package's latest vergitsion
       // onDidReceiveLocalNotification: onDidReceiveLocalNotification,
       );
   InitializationSettings initializationSettings =

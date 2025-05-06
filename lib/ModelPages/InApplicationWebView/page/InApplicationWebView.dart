@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
@@ -72,16 +74,27 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     useHybridComposition: false,
     hardwareAcceleration: false,
     geolocationEnabled: true,
-
   );
 
   void _download(String url) async {
+    try {
+      print("download Url: $url");
+      String fname = url.split('/').last.split('.').first;
+      print("download FileName: $fname");
+      FileDownloaderFlutter().urlFileSaver(url: url, fileName: fname);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void _download_old(String url) async {
     if (Platform.isAndroid) {
+      print("ANDROID download---------------------------->");
       try {
         print("download Url: $url");
         String fname = url.split('/').last.split('.').first;
         print("download FileName: $fname");
-        FileDownloaderFlutter().urlFileSaver(url: url,fileName: fname);
+        FileDownloaderFlutter().urlFileSaver(url: url, fileName: fname);
       } catch (e) {
         print(e.toString());
       }
@@ -123,20 +136,20 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     //   } else {
 
     if (Platform.isIOS) {
+      print("IOS download---------------------------->");
       var status = await Permission.storage.request().isGranted;
-      if (status) {
-        Directory documents = await getApplicationDocumentsDirectory();
-        print(documents.path);
-        await FlutterDownloader.enqueue(
-          url: url,
-          // fileName: "Download.pdf",
-          savedDir: documents.path,
-          showNotification: true, // show download progress in status bar (for Android)
-          openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-        );
-        // print("Task id: $taskId");
-      } else {
-        print("Permission Denied");
+      try {
+        if (status) {
+          Directory documents = await getApplicationDocumentsDirectory();
+          print(documents.path);
+          String fname = url.split('/').last.split('.').first;
+          print("download FileName: $fname");
+          FileDownloaderFlutter().urlFileSaver(url: url, fileName: fname);
+        } else {
+          print("Permission Denied");
+        }
+      } catch (e) {
+        print("IOS download error $e");
       }
     }
   }
@@ -199,12 +212,17 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   }
                 },
                 onDownloadStartRequest: (controller, downloadStartRequest) {
-                  print("Download");
+                  LogService.writeLog(
+                      message: "onDownloadStartRequest\nwith requested url: ${downloadStartRequest.url.toString()}");
+                  print("Download...");
                   print("Requested url: ${downloadStartRequest.url.toString()}");
                   _download(downloadStartRequest.url.toString());
+                  // _downloadToDevice("url");
                 },
                 onConsoleMessage: (controller, consoleMessage) {
-                  print("Console Message received");
+                  // LogService.writeLog(message: "onConsoleMessage: ${consoleMessage.toString()}");
+
+                  print("Console Message received...");
                   print(consoleMessage.toString());
                   if (consoleMessage.toString().contains("axm_mainpageloaded")) {
                     try {
@@ -217,6 +235,8 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   }
                 },
                 onProgressChanged: (controller, value) {
+                  LogService.writeLog(message: "onProgressChanged: value=> $value");
+
                   print('Progress---: $value : DT ${DateTime.now()}');
                   if (value == 100) {
                     setState(() {
@@ -227,8 +247,12 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                 shouldOverrideUrlLoading: (controller, navigationAction) async {
                   var uri = navigationAction.request.url!;
                   print("Override url: $uri");
+                  LogService.writeLog(message: "shouldOverrideUrlLoading: url=> $uri");
+
                   if (imageExtensions.any((ext) => uri.toString().endsWith(ext))) {
                     _download(uri.toString());
+                    // _downloadToDevice("url");
+
                     return Future.value(NavigationActionPolicy.CANCEL);
                   }
                   return Future.value(NavigationActionPolicy.ALLOW);
@@ -276,8 +300,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
       builder: (context) {
         return AlertDialog(
           title: Text("Location Permission Required"),
-          content: Text(
-              "This feature requires location access. Please enable location permissions in settings."),
+          content: Text("This feature requires location access. Please enable location permissions in settings."),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
