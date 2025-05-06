@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/VersionUpdateClearOldData.dart';
@@ -24,10 +26,11 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     super.initState();
     _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 800));
     _animationController.forward();
- VersionUpdateClearOldData.clearAllOldData();
+    VersionUpdateClearOldData.clearAllOldData();
     checkIfDeviceSupportBiometric();
     Future.delayed(Duration(milliseconds: 1800), () {
       _animationController.stop();
+      configMainProject();
       var cached = appStorage.retrieveValue(AppStorage.CACHED);
       try {
         if (cached == null)
@@ -76,7 +79,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
   }
 
- void checkIfDeviceSupportBiometric() async {
+  void checkIfDeviceSupportBiometric() async {
     final LocalAuthentication auth = LocalAuthentication();
     final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
     final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
@@ -92,6 +95,26 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       } else {
         AppStorage().remove(AppStorage.CAN_AUTHENTICATE);
       }
+    }
+  }
+
+  void configMainProject() {
+    var jsonList = appStorage.retrieveValue(AppStorage.PROJECT_LIST);
+    if (jsonList == null) {
+      appStorage.storeValue(AppStorage.PROJECT_LIST, jsonEncode(["payrolldev"]));
+      var paProject = {
+        "projectCaption": "payrolldev",
+        "projectname": "payrolldev",
+        "url": "",
+        "scripts_uri": "",
+        "dbtype": "",
+        "expirydate": "",
+        "notify_uri": "",
+        "web_url": "https://dev.payazzure.com/run",
+        "arm_url": "https://dev.payazzure.com/ArmMobile"
+      };
+
+      appStorage.storeValue("payrolldev", paProject);
     }
   }
 }

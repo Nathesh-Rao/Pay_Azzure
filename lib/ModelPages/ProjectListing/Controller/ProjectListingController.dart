@@ -20,7 +20,15 @@ class ProjectListingController extends GetxController {
     if (jsonList == null) {
       return list;
     } else {
+      print("JsonConnections => $jsonList");
+
       list = jsonDecode(jsonList).toList();
+      var jsonProject = appStorage.retrieveValue(list[0] ?? "");
+      print("JsonProject => $jsonProject");
+
+      var paProject =
+          "{projectCaption: payrolldev, projectname: payrolldev, url: , scripts_uri: , dbtype: , expirydate: , notify_uri: , web_url: https://dev.payazzure.com/run, arm_url: https://dev.payazzure.com/ArmMobile}";
+
       fullList = list;
       return list;
     }
