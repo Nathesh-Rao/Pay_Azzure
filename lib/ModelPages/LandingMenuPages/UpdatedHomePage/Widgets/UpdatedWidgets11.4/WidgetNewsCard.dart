@@ -267,6 +267,8 @@ class _NewsPanelState extends State<NewsPanel> {
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
+                          overflow: TextOverflow.visible,
+                          maxLines: 2,
                         ),
                       ),
                       Flexible(
@@ -276,6 +278,7 @@ class _NewsPanelState extends State<NewsPanel> {
                             fontWeight: FontWeight.w400,
                             fontSize: 12,
                           ),
+
                         ),
                       ),
                       Flexible(

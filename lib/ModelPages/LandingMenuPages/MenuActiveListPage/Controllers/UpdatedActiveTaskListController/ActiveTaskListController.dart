@@ -102,7 +102,7 @@ class ActiveTaskListController extends GetxController {
     body = {
       'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID),
       "AxSessionId": "meecdkr3rfj4dg5g4131xxrt",
-      "AppName": Const.PROJECT_NAME.toString(),
+      "AppName": appStorage.retrieveValue(AppStorage.PROJECT_NAME), //Const.PROJECT_NAME.toString(),
       "Trace": "false",
       "PageSize": pageSize,
       "PageNo": pageNo,

@@ -82,7 +82,7 @@ class WidgetBannerCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Color(0xff5c61f1),
+        color: Color(0xFFA61E2A),//Color(0xff5c61f1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Stack(
@@ -114,62 +114,64 @@ class WidgetBannerCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    cardname ?? '',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: MyColors.white1,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cardname ?? '',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: MyColors.white1,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    bannerData.title ?? '',
-                    style: GoogleFonts.urbanist(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: MyColors.blue2,
+                    SizedBox(height: 15),
+                    Text(
+                      bannerData.title ?? '',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: MyColors.white2,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  SizedBox(
-                    width: Get.width / 2,
-                    child: Row(
-                      children: [
-                        Flexible(
-                            child: Text(
-                          bannerData.subtitle ?? '',
-                          style: GoogleFonts.urbanist(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: MyColors.white3.withAlpha(190),
-                          ),
-                        )),
-                      ],
+                    SizedBox(height: 8),
+                    SizedBox(
+                      width: Get.width / 1.7,
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: Text(
+                            bannerData.subtitle ?? '',
+                            style: GoogleFonts.urbanist(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: MyColors.white3.withAlpha(190),
+                            ),
+                          )),
+                        ],
+                      ),
                     ),
-                  ),
-                  // SizedBox(height: 15),
-                  // Visibility(
-                  //   visible: bannerData.time != null,
-                  //   child: Container(
-                  //       decoration: BoxDecoration(
-                  //         color: Colors.white,
-                  //         borderRadius: BorderRadius.circular(25),
-                  //       ),
-                  //       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  //       child: Text(
-                  //         bannerData.time ?? '',
-                  //         style: GoogleFonts.urbanist(
-                  //           fontWeight: FontWeight.w700,
-                  //           fontSize: 10,
-                  //           color: MyColors.blue1,
-                  //         ),
-                  //       )),
-                  // ),
-                ],
+                    // SizedBox(height: 15),
+                    // Visibility(
+                    //   visible: bannerData.time != null,
+                    //   child: Container(
+                    //       decoration: BoxDecoration(
+                    //         color: Colors.white,
+                    //         borderRadius: BorderRadius.circular(25),
+                    //       ),
+                    //       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    //       child: Text(
+                    //         bannerData.time ?? '',
+                    //         style: GoogleFonts.urbanist(
+                    //           fontWeight: FontWeight.w700,
+                    //           fontSize: 10,
+                    //           color: MyColors.blue1,
+                    //         ),
+                    //       )),
+                    // ),
+                  ],
+                ),
               ),
             ),
           )

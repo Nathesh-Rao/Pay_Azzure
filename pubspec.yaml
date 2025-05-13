@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 11.3.0+6
+version: 11.4.0+6
 
 
 environment:
@@ -75,6 +75,7 @@ dependencies:
   #  flutter_local_network_ios: ^0.0.1
   flutter_expanded_tile: ^0.4.0
   app_settings: ^6.1.1
+  cupertino_icons: ^1.0.8
   #  simple_downloader: ^0.0.3+1
 #  background_location_tracker: ^1.4.3
   platform_device_id:

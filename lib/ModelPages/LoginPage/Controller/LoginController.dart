@@ -231,39 +231,41 @@ class LoginController extends GetxController {
             await _processLoginAndGoToHomePage();
           }
         } else {
-          Get.snackbar("Error", "Some Error occured",
-              backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar("Error", "Some Error occured", backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
         }
         LoadingScreen.dismiss();
         // print(resp);
         // print(googleUser);
       }
     } catch (e) {
-      Get.snackbar("Error", "User is not Registered!",
-          snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
+      Get.snackbar("Error", "User is not Registered!", snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
     }
   }
 
   _processLoginAndGoToHomePage() async {
     //mobile Notification
     await _callApiForMobileNotification();
-    //connect to Axpert
-    var connectBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
-    var cUrl = Const.getFullARMUrl(ServerConnections.API_CONNECTTOAXPERT);
-    var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
-    print(connectResp);
-    // getArmMenu
 
-    var jsonResp = jsonDecode(connectResp);
-    if (jsonResp != "") {
-      if (jsonResp['result']['success'].toString() == "true") {
-        // Get.offAllNamed(Routes.LandingPage);
+    try {
+      //connect to Axpert
+      var connectBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
+      var cUrl = Const.getFullARMUrl(ServerConnections.API_CONNECTTOAXPERT);
+      var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
+      print(connectResp);
+      // getArmMenu
+      var jsonResp = jsonDecode(connectResp);
+      if (jsonResp != "") {
+        if (jsonResp['result']['success'].toString() == "true") {
+          // Get.offAllNamed(Routes.LandingPage);
+        } else {
+          var message = jsonResp['result']['message'].toString();
+          showErrorSnack(title: "Error - Connect To Axpert", message: message);
+        }
       } else {
-        var message = jsonResp['result']['message'].toString();
-        showErrorSnack(title: "Error - Connect To Axpert", message: message);
+        showErrorSnack();
       }
-    } else {
-      showErrorSnack();
+    } catch (e) {
+      print(e);
     }
     Get.offAllNamed(Routes.LandingPage);
   }
