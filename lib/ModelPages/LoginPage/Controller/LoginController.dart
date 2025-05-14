@@ -140,7 +140,7 @@ class LoginController extends GetxController {
   getSignInBody() async {
     Map body = {
       "deviceid": Const.DEVICE_ID,
-      "appname": Const.PROJECT_NAME,
+      "appname": currentProjectName.value,
       "username": userNameController.text.toString().trim(),
       "userGroup": ddSelectedValue.value.toString().toLowerCase(),
       "biometricType": "LOGIN",
