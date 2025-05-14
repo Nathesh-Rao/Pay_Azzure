@@ -7,7 +7,7 @@ class Const {
   static String RELEASE_ID = "_testRelease300425";
   static String DEVICE_ID = "";
   static String PROJECT_URL = ""; //"https://app.buzzily.com/Run";
-  static String PROJECT_NAME = "axpertqa11";
+  static String PROJECT_NAME = "";
   static String ARM_URL = "";
   static String GUID = "";
   static String APP_VERSION = "";

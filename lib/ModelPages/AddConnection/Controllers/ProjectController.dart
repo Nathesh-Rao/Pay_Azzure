@@ -82,22 +82,28 @@ class ProjectController extends GetxController {
   }
 
   Future<void> saveProjects() async {
-    String encodedData = ProjectModel.encode(projects);
-    await appStorage.storeValue("projects", encodedData);
+    if (projects.isEmpty) {
+      await appStorage.storeValue("projects", null);
+    } else {
+      String encodedData = ProjectModel.encode(projects);
+      await appStorage.storeValue("projects", encodedData);
+    }
   }
 
   Future<void> loadProjects() async {
     String? storedData = appStorage.retrieveValue("projects");
-
+    LogService.writeLog(message: "storedData => $storedData || ${storedData?.isEmpty} || ${storedData == []}");
     // LogService.writeLog(message: "projects => storedData => $storedData");
 
-    if (storedData != null) {
-      projects.assignAll(ProjectModel.decode(storedData));
-    } else {
-      var project = ProjectModel(DateTime.now().toString(), "vagmay", "hhttps://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
-          "https://dev.payazzure.com/metaspeedarm", "vagmay");
+    if (storedData == null || storedData.isEmpty) {
+      // var project = ProjectModel(DateTime.now().toString(), "vagmay", "hhttps://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
+      //     "https://dev.payazzure.com/metaspeedarm", "vagmay");
+      var project = ProjectModel(DateTime.now().toString(), "meta", "https://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
+          "https://dev.payazzure.com/metaspeedarmmobile", "meta");
 
       await addProject(project);
+    } else {
+      projects.assignAll(ProjectModel.decode(storedData));
     }
   }
 
@@ -114,9 +120,75 @@ class ProjectController extends GetxController {
     }
   }
 
+  // Future<void> removeProject(String id) async {
+  //   //done delete cache if id matches
+  //
+  //   var cached = appStorage.retrieveValue(AppStorage.CACHED);
+  //   try {
+  //     if (cached == null) {
+  //       // Get.offAllNamed(Routes.ProjectListingPage);
+  //       // LogService.writeLog(message: "Cached => $cached");
+  //
+  //       projects.removeWhere((p) => p.id == id);
+  //       await saveProjects();
+  //     } else {
+  //       var jsonProject = appStorage.retrieveValue(cached);
+  //
+  //       ProjectModel? projectModel;
+  //       if (jsonProject is ProjectModel) {
+  //         projectModel = jsonProject;
+  //       } else {
+  //         projectModel = ProjectModel.fromJson(jsonProject);
+  //       }
+  //
+  //       if (projectModel.id == id) {
+  //         appStorage.remove(AppStorage.CACHED);
+  //       }
+  //
+  //       projects.removeWhere((p) => p.id == id);
+  //       await saveProjects();
+  //     }
+  //   } catch (e) {
+  //     projects.removeWhere((p) => p.id == id);
+  //     await saveProjects();
+  //     LogService.writeLog(message: e.toString());
+  //   }
+  // }
   Future<void> removeProject(String id) async {
-    projects.removeWhere((p) => p.id == id);
-    await saveProjects();
+    try {
+      final cachedData = appStorage.retrieveValue(AppStorage.CACHED);
+      final retrievedData = appStorage.retrieveValue(cachedData);
+      LogService.writeLog(message: "[i] ProjectController cachedData1 => $cachedData");
+
+      if (retrievedData != null) {
+        ProjectModel? projectModel;
+
+        if (retrievedData is ProjectModel) {
+          projectModel = retrievedData;
+        } else if (retrievedData is String) {
+          projectModel = ProjectModel.fromJson(json.decode(retrievedData));
+        } else if (retrievedData is Map<String, dynamic>) {
+          projectModel = ProjectModel.fromJson(retrievedData);
+        }
+        // LogService.writeLog(message: "[i] ProjectController projectModel => ${projectModel?.id} || ${id}");
+        // LogService.writeLog(message: "[i] projectModel idMatch => ${projectModel?.id == id}");
+
+        if (projectModel?.id == id) {
+          // LogService.writeLog(message: "[i] projectModel Cache removed");
+
+          await appStorage.remove(AppStorage.CACHED);
+        }
+      }
+
+      projects.removeWhere((p) => p.id == id);
+      await saveProjects();
+      final cachedData2 = appStorage.retrieveValue(AppStorage.CACHED);
+      LogService.writeLog(message: "[i] ProjectController cachedData2 => $cachedData2");
+    } catch (e) {
+      projects.removeWhere((p) => p.id == id);
+      await saveProjects();
+      LogService.writeLog(message: "Error removing project: $e");
+    }
   }
 
   ///----------------------------------

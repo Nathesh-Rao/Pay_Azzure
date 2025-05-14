@@ -37,11 +37,15 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     Future.delayed(Duration(milliseconds: 1800), () {
       _animationController.stop();
       var cached = appStorage.retrieveValue(AppStorage.CACHED);
+      LogService.writeLog(message: "[i] SplashPage Cached => $cached");
+
       try {
         if (cached == null)
           Get.offAllNamed(Routes.ProjectListingPage);
         else {
           var jsonProject = appStorage.retrieveValue(cached);
+          LogService.writeLog(message: "[i] SplashPage jsonProject => $jsonProject");
+
           projectModel = ProjectModel.fromJson(jsonProject);
           Const.PROJECT_NAME = projectModel!.projectname;
           Const.PROJECT_URL = projectModel!.web_url;
@@ -49,6 +53,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
           Get.offAllNamed(Routes.Login);
         }
       } catch (e) {
+        LogService.writeLog(message: "[i] SplashPage jsonProject => $e");
+
         Get.offAllNamed(Routes.ProjectListingPage);
       }
     });

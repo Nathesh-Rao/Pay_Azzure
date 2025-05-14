@@ -29,7 +29,7 @@ class LoginController extends GetxController {
   var errPassword = ''.obs;
   var fcmId;
   var willAuthenticate = false.obs;
-
+  var currentProjectName = ''.obs;
   LoginController() {
     // fetchUserTypeList();
     fetchRememberedData();
@@ -231,14 +231,16 @@ class LoginController extends GetxController {
             await _processLoginAndGoToHomePage();
           }
         } else {
-          Get.snackbar("Error", "Some Error occured", backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar("Error", "Some Error occured",
+              backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
         }
         LoadingScreen.dismiss();
         // print(resp);
         // print(googleUser);
       }
     } catch (e) {
-      Get.snackbar("Error", "User is not Registered!", snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
+      Get.snackbar("Error", "User is not Registered!",
+          snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
     }
   }
 
@@ -327,6 +329,10 @@ class LoginController extends GetxController {
     var groups = appStorage.retrieveValue(AppStorage.USER_GROUP) ?? {};
     groups.remove(Const.PROJECT_NAME);
     appStorage.storeValue(AppStorage.USER_GROUP, groups);
+  }
+
+  onLoad() async {
+    currentProjectName.value = await appStorage.retrieveValue(AppStorage.PROJECT_NAME) ?? '';
   }
 
   void fetchRememberedData() {
