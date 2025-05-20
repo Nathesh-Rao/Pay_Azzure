@@ -121,15 +121,15 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     final LocalAuthentication auth = LocalAuthentication();
     final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
     final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
-    LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
+    // LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
+    LogService.writeOnConsole(
+        message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
     if (canAuthenticate) {
       final List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
-      LogService.writeLog(
+      // LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
+      LogService.writeOnConsole(
           message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
 
-      // if (availableBiometrics.contains (BiometricType.fingerprint) ||
-      //     availableBiometrics.contains(BiometricType.weak) ||
-      //     availableBiometrics.contains(BiometricType.strong))
       if (availableBiometrics.isNotEmpty) {
         AppStorage().storeValue(AppStorage.CAN_AUTHENTICATE, canAuthenticate);
       } else {

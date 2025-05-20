@@ -191,45 +191,4 @@ class _RequestLocationPageState extends State<RequestLocationPage> with WidgetsB
       Navigator.of(context).pop();
     }
   }
-
-  _locationPermission1() async {
-    if (Platform.isAndroid) {
-      final permission = await Permission.locationAlways.request();
-
-      LogService.writeLog(message: "[i] SplashPage \nScope: askLocationPermission() : $permission");
-
-      if (permission != PermissionStatus.granted) {
-        setState(() {
-          isPermissionPDenied = permission == PermissionStatus.permanentlyDenied;
-        });
-        LogService.writeLog(message: " _locationPermission()=> Not Granted => $permission");
-        return;
-      }
-
-      setState(() {
-        isPermissionPDenied = false;
-      });
-
-      LogService.writeLog(message: " _locationPermission()=> Granted => $permission");
-      Get.back();
-      return;
-    }
-
-    final locationPermission = await Geolocator.checkPermission();
-
-    if (Platform.isIOS) {
-      if (locationPermission != LocationPermission.whileInUse) return;
-
-      LogService.writeLog(message: "[i] [IOS] RequestLocationPage\nScope: _locationPermission(): granted");
-      Navigator.of(context).pop();
-      return;
-    }
-
-    if (locationPermission == LocationPermission.always) {
-      LogService.writeLog(message: "[i] RequestLocationPage\nScope: _locationPermission(): granted");
-      LogService.writeLog(message: " _locationPermission()=> Granted => $locationPermission");
-
-      Navigator.of(context).pop();
-    }
-  }
 }

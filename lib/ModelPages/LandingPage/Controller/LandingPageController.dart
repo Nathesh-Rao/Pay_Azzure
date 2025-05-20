@@ -115,6 +115,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     var willAuthLocal = await getWillBiometricAuthenticateForThisUser(userName.value);
     if (willAuthLocal == null || willAuthLocal == false) {
       Get.bottomSheet(
+        isDismissible: false,
         PopScope(
           canPop: false,
           child: Container(
@@ -157,7 +158,9 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 ElevatedButton(
                   onPressed: () async {
                     var willAuthenticate = await showBiometricDialog();
-                    Get.back();
+                    if (willAuthenticate) {
+                      Get.back();
+                    }
                     await setWillBiometricAuthenticateForThisUser(userName.value, willAuthenticate);
                     willAuth = willAuthenticate;
                   },
@@ -182,7 +185,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
             ),
           ),
         ),
-        isDismissible: false,
+        // isDismissible: false,
         isScrollControlled: true,
         enableDrag: false,
         backgroundColor: Colors.black.withOpacity(0.2),

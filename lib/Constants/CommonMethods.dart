@@ -150,7 +150,35 @@ showErrorSnack({title = 'Error', message = 'Server busy, Please try again later.
     Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.redAccent);
 }
 
-showBiometricDialog() async {
+Future<bool> showBiometricDialog() async {
+  try {
+    final auth = LocalAuthentication();
+
+    final isAuthenticated = await auth.authenticate(
+      localizedReason: "Please use your touch ID to login",
+      authMessages: const <AuthMessages>[
+        AndroidAuthMessages(
+          signInTitle: 'Biometric authentication required!',
+          cancelButton: 'No thanks',
+        ),
+        IOSAuthMessages(
+          cancelButton: 'No thanks',
+        )
+      ],
+      options: const AuthenticationOptions(
+        biometricOnly: true,
+        useErrorDialogs: false,
+        stickyAuth: false,
+      ),
+    );
+
+    return isAuthenticated;
+  } catch (e) {
+    return false;
+  }
+}
+
+showBiometricDialogOld() async {
   try {
     LocalAuthentication auth = LocalAuthentication();
     return await auth.authenticate(
