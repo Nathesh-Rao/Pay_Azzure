@@ -52,7 +52,6 @@ class LogService {
   }
 
   static writeLog({String message = ""}) async {
-    return;
     _logWithColor(message, yellow);
     if (Const.isLogEnabled) {
       final file = await _localFile();
