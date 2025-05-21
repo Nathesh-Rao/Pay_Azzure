@@ -19,6 +19,7 @@ class ProjectItemListTile extends StatelessWidget {
   ProjectModel? projectModel;
   AddConnectionController addConnectionController = Get.find();
   ProjectController projectController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -28,10 +29,10 @@ class ProjectItemListTile extends StatelessWidget {
         Const.PROJECT_NAME = projectModel!.projectname;
         Const.PROJECT_URL = projectModel!.web_url;
         Const.ARM_URL = projectModel!.arm_url;
-        LogService.writeLog(message: "ProjectCaption => ${projectModel!.projectCaption}");
         await appStorage.storeValue(AppStorage.PROJECT_NAME, projectModel!.projectname);
         await appStorage.storeValue(AppStorage.PROJECT_URL, projectModel!.web_url);
         await appStorage.storeValue(AppStorage.ARM_URL, projectModel!.arm_url);
+        LogService.writeLog(message: "[i] ProjectListingPage\nSelected Project : ${projectModel!.projectname}");
 
         Get.offAllNamed(Routes.Login);
       },

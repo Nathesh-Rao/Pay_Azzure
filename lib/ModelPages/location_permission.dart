@@ -133,7 +133,7 @@ class _RequestLocationPageState extends State<RequestLocationPage> with WidgetsB
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "1. Tap Go to Settings in the prompt.In the App Info screen,\n2. select App(Axpert Flutter).\n3. Choose 'Allow all the time'.\n4. Press the back button to return to the app.",
+            "1. Tap Go to Settings in the prompt.In the App Info screen,\n2. select App(Pay Azzure).\n3. Choose 'Allow all the time'.\n4. Press the back button to return to the app.",
             style: GoogleFonts.poppins(),
           ),
           SizedBox(

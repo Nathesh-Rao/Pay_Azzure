@@ -57,6 +57,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
         Get.offAllNamed(Routes.ProjectListingPage);
       }
+      _askLocationPermission();
     });
   }
 
@@ -67,7 +68,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       // print("Location Permission: ${permission}");
       LogService.writeLog(message: "[i] SplashPage \nScope: askLocationPermission() : $permission ");
       if (permission != PermissionStatus.granted) {
-        Get.to(RequestLocationPage());
+       await Get.to(RequestLocationPage());
       }
     }
     if (Platform.isIOS) {
@@ -86,7 +87,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _askLocationPermission();
+     // _askLocationPermission();
       // await ensureLocalNetworkPermission();
     });
     return Scaffold(
