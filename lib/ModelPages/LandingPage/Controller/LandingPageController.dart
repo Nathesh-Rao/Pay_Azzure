@@ -141,7 +141,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  "Biometric Authentication in now Available!",
+                  "Biometric Authentication is now Available!",
                   style: GoogleFonts.poppins(textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
                   textAlign: TextAlign.center,
                   maxLines: 2,
