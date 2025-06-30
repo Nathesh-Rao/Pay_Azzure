@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/CommonMethods.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/CardModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/CardOptionModel.dart';
@@ -22,6 +23,7 @@ import '../../UpdatedHomePage/Widgets/WidgetMenuFolderPanelItem.dart';
 import '../Models/MenuFolderModel.dart';
 
 class MenuHomePageController extends GetxController {
+  final globalVariableController = Get.find<GlobalVariableController>();
   // final AttendanceController c = Get.put(AttendanceController());
   InternetConnectivity internetConnectivity = Get.find();
   var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
@@ -521,7 +523,7 @@ class MenuHomePageController extends GetxController {
     var body = {
       // "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_DashBoard),
       "publickey": ExecuteApi.API_PUBLICKEY_DASHBOARD,
-      "Project": Const.PROJECT_NAME,
+      "Project": globalVariableController.PROJECT_NAME.value,
       "getsqldata": {"trace": "false"}
     };
     var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
@@ -647,7 +649,7 @@ class MenuHomePageController extends GetxController {
     var body = {
       "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PRIVATEKEY_ATTENDANCE),
       "publickey": ExecuteApi.API_PUBLICKEY_ATTENDANCE,
-      "Project": Const.PROJECT_NAME, //"agilepost113",
+      "Project": globalVariableController.PROJECT_NAME.value, //"agilepost113",
       "getsqldata": {"trace": "false"}
     };
     var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
@@ -675,7 +677,7 @@ class MenuHomePageController extends GetxController {
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "username": appStorage.retrieveValue(AppStorage.USER_NAME),
-      "appname": Const.PROJECT_NAME, //"agilepost113",
+      "appname": globalVariableController.PROJECT_NAME.value, //"agilepost113",
       "datasource": "Company_Logo",
       "sqlParams": {"username": appStorage.retrieveValue(AppStorage.USER_NAME)}
     };

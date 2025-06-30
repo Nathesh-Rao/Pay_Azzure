@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
+
+final globalVariableController = Get.find<GlobalVariableController>();
 
 isTablet() {
   return MediaQueryData.fromView(WidgetsBinding.instance.window).size.shortestSide < 600 ? true : false;
@@ -207,7 +210,7 @@ willShowSetBiometricDialog(user) async {
   if (data.isEmpty) {
     return true;
   } else {
-    var projectWise = data[Const.PROJECT_NAME] ?? {};
+    var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
     var userWise = projectWise[user] ?? {};
     if (userWise.isEmpty)
       return true;
@@ -219,9 +222,9 @@ willShowSetBiometricDialog(user) async {
 setWillBiometricAuthenticateForThisUser(user, willAuthenticate) async {
   AppStorage appStorage = AppStorage();
   var data = await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ?? {};
-  var projectWise = data[Const.PROJECT_NAME] ?? {};
+  var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
   projectWise[user] = willAuthenticate;
-  data[Const.PROJECT_NAME] = projectWise;
+  data[globalVariableController.PROJECT_NAME.value] = projectWise;
   await appStorage.storeValue(AppStorage.WILL_AUTHENTICATE_FOR_USER, data);
 }
 
@@ -233,7 +236,7 @@ getWillBiometricAuthenticateForThisUser(user) async {
   if (data.isEmpty) {
     return null;
   } else {
-    var projectWise = data[Const.PROJECT_NAME] ?? {};
+    var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
     var userWise = projectWise[user] ?? {};
     try {
       if (userWise.isEmpty) return null;

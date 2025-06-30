@@ -1,4 +1,5 @@
 import 'package:axpertflutter/Constants/AppStorage.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/Const.dart';
@@ -13,27 +14,31 @@ class ProjectItemListTile extends StatelessWidget {
   String? keyValue;
   final AppStorage appStorage = AppStorage();
 
+
   ProjectItemListTile(ProjectModel value) {
     projectModel = value;
   }
   ProjectModel? projectModel;
   AddConnectionController addConnectionController = Get.find();
   ProjectController projectController = Get.find();
+  final globalVariableController = Get.find<GlobalVariableController>();
 
   @override
   Widget build(BuildContext context) {
+    final constInstance = Const();
     return GestureDetector(
       onTap: () async {
+
         await appStorage.storeValue(AppStorage.CACHED, projectModel!.projectCaption);
         await appStorage.storeValue(projectModel!.projectCaption, projectModel);
-        Const.PROJECT_NAME = projectModel!.projectname;
-        Const.PROJECT_URL = projectModel!.web_url;
-        Const.ARM_URL = projectModel!.arm_url;
+        globalVariableController.PROJECT_NAME.value = projectModel!.projectname;
+        globalVariableController.PROJECT_URL.value = projectModel!.web_url;
+        globalVariableController.ARM_URL.value = projectModel!.arm_url;
         await appStorage.storeValue(AppStorage.PROJECT_NAME, projectModel!.projectname);
         await appStorage.storeValue(AppStorage.PROJECT_URL, projectModel!.web_url);
         await appStorage.storeValue(AppStorage.ARM_URL, projectModel!.arm_url);
         LogService.writeLog(message: "[i] ProjectListingPage\nSelected Project : ${projectModel!.projectname}");
-        LogService.writeOnConsole(message: "Const.ARM_URL => ${Const.ARM_URL}");
+        LogService.writeOnConsole(message: "Const.ARM_URL => ${globalVariableController.ARM_URL.value}");
         Get.offAllNamed(Routes.Login);
       },
       child: Card(

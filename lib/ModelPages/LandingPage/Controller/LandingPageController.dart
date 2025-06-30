@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/CommonMethods.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
@@ -23,6 +24,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +37,7 @@ import '../../LandingMenuPages/MenuHomePagePage/Models/BannerModel.dart';
 import '../Widgets/WidgetBanner.dart';
 
 class LandingPageController extends GetxController with WidgetsBindingObserver {
+  final globalVariableController = Get.find<GlobalVariableController>();
   final MenuMorePageController menuMorePageController = Get.put(MenuMorePageController());
 
   TextEditingController userCtrl = TextEditingController();
@@ -121,7 +124,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "username": appStorage.retrieveValue(AppStorage.USER_NAME),
-      "appname": Const.PROJECT_NAME, //"agilepost113",
+      "appname": globalVariableController.PROJECT_NAME.value, //"agilepost113",
       "datasource": "Company_Logo",
       "sqlParams": {"username": appStorage.retrieveValue(AppStorage.USER_NAME)}
     };
@@ -718,7 +721,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 ),
                 SizedBox(height: 5),
                 TextScroll(
-                  CommonMethods.capitalize(userNickName.value),
+                  CommonMethods.capitalize(Get.find<MenuHomePageController>().user_nickName.value),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 )
               ],
@@ -1373,7 +1376,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   getBannerDetailList() async {
     try {
       list_bannerItem.clear();
-      var baseUrl = Const.PROJECT_URL;
+      var baseUrl = globalVariableController.PROJECT_URL.value;
       baseUrl += baseUrl.endsWith("/") ? "" : "/";
       var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
       // url = "https://demo.agilecloud.biz/mainpagebanner.json";
@@ -1388,11 +1391,11 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
           }
         }
       } else {
-        if (Const.PROJECT_URL.endsWith("/")) {
-          var URL = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.length - 1);
+        if (globalVariableController.PROJECT_URL.value.endsWith("/")) {
+          var URL = globalVariableController.PROJECT_URL.value.substring(0, globalVariableController.PROJECT_URL.value.length - 1);
           baseUrl = URL.substring(0, URL.lastIndexOf('/'));
         } else {
-          baseUrl = Const.PROJECT_URL.substring(0, Const.PROJECT_URL.lastIndexOf('/'));
+          baseUrl = globalVariableController.PROJECT_URL.value.substring(0, globalVariableController.PROJECT_URL.value.lastIndexOf('/'));
         }
 
         baseUrl += baseUrl.endsWith("/") ? "" : "/";

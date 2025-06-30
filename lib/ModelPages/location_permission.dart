@@ -129,12 +129,16 @@ class _RequestLocationPageState extends State<RequestLocationPage> with WidgetsB
           ]),
         ],
       );
+
   openSettingWidget() => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            "1. Tap Go to Settings in the prompt.In the App Info screen,\n2. select App(Pay Azzure).\n3. Choose 'Allow all the time'.\n4. Press the back button to return to the app.",
-            style: GoogleFonts.poppins(),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Text(
+              "1. Tap Go to Settings in the prompt.In the App Info screen,\n2. select App(Pay Azzure).\n3. Choose 'Allow all the time'.\n4. Press the back button to return to the app.",
+              style: GoogleFonts.poppins(),
+            ),
           ),
           SizedBox(
             height: 20,
@@ -151,6 +155,7 @@ class _RequestLocationPageState extends State<RequestLocationPage> with WidgetsB
           ]),
         ],
       );
+
   _openAppSettings() async {
     await AppSettings.openAppSettings(type: AppSettingsType.location);
   }

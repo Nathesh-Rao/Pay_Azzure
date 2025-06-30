@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/VersionUpdateClearOldData.dart';
 import 'package:axpertflutter/Constants/const.dart';
@@ -25,6 +26,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   var _animationController;
   AppStorage appStorage = AppStorage();
   ProjectModel? projectModel;
+  final GlobalVariableController globalVariableController = Get.put(GlobalVariableController(), permanent: true);
 
   @override
   void initState() {
@@ -47,9 +49,9 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
           LogService.writeLog(message: "[i] SplashPage jsonProject => $jsonProject");
 
           projectModel = ProjectModel.fromJson(jsonProject);
-          Const.PROJECT_NAME = projectModel!.projectname;
-          Const.PROJECT_URL = projectModel!.web_url;
-          Const.ARM_URL = projectModel!.arm_url;
+          globalVariableController.PROJECT_NAME.value = projectModel!.projectname;
+          globalVariableController.PROJECT_URL.value = projectModel!.web_url;
+          globalVariableController.ARM_URL.value = projectModel!.arm_url;
           Get.offAllNamed(Routes.Login);
         }
       } catch (e) {
@@ -57,23 +59,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
         Get.offAllNamed(Routes.ProjectListingPage);
       }
-      _askLocationPermission();
     });
-  }
-
-  _askLocationPermission() async {
-    if (Platform.isAndroid) {
-      var permission = await Permission.locationAlways.request();
-
-      // print("Location Permission: ${permission}");
-      LogService.writeLog(message: "[i] SplashPage \nScope: askLocationPermission() : $permission ");
-      if (permission != PermissionStatus.granted) {
-       await Get.to(RequestLocationPage());
-      }
-    }
-    if (Platform.isIOS) {
-      await Geolocator.requestPermission();
-    }
   }
 
   @override
@@ -87,7 +73,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-     // _askLocationPermission();
+      // _askLocationPermission();
       // await ensureLocalNetworkPermission();
     });
     return Scaffold(
@@ -126,8 +112,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     // LogService.writeOnConsole(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
     if (canAuthenticate) {
       final List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
-      LogService.writeLog(
-          message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
+      LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
       // LogService.writeOnConsole(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
 
       if (availableBiometrics.isNotEmpty) {

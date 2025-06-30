@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../Constants/CommonMethods.dart';
+import '../../../Constants/Const.dart';
 import '../../../Constants/Routes.dart';
 import '../../../Utils/LogServices/LogService.dart';
 import '../../../Utils/ServerConnections/ServerConnections.dart';
@@ -18,6 +19,7 @@ class ProjectController extends GetxController {
   RxList<ProjectModel> projects = <ProjectModel>[].obs;
   var isLoading = false.obs;
   AppStorage appStorage = AppStorage();
+
   //------------------
   TextEditingController connectionCodeController = TextEditingController();
   TextEditingController webUrlController = TextEditingController();
@@ -31,12 +33,14 @@ class ProjectController extends GetxController {
   var errCaption = ''.obs;
   var isFlashOn = false.obs;
   var isPlayPauseOn = false.obs;
+
 //---------------------------
   MobileScannerController? scannerController;
 
   // Barcode? barcodeResult;
 
   ServerConnections serverConnections = ServerConnections();
+
 //---------------------------
 
   @override
@@ -98,8 +102,10 @@ class ProjectController extends GetxController {
     if (storedData == null || storedData.isEmpty) {
       // var project = ProjectModel(DateTime.now().toString(), "vagmay", "hhttps://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
       //     "https://dev.payazzure.com/metaspeedarm", "vagmay");
-      var project = ProjectModel(DateTime.now().toString(), "meta", "https://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
-          "https://dev.payazzure.com/metaspeedarmmobile", "meta");
+      /*var project = ProjectModel(DateTime.now().toString(), "meta", "https://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
+          "https://dev.payazzure.com/metaspeedarmmobile", "meta");*/
+      var project = ProjectModel(
+          DateTime.now().toString(), Const.PAYAZZURE_PROJECT_NAME, Const.PAYAZZURE_WEB_URL, Const.PAYAZZURE_ARM_URL, Const.PAYAZZURE_PROJECT_NAME);
 
       await addProject(project);
     } else {
@@ -133,8 +139,8 @@ class ProjectController extends GetxController {
       if (isQr) {
         // LogService.writeOnConsole(message: "saveOrUpdateConnection => isQR: $isQr");
         if (!isDuplicate(model)) {
-          var project = ProjectModel(DateTime.now().toString(), conNameController.text, webUrlController.text,
-              armUrlController.text, conCaptionController.text);
+          var project = ProjectModel(
+              DateTime.now().toString(), conNameController.text, webUrlController.text, armUrlController.text, conCaptionController.text);
 
           await addProject(project);
           clearAllData();
@@ -151,8 +157,8 @@ class ProjectController extends GetxController {
       // LogService.writeOnConsole(message: "validateProjectDetailsForm => true");
 
       if (isQr) {
-        var project = ProjectModel(DateTime.now().toString(), conNameController.text, webUrlController.text,
-            armUrlController.text, conCaptionController.text);
+        var project =
+            ProjectModel(DateTime.now().toString(), conNameController.text, webUrlController.text, armUrlController.text, conCaptionController.text);
 
         if (!isDuplicate(model)) {
           LoadingScreen.show();
@@ -181,13 +187,12 @@ class ProjectController extends GetxController {
           if (!isDuplicate(model)) {
             if (await validateConnectionName(baseUrl)) {
               if (model == null) {
-                var project = ProjectModel(DateTime.now().toString(), conNameController.text, webUrlController.text,
-                    armUrlController.text, conCaptionController.text);
+                var project = ProjectModel(
+                    DateTime.now().toString(), conNameController.text, webUrlController.text, armUrlController.text, conCaptionController.text);
 
                 await addProject(project);
               } else {
-                await updateProject(
-                    model.id, conNameController.text, webUrlController.text, armUrlController.text, conCaptionController.text);
+                await updateProject(model.id, conNameController.text, webUrlController.text, armUrlController.text, conCaptionController.text);
               }
 
               clearAllData();
@@ -226,8 +231,7 @@ class ProjectController extends GetxController {
           conNameController.text.trim() == model.projectname &&
           newCaption == model.projectCaption.trim().toLowerCase()) {
         if (!Get.isSnackbarOpen) {
-          Get.snackbar("Nothing to save.", "",
-              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+          Get.snackbar("Nothing to save.", "", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
         }
         return true;
       }
@@ -255,8 +259,7 @@ class ProjectController extends GetxController {
           conNameController.text.trim() == model.projectname &&
           newCaption == model.projectCaption.trim().toLowerCase()) {
         if (!Get.isSnackbarOpen) {
-          Get.snackbar("Nothing to save.", "",
-              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+          Get.snackbar("Nothing to save.", "", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
         }
         return true;
       }
