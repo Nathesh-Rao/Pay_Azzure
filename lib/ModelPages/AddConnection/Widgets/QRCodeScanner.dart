@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/ModelPages/AddConnection/Controllers/AddConnectionController.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+
+import '../Controllers/ProjectController.dart';
 
 class QRCodeScanner extends StatefulWidget {
   const QRCodeScanner({super.key});
@@ -14,8 +17,22 @@ class QRCodeScanner extends StatefulWidget {
 }
 
 class _QRCodeScannerState extends State<QRCodeScanner> {
-  AddConnectionController addConnectionController = Get.find();
+  // AddConnectionController addConnectionController = Get.find();
+  ProjectController projectController = Get.find();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+
+  @override
+  void initState() {
+    // addConnectionController.scannerController = MobileScannerController();
+    projectController.scannerController = MobileScannerController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    projectController.scannerController!.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,41 +67,41 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Visibility(
-                    visible: !addConnectionController.doesDeviceHasFlash(),
+                    visible: !projectController.doesDeviceHasFlash(),
                     child: IconButton(onPressed: null, icon: Icon(Icons.no_flash, color: MyColors.blue2)),
                   ),
                   Visibility(
-                    visible: addConnectionController.doesDeviceHasFlash(),
+                    visible: projectController.doesDeviceHasFlash(),
                     child: IconButton(
                         onPressed: () {
-                          addConnectionController.qrViewController!.toggleFlash();
-                          addConnectionController.isFlashOn.toggle();
+                          projectController.scannerController!.toggleTorch();
+                          projectController.isFlashOn.toggle();
                         },
-                        icon: Obx(() => addConnectionController.isFlashOn.value
+                        icon: Obx(() => projectController.isFlashOn.value
                             ? Icon(Icons.flash_on, color: MyColors.blue2)
                             : Icon(Icons.flash_off, color: MyColors.blue2))),
                   ),
                   IconButton(
                       onPressed: () async {
-                        if (!addConnectionController.isPlayPauseOn.value) {
-                          await addConnectionController.qrViewController!.pauseCamera();
-                          addConnectionController.isPlayPauseOn.toggle();
+                        if (!projectController.isPlayPauseOn.value) {
+                          await projectController.scannerController!.pause();
+                          projectController.isPlayPauseOn.toggle();
                         } else {
-                          await addConnectionController.qrViewController!.resumeCamera();
-                          addConnectionController.isPlayPauseOn.toggle();
+                          await projectController.scannerController!.start();
+                          projectController.isPlayPauseOn.toggle();
                         }
                       },
-                      icon: Obx(() => !addConnectionController.isPlayPauseOn.value
+                      icon: Obx(() => !projectController.isPlayPauseOn.value
                           ? Icon(Icons.pause, color: MyColors.blue2)
                           : Icon(Icons.play_arrow_sharp, color: MyColors.blue2))),
                   IconButton(
                       onPressed: () {
-                        addConnectionController.qrViewController!.flipCamera();
+                        projectController.scannerController!.switchCamera();
                       },
                       icon: Icon(Icons.flip_camera_ios, color: MyColors.blue2)),
                   IconButton(
                       onPressed: () {
-                        addConnectionController.pickImageFromGalleryCalled();
+                        projectController.pickImageFromGalleryCalled();
                       },
                       icon: Icon(Icons.filter, color: MyColors.blue2)),
                 ],
@@ -97,47 +114,90 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
   }
 
   _buildQrView(BuildContext context) {
-    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
-
-    var scanArea =
-        //MediaQuery.of(context).size.height;
-        MediaQuery.of(context).size.width - 200;
-
-    // To ensure the Scanner view is properly sizes after rotation
-    // we need to listen for Flutter SizeChanged notification and update controller
-    return QRView(
-      key: qrKey,
-      onQRViewCreated: _onQRViewCreated,
-      overlay: QrScannerOverlayShape(
-          borderColor: MyColors.blue2, borderRadius: 10, borderLength: 30, borderWidth: 10, cutOutSize: scanArea),
-      onPermissionSet: (ctrl, p) => addConnectionController.requestPermissionForCamera(ctrl, p),
+    var scanArea = MediaQuery.of(context).size.width - 200;
+    return MobileScanner(
+      controller: projectController.scannerController,
+      overlayBuilder: (ctx, cts) => Container(
+        decoration: BoxDecoration(border: Border.all(color: MyColors.blue2)),
+      ),
+      onDetect: (capture) {
+        final List<Barcode> barcodes = capture.barcodes;
+        print("barcodes length => ${barcodes.length}");
+        if (barcodes.isNotEmpty) {
+          var barcode = barcodes.first;
+          _onQRViewCreated(barcode.rawValue);
+        }
+        // for (final barcode in barcodes) {
+        //   debugPrint('Scanned QR Code length: ${barcodes.length}');
+        //   debugPrint('Scanned QR Code: ${barcode.rawValue}');
+        // }
+      },
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      addConnectionController.qrViewController = controller;
-    });
-
-    controller.scannedDataStream.listen((scanData) {
-      addConnectionController.barcodeResult = scanData;
-      // print(scanData);
-      if (addConnectionController.barcodeResult.toString() != "") {
-        print(addConnectionController.barcodeResult.toString());
-        controller.pauseCamera();
-        var data = addConnectionController.barcodeResult!.code.toString();
-        if (data == "" || !addConnectionController.validateQRData(data)) {
-          Get.snackbar("Invalid!", "Please choose a valid QR Code",
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-              duration: Duration(seconds: 1));
-          Timer(Duration(seconds: 2), () {
-            controller.resumeCamera();
-          });
-        } else
-          addConnectionController.decodeQRResult(data);
-      }
-    });
+  void _onQRViewCreated(String? barcodeRawValue) {
+    if (barcodeRawValue != null || barcodeRawValue.toString() != "") {
+      print(barcodeRawValue.toString());
+      projectController.scannerController!.pause();
+      var data = barcodeRawValue.toString();
+      if (data == "" || !projectController.validateQRData(data)) {
+        LogService.writeLog(message: "[ERROR] QRCodeScanner\nScope: _onQRViewCreated\ndata is null");
+        Get.snackbar("Invalid!", "Please choose a valid QR Code",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: Duration(seconds: 1));
+        Timer(Duration(seconds: 2), () {
+          projectController.scannerController!.start();
+        });
+      } else
+        projectController.decodeQRResult(data);
+    }
   }
+
+// _buildQrView(BuildContext context) {
+//   // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
+//
+//   var scanArea =
+//       //MediaQuery.of(context).size.height;
+//       MediaQuery.of(context).size.width - 200;
+//
+//   // To ensure the Scanner view is properly sizes after rotation
+//   // we need to listen for Flutter SizeChanged notification and update controller
+//   return QRView(
+//     key: qrKey,
+//     onQRViewCreated: _onQRViewCreated,
+//     overlay: QrScannerOverlayShape(
+//         borderColor: MyColors.blue2, borderRadius: 10, borderLength: 30, borderWidth: 10, cutOutSize: scanArea),
+//     onPermissionSet: (ctrl, p) => addConnectionController.requestPermissionForCamera(ctrl, p),
+//   );
+// }
+
+// void _onQRViewCreated(QRViewController controller) {
+//   setState(() {
+//     addConnectionController.qrViewController = controller;
+//   });
+//
+//   controller.scannedDataStream.listen((scanData) {
+//     addConnectionController.barcodeResult = scanData;
+//     // print(scanData);
+//     if (addConnectionController.barcodeResult.toString() != "") {
+//       print(addConnectionController.barcodeResult.toString());
+//       controller.pauseCamera();
+//       var data = addConnectionController.barcodeResult!.code.toString();
+//       if (data == "" || !addConnectionController.validateQRData(data)) {
+//         LogService.writeLog(message: "[ERROR] QRCodeScanner\nScope: _onQRViewCreated\ndata is null");
+//         Get.snackbar("Invalid!", "Please choose a valid QR Code",
+//             snackPosition: SnackPosition.BOTTOM,
+//             backgroundColor: Colors.red,
+//             colorText: Colors.white,
+//             duration: Duration(seconds: 1));
+//         Timer(Duration(seconds: 2), () {
+//           controller.resumeCamera();
+//         });
+//       } else
+//         addConnectionController.decodeQRResult(data);
+//     }
+//   });
+// }
 }

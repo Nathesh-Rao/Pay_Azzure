@@ -47,6 +47,10 @@ class LogService {
     } catch (e) {}
   }
 
+  static writeOnConsole({String message = ""}) async {
+    _logWithColor("console-log: $message", skyBlue);
+  }
+
   static writeLog({String message = ""}) async {
     _logWithColor(message, yellow);
     if (Const.isLogEnabled) {
@@ -59,6 +63,7 @@ class LogService {
   }
 
   static const String yellow = '\u001B[33m';
+  static const String skyBlue = '\u001B[38;5;39m';
 
   static clearLog() async {
     try {

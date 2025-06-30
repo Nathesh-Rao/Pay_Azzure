@@ -161,7 +161,8 @@ class CompletedListPage extends StatelessWidget {
                         switch (completedListController.completed_activeList[index].tasktype.toString().toUpperCase()) {
                           case "MAKE":
                             var URL = CommonMethods.activeList_CreateURL_MAKE(
-                                completedListController.completed_activeList[index], index);
+                              completedListController.completed_activeList[index],
+                            );
                             if (!URL.isEmpty)
                               Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
                             break;
@@ -175,8 +176,8 @@ class CompletedListPage extends StatelessWidget {
                           case "":
                           case "NULL":
                           case "CACHED SAVE":
-                            var URL = CommonMethods.activeList_CreateURL_MESSAGE(
-                                completedListController.completed_activeList[index], index);
+                            var URL =
+                                CommonMethods.activeList_CreateURL_MESSAGE(completedListController.completed_activeList[index]);
                             if (!URL.isEmpty)
                               Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
                             break;

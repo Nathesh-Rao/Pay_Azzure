@@ -4,6 +4,7 @@ import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LoginPage/Controller/LoginController.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,6 +25,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // LogService.writeLog(message: "LoginPage => PROJECT_NAME => ${Const.PROJECT_NAME}");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loginController.onLoad();
+    });
     return Obx(() => Scaffold(
           appBar: Platform.isIOS
               ? AppBar(
@@ -97,10 +102,13 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                         SizedBox(height: 5),
-                        Text(
-                          Const.PROJECT_NAME.toString().toUpperCase(),
-                          style: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 10, color: Colors.black)),
+                        Obx(
+                          () => Text(
+                            loginController.currentProjectName.value,
+                            // Const.PROJECT_NAME.toString().toUpperCase(),
+                            style: GoogleFonts.poppins(
+                                textStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 10, color: Colors.black)),
+                          ),
                         ),
                         SizedBox(height: 20),
                         TextField(
@@ -357,7 +365,7 @@ class _LoginPageState extends State<LoginPage> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Text(
-                                "Version: ${snapshot.data}",
+                                "Version:${snapshot.data}${Const.RELEASE_ID}",
                                 style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
                                         color: MyColors.buzzilyblack,

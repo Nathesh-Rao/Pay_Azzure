@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/CommonMethods.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
@@ -9,12 +11,20 @@ import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
+import '../../../Utils/LogServices/LogService.dart';
+
+import '../../../Utils/LogServices/LogService.dart';
+import '../../location_permission.dart';
+
 class LoginController extends GetxController {
+  GlobalVariableController globalVariableController = Get.find();
   ServerConnections serverConnections = ServerConnections();
   final googleLoginIn = GoogleSignIn();
   AppStorage appStorage = AppStorage();
@@ -29,8 +39,9 @@ class LoginController extends GetxController {
   var errPassword = ''.obs;
   var fcmId;
   var willAuthenticate = false.obs;
-
+  var currentProjectName = ''.obs;
   LoginController() {
+    _askLocationPermission();
     // fetchUserTypeList();
     fetchRememberedData();
     dropDownItemChanged(ddSelectedValue);
@@ -39,6 +50,21 @@ class LoginController extends GetxController {
     setWillAuthenticate();
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value) => fcmId = value);
+  }
+
+  _askLocationPermission() async {
+    if (Platform.isAndroid) {
+      var permission = await Permission.locationAlways.request();
+
+      // print("Location Permission: ${permission}");
+      LogService.writeLog(message: "[i] SplashPage \nScope: askLocationPermission() : $permission ");
+      if (permission != PermissionStatus.granted) {
+        await Get.to(RequestLocationPage());
+      }
+    }
+    if (Platform.isIOS) {
+      await Geolocator.requestPermission();
+    }
   }
 
   setWillAuthenticate() async {
@@ -137,29 +163,95 @@ class LoginController extends GetxController {
     return true;
   }
 
+  // getSignInBody() async {
+  //   Map body = {
+  //     "deviceid": Const.DEVICE_ID,
+  //     "appname": currentProjectName.value,
+  //     "username": userNameController.text.toString().trim(),
+  //     "userGroup": ddSelectedValue.value.toString().toLowerCase(),
+  //     "biometricType": "LOGIN",
+  //     "password": userPasswordController.text.toString().trim()
+  //   };
+  //   return jsonEncode(body);
+  // }
+  // static String getFullARMUrl(String Entrypoint) {
+  //   if (ARM_URL == "") {
+  //     var data = AppStorage().retrieveValue(AppStorage.ARM_URL) ?? "";
+  //     return data.endsWith("/") ? data + Entrypoint : data + "/" + Entrypoint;
+  //   } else
+  //     return ARM_URL.endsWith("/") ? ARM_URL + Entrypoint : ARM_URL + "/" + Entrypoint;
+  // }
   getSignInBody() async {
     Map body = {
-      "deviceid": Const.DEVICE_ID,
-      "appname": Const.PROJECT_NAME,
+      "appname": globalVariableController.PROJECT_NAME.value,
       "username": userNameController.text.toString().trim(),
-      "userGroup": ddSelectedValue.value.toString().toLowerCase(),
-      "biometricType": "LOGIN",
-      "password": userPasswordController.text.toString().trim()
+      "password": userPasswordController.text.toString().trim(),
+      "Language": "English"
+      //"deviceid": Const.DEVICE_ID,
+      //"userGroup": "power",
+      // "userGroup": ddSelectedValue.value.toString().toLowerCase(),
+      //"biometricType": "LOGIN",
     };
     return jsonEncode(body);
   }
 
+  // void loginButtonClicked({bodyArgs = ''}) async {
+  //   if (validateForm()) {
+  //     FocusManager.instance.primaryFocus?.unfocus();
+  //     LoadingScreen.show();
+  //     var body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
+  //     var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
+  //     // print(body.toString());
+  //     // var response = await http.post(Uri.parse(url),
+  //     //     headers: {"Content-Type": "application/json"}, body: body);
+  //     // var data = serverConnections.parseData(response);
+  //     var response = await serverConnections.postToServer(url: url, body: body);
+  //     if (response != "") {
+  //       var json = jsonDecode(response);
+  //       // print(json["result"]["sessionid"].toString());
+  //       if (json["result"]["success"].toString().toLowerCase() == "true") {
+  //         await appStorage.storeValue(AppStorage.TOKEN, json["result"]["token"].toString());
+  //         await appStorage.storeValue(AppStorage.SESSIONID, json["result"]["sessionid"].toString());
+  //         await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
+  //         await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
+  //         storeLastLoginData(body);
+  //         print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+  //         //Save Data
+  //         if (rememberMe.value) {
+  //           rememberCredentials();
+  //         } else {
+  //           dontRememberCredentials();
+  //         }
+  //
+  //         await _processLoginAndGoToHomePage();
+  //       } else {
+  //         Get.snackbar("Error ", json["result"]["message"],
+  //             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+  //       }
+  //     }
+  //     LoadingScreen.dismiss();
+  //   }
+  // }
+  void loginButtonClicked_temp({bodyArgs = ''}) async {
+    var _armUrl = globalVariableController.ARM_URL.value;
+    var _body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
+    var _url = Const.getFullARMUrl(ServerConnections.API_AX_START_SESSION);
+
+    LogService.writeOnConsole(message: "loginButtonClicked\nBody=> $_body\nurl=> $_url\narm_url=> $_armUrl");
+  }
+
   void loginButtonClicked({bodyArgs = ''}) async {
+    LogService.writeLog(message: "[i] LoginController\nSelected UserGroup : power");
     if (validateForm()) {
       FocusManager.instance.primaryFocus?.unfocus();
       LoadingScreen.show();
-      var body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
-      var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
-      // print(body.toString());
-      // var response = await http.post(Uri.parse(url),
-      //     headers: {"Content-Type": "application/json"}, body: body);
-      // var data = serverConnections.parseData(response);
-      var response = await serverConnections.postToServer(url: url, body: body);
+      var _body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
+      //var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
+      var _url = Const.getFullARMUrl(ServerConnections.API_AX_START_SESSION);
+
+      var response = await serverConnections.postToServer(url: _url, body: _body);
+      // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
+
       if (response != "") {
         var json = jsonDecode(response);
         // print(json["result"]["sessionid"].toString());
@@ -168,8 +260,14 @@ class LoginController extends GetxController {
           await appStorage.storeValue(AppStorage.SESSIONID, json["result"]["sessionid"].toString());
           await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
           await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
-          storeLastLoginData(body);
+          await appStorage.storeValue(
+              AppStorage.NICK_NAME, json["result"]["NickName"].toString() ?? userNameController.text.trim());
+          storeLastLoginData(_body);
           print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+          LogService.writeLog(
+              message:
+                  "[-] LoginController\nScope: loginButtonClicked()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+
           //Save Data
           if (rememberMe.value) {
             rememberCredentials();
@@ -201,7 +299,7 @@ class LoginController extends GetxController {
         await FirebaseAuth.instance.signInWithCredential(credential);
 
         Map body = {
-          'appname': Const.PROJECT_NAME,
+          'appname': globalVariableController.PROJECT_NAME.value,
           'userid': googleUser.email.toString(),
           'userGroup': ddSelectedValue.value.toString(),
           'ssoType': 'Google',
@@ -247,23 +345,27 @@ class LoginController extends GetxController {
   _processLoginAndGoToHomePage() async {
     //mobile Notification
     await _callApiForMobileNotification();
-    //connect to Axpert
-    var connectBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
-    var cUrl = Const.getFullARMUrl(ServerConnections.API_CONNECTTOAXPERT);
-    var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
-    print(connectResp);
-    // getArmMenu
 
-    var jsonResp = jsonDecode(connectResp);
-    if (jsonResp != "") {
-      if (jsonResp['result']['success'].toString() == "true") {
-        // Get.offAllNamed(Routes.LandingPage);
+    try {
+      //connect to Axpert
+      var connectBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
+      var cUrl = Const.getFullARMUrl(ServerConnections.API_CONNECTTOAXPERT);
+      var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
+      print(connectResp);
+      // getArmMenu
+      var jsonResp = jsonDecode(connectResp);
+      if (jsonResp != "") {
+        if (jsonResp['result']['success'].toString() == "true") {
+          // Get.offAllNamed(Routes.LandingPage);
+        } else {
+          var message = jsonResp['result']['message'].toString();
+          showErrorSnack(title: "Error - Connect To Axpert", message: message);
+        }
       } else {
-        var message = jsonResp['result']['message'].toString();
-        showErrorSnack(title: "Error - Connect To Axpert", message: message);
+        showErrorSnack();
       }
-    } else {
-      showErrorSnack();
+    } catch (e) {
+      print(e);
     }
     Get.offAllNamed(Routes.LandingPage);
   }
@@ -295,15 +397,15 @@ class LoginController extends GetxController {
     try {
       count++;
       var users = appStorage.retrieveValue(AppStorage.USERID) ?? {};
-      users[Const.PROJECT_NAME] = userNameController.text.trim();
+      users[globalVariableController.PROJECT_NAME.value] = userNameController.text.trim();
       appStorage.storeValue(AppStorage.USERID, users);
 
       var passes = appStorage.retrieveValue(AppStorage.USER_PASSWORD) ?? {};
-      passes[Const.PROJECT_NAME] = userPasswordController.text;
+      passes[globalVariableController.PROJECT_NAME.value] = userPasswordController.text;
       appStorage.storeValue(AppStorage.USER_PASSWORD, passes);
 
       var groups = appStorage.retrieveValue(AppStorage.USER_GROUP) ?? {};
-      groups[Const.PROJECT_NAME] = ddSelectedValue.value;
+      groups[globalVariableController.PROJECT_NAME.value] = ddSelectedValue.value;
       appStorage.storeValue(AppStorage.USER_GROUP, groups);
     } catch (e) {
       appStorage.remove(AppStorage.USERID);
@@ -315,29 +417,33 @@ class LoginController extends GetxController {
 
   void dontRememberCredentials() {
     Map users = appStorage.retrieveValue(AppStorage.USERID) ?? {};
-    users.remove(Const.PROJECT_NAME);
+    users.remove(globalVariableController.PROJECT_NAME.value);
     appStorage.storeValue(AppStorage.USERID, users);
 
     var passes = appStorage.retrieveValue(AppStorage.USER_PASSWORD) ?? {};
-    passes.remove(Const.PROJECT_NAME);
+    passes.remove(globalVariableController.PROJECT_NAME.value);
     appStorage.storeValue(AppStorage.USER_PASSWORD, passes);
 
     var groups = appStorage.retrieveValue(AppStorage.USER_GROUP) ?? {};
-    groups.remove(Const.PROJECT_NAME);
+    groups.remove(globalVariableController.PROJECT_NAME.value);
     appStorage.storeValue(AppStorage.USER_GROUP, groups);
   }
 
-  void fetchRememberedData() {
+  onLoad() async {
+    currentProjectName.value = await appStorage.retrieveValue(AppStorage.PROJECT_NAME) ?? '';
+  }
+
+  Future<void> fetchRememberedData() async {
     try {
       var users = appStorage.retrieveValue(AppStorage.USERID) ?? {};
       print(users);
-      userNameController.text = users[Const.PROJECT_NAME].trim() ?? "";
+      userNameController.text = users[globalVariableController.PROJECT_NAME.value].trim() ?? "";
 
       var passes = appStorage.retrieveValue(AppStorage.USER_PASSWORD) ?? {};
-      userPasswordController.text = passes[Const.PROJECT_NAME] ?? "";
+      userPasswordController.text = passes[globalVariableController.PROJECT_NAME.value] ?? "";
 
       var groups = appStorage.retrieveValue(AppStorage.USER_GROUP) ?? {};
-      ddSelectedValue.value = groups[Const.PROJECT_NAME] ?? "Power";
+      ddSelectedValue.value = groups[globalVariableController.PROJECT_NAME.value] ?? "Power";
     } catch (e) {
       // appStorage.remove(AppStorage.USERID);
       // appStorage.remove(AppStorage.USER_PASSWORD);
@@ -361,7 +467,7 @@ class LoginController extends GetxController {
 
   void storeLastLoginData(body) {
     AppStorage appStorage = AppStorage();
-    var projectName = Const.PROJECT_NAME;
+    var projectName = globalVariableController.PROJECT_NAME.value;
     Map lastData = appStorage.retrieveValue(AppStorage.LAST_LOGIN_DATA) ?? {};
     lastData[projectName] = body;
     appStorage.storeValue(AppStorage.LAST_LOGIN_DATA, lastData);
@@ -369,7 +475,7 @@ class LoginController extends GetxController {
 
   retrieveLastLoginData() {
     AppStorage appStorage = AppStorage();
-    var projectName = Const.PROJECT_NAME;
+    var projectName = globalVariableController.PROJECT_NAME.value;
     Map lastData = appStorage.retrieveValue(AppStorage.LAST_LOGIN_DATA) ?? {};
     return lastData[projectName] ?? '';
   }

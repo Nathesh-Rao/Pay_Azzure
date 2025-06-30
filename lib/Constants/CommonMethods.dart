@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
+
+final globalVariableController = Get.find<GlobalVariableController>();
 
 isTablet() {
   return MediaQueryData.fromView(WidgetsBinding.instance.window).size.shortestSide < 600 ? true : false;
@@ -31,7 +34,7 @@ class CommonMethods {
     return result;
   }
 
-  static String activeList_CreateURL_MAKE(activeList, int index) {
+  static String activeList_CreateURL_MAKE(activeList) {
     var url = "";
     if (activeList.recordid.toString().toLowerCase() == "" || activeList.recordid.toString().toLowerCase() == "null") {
       url = "aspx/AxMain.aspx?pname=t" +
@@ -53,7 +56,9 @@ class CommonMethods {
     return url;
   }
 
-  static String activeList_CreateURL_MESSAGE(activeList, int index) {
+  static String activeList_CreateURL_MESSAGE(
+    activeList,
+  ) {
     var url = "";
     var msgType = activeList.msgtype.toString().toUpperCase().trim();
     if (msgType == "MESSAGE" ||
@@ -148,7 +153,35 @@ showErrorSnack({title = 'Error', message = 'Server busy, Please try again later.
     Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.redAccent);
 }
 
-showBiometricDialog() async {
+Future<bool> showBiometricDialog() async {
+  try {
+    final auth = LocalAuthentication();
+
+    final isAuthenticated = await auth.authenticate(
+      localizedReason: "Please use your touch ID to login",
+      authMessages: const <AuthMessages>[
+        AndroidAuthMessages(
+          signInTitle: 'Biometric authentication required!',
+          cancelButton: 'No thanks',
+        ),
+        IOSAuthMessages(
+          cancelButton: 'No thanks',
+        )
+      ],
+      options: const AuthenticationOptions(
+        biometricOnly: true,
+        useErrorDialogs: false,
+        stickyAuth: false,
+      ),
+    );
+
+    return isAuthenticated;
+  } catch (e) {
+    return false;
+  }
+}
+
+showBiometricDialogOld() async {
   try {
     LocalAuthentication auth = LocalAuthentication();
     return await auth.authenticate(
@@ -177,7 +210,7 @@ willShowSetBiometricDialog(user) async {
   if (data.isEmpty) {
     return true;
   } else {
-    var projectWise = data[Const.PROJECT_NAME] ?? {};
+    var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
     var userWise = projectWise[user] ?? {};
     if (userWise.isEmpty)
       return true;
@@ -189,9 +222,9 @@ willShowSetBiometricDialog(user) async {
 setWillBiometricAuthenticateForThisUser(user, willAuthenticate) async {
   AppStorage appStorage = AppStorage();
   var data = await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ?? {};
-  var projectWise = data[Const.PROJECT_NAME] ?? {};
+  var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
   projectWise[user] = willAuthenticate;
-  data[Const.PROJECT_NAME] = projectWise;
+  data[globalVariableController.PROJECT_NAME.value] = projectWise;
   await appStorage.storeValue(AppStorage.WILL_AUTHENTICATE_FOR_USER, data);
 }
 
@@ -203,7 +236,7 @@ getWillBiometricAuthenticateForThisUser(user) async {
   if (data.isEmpty) {
     return null;
   } else {
-    var projectWise = data[Const.PROJECT_NAME] ?? {};
+    var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
     var userWise = projectWise[user] ?? {};
     try {
       if (userWise.isEmpty) return null;

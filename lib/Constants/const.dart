@@ -1,12 +1,15 @@
 import 'package:axpertflutter/Constants/AppStorage.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+final globalVariableController = Get.find<GlobalVariableController>();
 
 class Const {
+  static DateTime DEMO_END_DATE = DateTime(2025, 2, 8);
+  static String RELEASE_ID = "_testRelease300625";
   static String DEVICE_ID = "";
-  static String PROJECT_URL = ""; //"https://app.buzzily.com/Run";
-  static String PROJECT_NAME = "axpertqa11";
-  static String ARM_URL = "";
   static String GUID = "";
   static String APP_VERSION = "";
   static String FIREBASE_TOKEN = "";
@@ -20,16 +23,27 @@ class Const {
   static final String SET_HYBRID_INFO = "/Webservice.asmx/SetHybridInfo";
   static final String SET_HYBRID_NOTIFICATION_INFO = "/Webservice.asmx/SetHybridNotifiInfo";
   static final String LOGOUT_LINK = "webservice.asmx/SignOut";
+
+  //NOTE BottomBar Items urls
+  static final String BOTTOMBAR_CALENDAR = 'aspx/AxMain.aspx?pname=dcalendar&authKey=AXPERT-';
+  static final String BOTTOMBAR_ANALYTICS = 'aspx/AxMain.aspx?pname=danalytics&authKey=AXPERT-';
   static bool isLogEnabled = false;
+
+  static  String PAYAZZURE_PROJECT_NAME = "uat114";
+  static  String PAYAZZURE_WEB_URL = "https://client.payazzure.com/uat114";
+  static  String PAYAZZURE_ARM_URL = "https://client.payazzure.com/UAT114arm";
 
   static String getSQLforClientID(String clientID) => "select * from tblclientMST where " + "clientid = '" + clientID + "'";
 
   static String getFullARMUrl(String Entrypoint) {
-    if (ARM_URL == "") {
+    print("getFullARMUrl => ${globalVariableController.ARM_URL.value}");
+    if (globalVariableController.ARM_URL.value == "") {
       var data = AppStorage().retrieveValue(AppStorage.ARM_URL) ?? "";
       return data.endsWith("/") ? data + Entrypoint : data + "/" + Entrypoint;
     } else
-      return ARM_URL.endsWith("/") ? ARM_URL + Entrypoint : ARM_URL + "/" + Entrypoint;
+      return globalVariableController.ARM_URL.value.endsWith("/")
+          ? globalVariableController.ARM_URL.value + Entrypoint
+          : globalVariableController.ARM_URL.value + "/" + Entrypoint;
   }
 
   // static String getFullARMUrl_HardCoded(String Entrypoint) {
@@ -37,15 +51,17 @@ class Const {
   // }
 
   static String getFullProjectUrl(String Entrypoint) {
-    if (PROJECT_URL == "") {
+    if (globalVariableController.PROJECT_URL.value == "") {
       var data = AppStorage().retrieveValue(AppStorage.PROJECT_URL) ?? "";
       return data.endsWith("/") ? data + Entrypoint : data + "/" + Entrypoint;
     } else
       // print("form const" + PROJECT_URL);
-      return PROJECT_URL.endsWith("/") ? PROJECT_URL + Entrypoint : PROJECT_URL + "/" + Entrypoint;
+      return globalVariableController.PROJECT_URL.value.endsWith("/")
+          ? globalVariableController.PROJECT_URL.value + Entrypoint
+          : globalVariableController.PROJECT_URL.value + "/" + Entrypoint;
   }
 
-  static String getAppBody() => "{\"Appname\":\"" + PROJECT_NAME + "\"}";
+  static String getAppBody() => "{\"Appname\":\"" + globalVariableController.PROJECT_NAME.value + "\"}";
 
   // static String getSQLforClientID(String clientID) =>
   //     "select projectname, scripts_uri,dbtype, expirydate, notify_uri,web_url,arm_url from tblclientMST   where " +
@@ -55,8 +71,8 @@ class Const {
     brightness: Brightness.light,
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-            backgroundColor: MaterialStateColor.resolveWith((states) => MyColors.blue2),
-            foregroundColor: MaterialStateColor.resolveWith((states) => Colors.white))),
+            backgroundColor: WidgetStateColor.resolveWith((states) => MyColors.blue2),
+            foregroundColor: WidgetStateColor.resolveWith((states) => Colors.white))),
     primaryColor: Color(0xff003AA5),
     scaffoldBackgroundColor: Colors.white,
     colorScheme: ThemeData().colorScheme.copyWith(primary: MyColors.blue2),

@@ -3,15 +3,20 @@ import 'package:axpertflutter/ModelPages/AddConnection/Controllers/AddConnection
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class URLDetails extends StatefulWidget {
-  const URLDetails({super.key});
+import '../../ProjectListing/Model/ProjectModel.dart';
+import '../Controllers/ProjectController.dart';
 
+class URLDetails extends StatefulWidget {
+  const URLDetails({super.key, this.project});
+
+  final ProjectModel? project;
   @override
   State<URLDetails> createState() => _URLDetailsState();
 }
 
 class _URLDetailsState extends State<URLDetails> {
-  AddConnectionController addConnectionController = Get.find();
+  // AddConnectionController addConnectionController = Get.find();
+  ProjectController projectController = Get.find();
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -33,40 +38,40 @@ class _URLDetailsState extends State<URLDetails> {
                   Text("Enter Project Details", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   SizedBox(height: 20),
                   TextField(
-                      controller: addConnectionController.webUrlController,
+                      controller: projectController.webUrlController,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(borderSide: BorderSide(width: 1), borderRadius: BorderRadius.circular(10)),
                           hintText: "https://",
-                          errorText: addConnectionController.evaluateErrorText(addConnectionController.errWebUrl),
+                          errorText: projectController.evaluateErrorText(projectController.errWebUrl),
                           label: Text("Web URL"))),
                   SizedBox(height: 20),
                   TextField(
-                      controller: addConnectionController.armUrlController,
+                      controller: projectController.armUrlController,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(borderSide: BorderSide(width: 1), borderRadius: BorderRadius.circular(10)),
                           hintText: "Enter Arm Url",
-                          errorText: addConnectionController.evaluateErrorText(addConnectionController.errArmUrl),
+                          errorText: projectController.evaluateErrorText(projectController.errArmUrl),
                           label: Text("ARM URL"))),
                   SizedBox(height: 20),
                   TextField(
-                      controller: addConnectionController.conNameController,
+                      controller: projectController.conNameController,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(borderSide: BorderSide(width: 1), borderRadius: BorderRadius.circular(10)),
                           hintText: "Enter Connection Name",
-                          errorText: addConnectionController.evaluateErrorText(addConnectionController.errName),
+                          errorText: projectController.evaluateErrorText(projectController.errName),
                           label: Text("Connection Name"))),
                   SizedBox(height: 20),
                   TextField(
-                      controller: addConnectionController.conCaptionController,
+                      controller: projectController.conCaptionController,
                       textInputAction: TextInputAction.done,
-                      onSubmitted: (value) => addConnectionController.projectDetailsClicked(),
+                      onSubmitted: (value) => projectController.saveOrUpdateConnection(model: widget.project),
                       decoration: InputDecoration(
                           border: OutlineInputBorder(borderSide: BorderSide(width: 1), borderRadius: BorderRadius.circular(10)),
                           hintText: "Enter Connection Caption",
-                          errorText: addConnectionController.evaluateErrorText(addConnectionController.errCaption),
+                          errorText: projectController.evaluateErrorText(projectController.errCaption),
                           label: Text("Connection Caption"))),
                   SizedBox(height: 20),
                   Center(
@@ -74,7 +79,9 @@ class _URLDetailsState extends State<URLDetails> {
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(200, 40),
                         ),
-                        onPressed: addConnectionController.projectDetailsClicked,
+                        onPressed: () {
+                          projectController.saveOrUpdateConnection(model: widget.project);
+                        },
                         child: Text("SAVE")),
                   ),
                   SizedBox(height: 20),

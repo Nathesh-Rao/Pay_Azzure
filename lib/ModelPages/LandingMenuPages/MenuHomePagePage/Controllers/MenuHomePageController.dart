@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/CommonMethods.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/CardModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/CardOptionModel.dart';
@@ -15,19 +16,25 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:material_icons_named/material_icons_named.dart';
 
+import '../../../../Constants/Routes.dart';
+import '../../../../Utils/LogServices/LogService.dart';
+import '../../UpdatedHomePage/Models/UpdatedHomeCardDataModel.dart';
 import '../../UpdatedHomePage/Widgets/WidgetMenuFolderPanelItem.dart';
 import '../Models/MenuFolderModel.dart';
 
 class MenuHomePageController extends GetxController {
+  final globalVariableController = Get.find<GlobalVariableController>();
+  // final AttendanceController c = Get.put(AttendanceController());
   InternetConnectivity internetConnectivity = Get.find();
   var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
 
   // var colorList = ["#EEF2FF", "#FFF9E7", "#F5EBFF", "#FFECF6", "#E5F5FA", "#E6FAF4", "#F7F7F7", "#E8F5F8"];
-  var listOfCards = [].obs;
-  var listOfGridCardItems = [].obs;
-  var map_dataSource = {};
+  var listOfOptionCards = [].obs;
+  var list_menuFolderData = {}.obs;
+  var listOfshortcutCardItems = [].obs;
   var actionData = {};
   Set setOfDatasource = {};
+  var map_dataSource = {};
   var switchPage = false.obs;
   var webUrl = "";
   var isShowPunchIn = false.obs;
@@ -45,7 +52,7 @@ class MenuHomePageController extends GetxController {
   var client_info_companyTitle = "".obs;
   var client_info_userNickname = "".obs;
   var client_info_logo_base64String = "".obs;
-
+  var user_nickName = "".obs;
   var isLoading = true.obs;
   ServerConnections serverConnections = ServerConnections();
   AppStorage appStorage = AppStorage();
@@ -54,32 +61,167 @@ class MenuHomePageController extends GetxController {
   MenuHomePageController() {
     body = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
     getClientInfo();
-    getCardDetails();
-    getPunchINData();
+    //---------------------->
+    //NOTE Axpert 11.4-------->
+    _getCardsWithData();
+    //NOTE---------------------->
+    //getCardDetails();
+    // getPunchINData();
     getShorcutMenuDashboardDetails();
     getAttendanceDetails();
   }
-  void getShorcutMenuDashboardDetails() async {
-    var body = {
-      // "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_DashBoard),
-      "publickey": ExecuteApi.API_PublicKey_DashBoard,
-      "Project": Const.PROJECT_NAME,
-      "getsqldata": {"trace": "false"}
+
+//------------------------------------------------------------------------------------->
+  //NOTE Axpert 11.4 API calls and methods
+  var bannerIndex = 0.obs;
+  var bannerCardData = [].obs;
+
+  var taskListData = [].obs;
+  List<RxBool> taskListDataSwitches = [];
+  var newsCardData = [].obs;
+  List<RxBool> newsCardDataSwitches = [];
+  var kpiListCardData = [].obs;
+  List<RxBool> kpiListCardDataSwitches = [];
+  var kpiSliderCardData = [].obs;
+  var menuIconsData = [].obs;
+  List<RxBool> menuIconsDataSwitches = [];
+  var activityListData = [].obs;
+  List<RxBool> activityListDataSwitches = [];
+
+//---------------------------------
+  pseudoCallGet() {
+    _getCardsWithData();
+  }
+
+  pseudoCallClear() {
+    _clearDataLists();
+  }
+
+  updateBannerIndex(int index) {
+    bannerIndex.value = index;
+  }
+
+  _sortDataByPluginName({required List<UpdatedHomeCardDataModel> dataList}) {
+    for (var data in dataList) {
+      switch (data.pluginname?.toUpperCase()) {
+        case "BANNER CARD":
+          bannerCardData.add(data);
+
+          break;
+        case "TASK LIST":
+          taskListData.add(data);
+          break;
+        case "NEWS CARD":
+          newsCardData.add(data);
+          break;
+        case "KPI LIST":
+          if (data.carddata is! String) {
+            if (data.cardname?.toUpperCase() == "KPI LIST") {
+              kpiSliderCardData.add(data);
+            } else {
+              kpiListCardData.add(data);
+            }
+          }
+          break;
+        case "MENU ICONS":
+          menuIconsData.add(data);
+          break;
+        case "ACTIVITY LIST":
+          activityListData.add(data);
+          break;
+        default:
+      }
+    }
+    _initializeListSwitches();
+  }
+
+  _initializeListSwitches() {
+    taskListDataSwitches = List.generate(taskListDataSwitches.length, (index) => false.obs);
+    newsCardDataSwitches = List.generate(newsCardDataSwitches.length, (index) => false.obs);
+    kpiListCardDataSwitches = List.generate(kpiListCardDataSwitches.length, (index) => false.obs);
+    menuIconsDataSwitches = List.generate(menuIconsDataSwitches.length, (index) => false.obs);
+    activityListDataSwitches = List.generate(activityListDataSwitches.length, (index) => false.obs);
+  }
+
+  _getCardsWithData() async {
+    isLoading.value = true;
+    LoadingScreen.show();
+    LogService.writeLog(message: "_getCardsWithData: started");
+    var url = Const.getFullARMUrl(ServerConnections.API_GET_CARDS_WITH_DATA);
+    var getCardsBody = {
+      "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
+      "Trace": false,
+      "HomePageCards": true,
+      "RefreshData": false,
+      "IsMobile": true
+      // "UserName": appStorage.retrieveValue(AppStorage.USER_NAME),
+      //"Roles": "default",
+      //"AppName": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
+      // "AxSessionId": "jbxqzz5tie2y3yujshe3k1x5",
+      //"GlobalParams": ServerConnections.SAMPLE_GET_CARDS_WITH_DATA_GLOBAL_PARAMS
     };
-    var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
-    if (resp != "") {
-      var jsonResp = jsonDecode(resp);
-      if (jsonResp["success"].toString() == "true") {
-        var listItems = jsonResp["axm_dashboard_shortcutmenu"]["rows"];
-        listOfshortcutCardItems.clear();
-        for (var items in listItems) {
-          ShortcutMenuDashboardModel newModel = ShortcutMenuDashboardModel.fromJson(items);
-          listOfshortcutCardItems.add(newModel);
+    // LogService.writeOnConsole(message: "getcardswithdata");
+    // LogService.writeOnConsole(message: url);
+    // LogService.writeOnConsole(message: "$getCardsBody");
+
+    var resp = await serverConnections.postToServer(url: url, body: jsonEncode(getCardsBody), isBearer: true);
+    LogService.writeLog(message: "getcardswithdata : $resp");
+    LogService.writeOnConsole(message: "getcardswithdata : $resp");
+    var response = jsonDecode(resp);
+    // LogService.writeLog(message: "_getCardsWithData: resp:$response");
+    List dataList = response["result"]["data"];
+    // _clearDataLists();
+    _UpdateDataLists(dataList);
+
+    isLoading.value = false;
+    LoadingScreen.dismiss();
+    // _printDataCard();
+  }
+
+  _UpdateDataLists(List dataList) {
+    _clearDataLists();
+    List<UpdatedHomeCardDataModel> cardDataList = dataList.map((e) => UpdatedHomeCardDataModel.fromJson(e)).toList();
+
+    for (var i in cardDataList) {
+      if (i.carddata != null) {
+        try {
+          i.carddata = jsonDecode(i.carddata);
+        } catch (e) {
+          print(e);
         }
       }
     }
+
+    _sortDataByPluginName(dataList: cardDataList);
   }
 
+  _clearDataLists() {
+    bannerCardData.clear();
+    taskListData.clear();
+    newsCardData.clear();
+    kpiListCardData.clear();
+    kpiSliderCardData.clear();
+    menuIconsData.clear();
+    activityListData.clear();
+    //
+    taskListDataSwitches.clear();
+    newsCardDataSwitches.clear();
+    kpiListCardDataSwitches.clear();
+    menuIconsDataSwitches.clear();
+    activityListDataSwitches.clear();
+  }
+
+  _printDataCard() {
+    LogService.writeLog(message: "bannerCardData length => ${bannerCardData.length}");
+    LogService.writeLog(message: "taskListData length => ${taskListData.length}");
+    LogService.writeLog(message: "newsCardData length => ${newsCardData.length}");
+    LogService.writeLog(message: "kpiListCardData length => ${kpiListCardData.length}");
+    LogService.writeLog(message: "kpiListSliderCardData length => ${kpiSliderCardData.length}");
+    LogService.writeLog(message: "menuIconsData length => ${menuIconsData.length}");
+    LogService.writeLog(message: "activityListData length => ${activityListData.length}");
+  }
+
+//------------------------------------------------------------------------------------->
   showMenuDialog(CardModel cardModel) {
     Get.dialog(Dialog(
       backgroundColor: Colors.transparent,
@@ -158,19 +300,6 @@ class MenuHomePageController extends GetxController {
     return listOfOptionCards;
   }
 
-  void parseMenuFolderData(List menuFolderList) {
-    var map_folderList = {};
-    for (var item in menuFolderList) {
-      var folderName = item.groupfolder;
-      List<MenuFolderModel> list = [];
-      list = map_folderList[folderName] ?? [];
-      list.add(item);
-      map_folderList[folderName] = list;
-    }
-    list_menuFolderData.value = map_folderList;
-    print("list_menuFolderData: ${list_menuFolderData.toString()}");
-  }
-
   getCardDataSources() async {
     if (actionData.length > 1) {
       return actionData;
@@ -181,11 +310,14 @@ class MenuHomePageController extends GetxController {
       dataSourceBody["sqlParams"] = {"param": "value", "username": appStorage.retrieveValue(AppStorage.USER_NAME)};
 
       actionData.clear();
-      for (var items in setOfDatasource) {
-        if (items.toString() != "") {
-          dataSourceBody["datasource"] = items;
+      for (var cardDataSource in map_dataSource.entries) {
+        if (cardDataSource.value != "") {
+          dataSourceBody["datasource"] = cardDataSource.value;
           // setOfDatasource.remove(items);
           var dsResp = await serverConnections.postToServer(url: dataSourceUrl, isBearer: true, body: jsonEncode(dataSourceBody));
+          // LogService.writeLog(
+          //     message: "[-] UpdatedHomePage => getCardDataSources > API_GET_HOMEPAGE_CARDSDATASOURCE - Response : $dsResp ");
+
           if (dsResp != "") {
             var jsonDSResp = jsonDecode(dsResp);
             // print(jsonDSResp);
@@ -193,11 +325,11 @@ class MenuHomePageController extends GetxController {
               var dsDataList = jsonDSResp['result']['data'];
               for (var item in dsDataList) {
                 var list = [];
-                list = actionData[item['cardname']] != null ? actionData[item['cardname']] : [];
+                list = actionData[cardDataSource.key] != null ? actionData[cardDataSource.key] : [];
                 CardOptionModel cardOptionModel = CardOptionModel.fromJson(item);
 
                 if (list.indexOf(cardOptionModel) < 0) list.add(cardOptionModel);
-                actionData[item['cardname']] = list;
+                actionData[cardDataSource.key] = list;
               }
             }
           }
@@ -215,6 +347,8 @@ class MenuHomePageController extends GetxController {
             appStorage.retrieveValue(AppStorage.SESSIONID) +
             "&pname=" +
             btnOpen;
+        print("URL : $webUrl");
+
         switchPage.toggle();
       } else {}
     }
@@ -240,9 +374,9 @@ class MenuHomePageController extends GetxController {
     LoadingScreen.show();
     secretEncryptedKey = await getEncryptedSecretKey(ExecuteApi.API_SECRETKEY_GET_PUNCHIN_DATA);
     if (secretEncryptedKey != "") {
-      var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE);
+      var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE_PUBLISHED);
       var body = {
-        "SecretKey": secretEncryptedKey,
+        // "SecretKey": secretEncryptedKey,
         "publickey": "AXPKEY000000010003",
         "username": appStorage.retrieveValue(AppStorage.USER_NAME),
         "Project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
@@ -285,7 +419,7 @@ class MenuHomePageController extends GetxController {
     print("address: ${address.toString()}");
     var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE);
     var body = {
-      "SecretKey": secretEncryptedKey, //1408279244140740
+      // "SecretKey": secretEncryptedKey, //1408279244140740
       "publickey": "AXPKEY000000010002",
       "project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
       "submitdata": {
@@ -343,7 +477,7 @@ class MenuHomePageController extends GetxController {
 
     var url = Const.getFullARMUrl(ExecuteApi.API_ARM_EXECUTE);
     var body = {
-      "SecretKey": secretEncryptedKey, //1408279244140740
+      // "SecretKey": secretEncryptedKey, //1408279244140740
       "publickey": "AXPKEY000000010002",
       "project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
       "submitdata": {
@@ -385,11 +519,11 @@ class MenuHomePageController extends GetxController {
     LoadingScreen.dismiss();
   }
 
-  void getGridDashboardDetails() async {
+  void getShorcutMenuDashboardDetails() async {
     var body = {
-      "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_DashBoard),
-      "publickey": ExecuteApi.API_PublicKey_DashBoard,
-      "Project": Const.PROJECT_NAME,
+      // "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_DashBoard),
+      "publickey": ExecuteApi.API_PUBLICKEY_DASHBOARD,
+      "Project": globalVariableController.PROJECT_NAME.value,
       "getsqldata": {"trace": "false"}
     };
     var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
@@ -397,13 +531,98 @@ class MenuHomePageController extends GetxController {
       var jsonResp = jsonDecode(resp);
       if (jsonResp["success"].toString() == "true") {
         var listItems = jsonResp["axm_dashboard_shortcutmenu"]["rows"];
-        listOfGridCardItems.clear();
+        listOfshortcutCardItems.clear();
         for (var items in listItems) {
           ShortcutMenuDashboardModel newModel = ShortcutMenuDashboardModel.fromJson(items);
-          listOfGridCardItems.add(newModel);
+          listOfshortcutCardItems.add(newModel);
         }
       }
     }
+  }
+
+  captionOnTapFunction(transid) {
+    String link_id = transid;
+    // String link_id = transid.replaceAll('(', '').replaceAll(')', '');
+
+    LogService.writeLog(message: "captionOnTapFunction: transid => $link_id");
+    var validity = false;
+    if (link_id.toLowerCase().startsWith('h')) {
+      if (link_id.toLowerCase().contains("hp")) {
+        link_id = link_id.toLowerCase().replaceAll("hp", "h");
+      }
+      validity = true;
+    } else {
+      if (link_id.toLowerCase().startsWith('i')) {
+        validity = true;
+      } else {
+        if (link_id.toLowerCase().startsWith('t')) {
+          validity = true;
+        } else
+          validity = false;
+      }
+    }
+    if (validity) {
+      // LogService.writeLog(message: "[i] FolderPanel : Open in webview {$link_id}");
+
+      openBtnAction("button", link_id);
+    }
+  }
+
+  captionOnTapFunctionNew(transid) async {
+    if (transid != null) {
+      String link_id = getStringForWebViewParam(transid); //transid.replaceAll('(', '').replaceAll(')', '');
+
+      LogService.writeLog(message: "captionOnTapFunction: transid => $link_id");
+      var validity = false;
+      if (link_id.toLowerCase().startsWith('h')) {
+        if (link_id.toLowerCase().contains("hp")) {
+          link_id = link_id.toLowerCase().replaceAll("hp", "h");
+        }
+        validity = true;
+      } else {
+        if (link_id.toLowerCase().startsWith('i') || link_id.toLowerCase().startsWith('l')) {
+          validity = true;
+        } else {
+          if (link_id.toLowerCase().startsWith('t')) {
+            validity = true;
+          } else
+            validity = false;
+        }
+      }
+      if (validity) {
+        // LogService.writeLog(message: "[i] FolderPanel : Open in webview {$link_id}");
+
+        if (await internetConnectivity.connectionStatus) {
+          webUrl = Const.getFullProjectUrl("aspx/AxMain.aspx?authKey=AXPERT-") +
+              appStorage.retrieveValue(AppStorage.SESSIONID) +
+              "&pname=" +
+              link_id;
+          print("Web_URL_card: $webUrl");
+          // LogService.writeLog(message: "Web url => $webUrl");
+          Get.toNamed(Routes.InApplicationWebViewer, arguments: [webUrl]);
+        }
+      }
+    } /*else {
+      Get.snackbar("Invalid Link", "The Link attached is invalid or empty",
+          margin: EdgeInsets.all(10),
+          backgroundColor: MyColors.blue9,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 3));
+    }*/
+  }
+
+  String getStringForWebViewParam(String input) {
+    if (input.contains('(')) {
+      final match = RegExp(r'(\w+)\((.*?)\)').firstMatch(input);
+      if (match != null) {
+        String base = match.group(1) ?? '';
+        String params = match.group(2) ?? '';
+
+        return params.isNotEmpty ? '$base&params=^$params' : base;
+      }
+    }
+    return input;
   }
 
   generateIcon(model) {
@@ -428,9 +647,9 @@ class MenuHomePageController extends GetxController {
 
   void getAttendanceDetails() async {
     var body = {
-      "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PrivateKey_Attendance),
-      "publickey": ExecuteApi.API_PublicKey_Attendance,
-      "Project": Const.PROJECT_NAME, //"agilepost113",
+      "SecretKey": await getEncryptedSecretKey(ExecuteApi.API_PRIVATEKEY_ATTENDANCE),
+      "publickey": ExecuteApi.API_PUBLICKEY_ATTENDANCE,
+      "Project": globalVariableController.PROJECT_NAME.value, //"agilepost113",
       "getsqldata": {"trace": "false"}
     };
     var resp = await ExecuteApi().CallFetchData_ExecuteAPI(body: jsonEncode(body));
@@ -450,6 +669,7 @@ class MenuHomePageController extends GetxController {
   }
 
   getClientInfo() async {
+    user_nickName.value = appStorage.retrieveValue(AppStorage.NICK_NAME);
     var cl_recId = "";
     var cl_imagePath = "";
     // var dataSourceUrl = baseUrl + GlobalConfiguration().get("HomeCardDataResponse").toString();
@@ -457,12 +677,14 @@ class MenuHomePageController extends GetxController {
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "username": appStorage.retrieveValue(AppStorage.USER_NAME),
-      "appname": Const.PROJECT_NAME, //"agilepost113",
+      "appname": globalVariableController.PROJECT_NAME.value, //"agilepost113",
       "datasource": "Company_Logo",
       "sqlParams": {"username": appStorage.retrieveValue(AppStorage.USER_NAME)}
     };
 
     var dsResp = await serverConnections.postToServer(url: dataSourceUrl, isBearer: true, body: jsonEncode(body));
+    LogService.writeOnConsole(message: "MenuHomePageController:\ngetClientInfo()=> dsResp:$dsResp");
+
     if (dsResp != "") {
       var jsonDSResp = jsonDecode(dsResp);
       if (jsonDSResp['result']['success'].toString() == "true") {
@@ -499,35 +721,21 @@ class MenuHomePageController extends GetxController {
     }
   }
 
-  // merge------->
-  captionOnTapFunction(transid) {
-    var link_id = transid;
-    var validity = false;
-    if (link_id.toLowerCase().startsWith('h')) {
-      if (link_id.toLowerCase().contains("hp")) {
-        link_id = link_id.toLowerCase().replaceAll("hp", "h");
-      }
-      validity = true;
-    } else {
-      if (link_id.toLowerCase().startsWith('i')) {
-        validity = true;
-      } else {
-        if (link_id.toLowerCase().startsWith('t')) {
-          validity = true;
-        } else
-          validity = false;
-      }
+  void parseMenuFolderData(List menuFolderList) {
+    var map_folderList = {};
+    for (var item in menuFolderList) {
+      var folderName = item.groupfolder;
+      List<MenuFolderModel> list = [];
+      list = map_folderList[folderName] ?? [];
+      list.add(item);
+      map_folderList[folderName] = list;
     }
-    if (validity) {
-      // LogService.writeLog(message: "[i] FolderPanel : Open in webview {$link_id}");
-
-      openBtnAction("button", link_id);
-    }
+    list_menuFolderData.value = map_folderList;
+    print("list_menuFolderData: ${list_menuFolderData.toString()}");
+    LogService.writeLog(
+        message:
+            "[i] MenuHomePageController\nScope: parseMenuFolderData()\nlist_menuFolderData: ${list_menuFolderData.toString()}");
   }
-
-  var listOfOptionCards = [].obs;
-  var list_menuFolderData = {}.obs;
-  var listOfshortcutCardItems = [].obs;
 
   getMenuFolderPanelWidgetList() {
     var panelModel = list_menuFolderData;

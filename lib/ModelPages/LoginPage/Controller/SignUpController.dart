@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:axpertflutter/Constants/CommonMethods.dart';
+import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SignUpController extends GetxController {
+  final globalVariableController = Get.find<GlobalVariableController>();
   var userTypeList = [].obs;
   var ddSelectedValue = ''.obs;
   var userIdVisible = false.obs;
@@ -241,13 +243,13 @@ class SignUpController extends GetxController {
 
   getJsonBody() {
     Map iBody = {
-      "appname": Const.PROJECT_NAME,
+      "appname": globalVariableController.PROJECT_NAME.value,
       "userid": userIdController.text.trim(),
       "password": userPassController.text.trim(),
       "usergroup": ddSelectedValue.toLowerCase(),
     };
     Map eBody = {
-      "appname": Const.PROJECT_NAME,
+      "appname": globalVariableController.PROJECT_NAME.value,
       "username": userNameController.text.trim(),
       "password": userPassController.text.trim(),
       "email": userEmailController.text.trim(),

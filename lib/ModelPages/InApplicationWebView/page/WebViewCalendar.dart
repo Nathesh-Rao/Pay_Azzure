@@ -2,20 +2,19 @@ import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplicationWebView.dart';
 import 'package:flutter/material.dart';
+import 'package:axpertflutter/Constants/AppStorage.dart';
+import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplicationWebView.dart';
+import 'package:flutter/material.dart';
 
-class WebViewCalendar extends StatefulWidget {
-  final String weburl = Const.getFullProjectUrl('aspx/AxMain.aspx?pname=dcalendar&authKey=AXPERT-') +
-      AppStorage().retrieveValue(AppStorage.SESSIONID);
+class WebViewFromBottomBar extends StatelessWidget {
+  final String url;
 
-  WebViewCalendar();
-  @override
-  _WebViewCalendarState createState() => _WebViewCalendarState();
-}
+  const WebViewFromBottomBar({super.key, required this.url});
 
-class _WebViewCalendarState extends State<WebViewCalendar> {
   @override
   Widget build(BuildContext context) {
-    print(widget.weburl);
-    return InApplicationWebViewer(widget.weburl);
+    final String weburl = Const.getFullProjectUrl(url) + AppStorage().retrieveValue(AppStorage.SESSIONID);
+    print(weburl);
+    return InApplicationWebViewer(weburl);
   }
 }
