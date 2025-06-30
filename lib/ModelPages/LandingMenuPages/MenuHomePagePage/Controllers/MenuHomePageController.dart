@@ -50,7 +50,7 @@ class MenuHomePageController extends GetxController {
   var client_info_companyTitle = "".obs;
   var client_info_userNickname = "".obs;
   var client_info_logo_base64String = "".obs;
-
+  var user_nickName = "".obs;
   var isLoading = true.obs;
   ServerConnections serverConnections = ServerConnections();
   AppStorage appStorage = AppStorage();
@@ -148,17 +148,23 @@ class MenuHomePageController extends GetxController {
     var url = Const.getFullARMUrl(ServerConnections.API_GET_CARDS_WITH_DATA);
     var getCardsBody = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
-      "AxSessionId": "jbxqzz5tie2y3yujshe3k1x5",
-      "Trace": "false",
-      "AppName": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
-      "Roles": "default",
-      "UserName": appStorage.retrieveValue(AppStorage.USER_NAME),
+      "Trace": false,
       "HomePageCards": true,
       "RefreshData": false,
-      "GlobalParams": ServerConnections.SAMPLE_GET_CARDS_WITH_DATA_GLOBAL_PARAMS
+      "IsMobile": true
+      // "UserName": appStorage.retrieveValue(AppStorage.USER_NAME),
+      //"Roles": "default",
+      //"AppName": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
+      // "AxSessionId": "jbxqzz5tie2y3yujshe3k1x5",
+      //"GlobalParams": ServerConnections.SAMPLE_GET_CARDS_WITH_DATA_GLOBAL_PARAMS
     };
+    // LogService.writeOnConsole(message: "getcardswithdata");
+    // LogService.writeOnConsole(message: url);
+    // LogService.writeOnConsole(message: "$getCardsBody");
+
     var resp = await serverConnections.postToServer(url: url, body: jsonEncode(getCardsBody), isBearer: true);
     LogService.writeLog(message: "getcardswithdata : $resp");
+    LogService.writeOnConsole(message: "getcardswithdata : $resp");
     var response = jsonDecode(resp);
     // LogService.writeLog(message: "_getCardsWithData: resp:$response");
     List dataList = response["result"]["data"];
@@ -661,6 +667,7 @@ class MenuHomePageController extends GetxController {
   }
 
   getClientInfo() async {
+    user_nickName.value = appStorage.retrieveValue(AppStorage.NICK_NAME);
     var cl_recId = "";
     var cl_imagePath = "";
     // var dataSourceUrl = baseUrl + GlobalConfiguration().get("HomeCardDataResponse").toString();
@@ -674,6 +681,8 @@ class MenuHomePageController extends GetxController {
     };
 
     var dsResp = await serverConnections.postToServer(url: dataSourceUrl, isBearer: true, body: jsonEncode(body));
+    LogService.writeOnConsole(message: "MenuHomePageController:\ngetClientInfo()=> dsResp:$dsResp");
+
     if (dsResp != "") {
       var jsonDSResp = jsonDecode(dsResp);
       if (jsonDSResp['result']['success'].toString() == "true") {

@@ -33,7 +33,7 @@ class ProjectItemListTile extends StatelessWidget {
         await appStorage.storeValue(AppStorage.PROJECT_URL, projectModel!.web_url);
         await appStorage.storeValue(AppStorage.ARM_URL, projectModel!.arm_url);
         LogService.writeLog(message: "[i] ProjectListingPage\nSelected Project : ${projectModel!.projectname}");
-
+        LogService.writeOnConsole(message: "Const.ARM_URL => ${Const.ARM_URL}");
         Get.offAllNamed(Routes.Login);
       },
       child: Card(

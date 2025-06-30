@@ -98,9 +98,7 @@ class SettingsPage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        CommonMethods.capitalize(menuHomePageController.client_info_userNickname.value != ""
-                                            ? menuHomePageController.client_info_userNickname.value
-                                            : landingPageController.userName.value),
+                                        CommonMethods.capitalize(menuHomePageController.user_nickName.value),
                                         maxLines: 2,
                                         style: GoogleFonts.poppins(
                                             textStyle: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w600)),

@@ -16,6 +16,8 @@ class ServerConnections {
   static const String API_GET_USERGROUPS = "api/v1/ARMUserGroups";
   static const String API_GET_SIGNINDETAILS = "api/v1/ARMSigninDetails";
   static const String API_SIGNIN = "api/v1/ARMSignIn";
+  static const String API_AX_START_SESSION = "api/v1/AxStartSession";
+
   static const String API_GET_APPSTATUS = "api/v1/ARMAppStatus";
   static const String API_ADDUSER = "api/v1/ARMAddUser";
   static const String API_OTP_VALIDATE_USER = "api/v1/ARMValidateAddUser";

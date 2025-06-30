@@ -30,6 +30,7 @@ class Const {
   static String getSQLforClientID(String clientID) => "select * from tblclientMST where " + "clientid = '" + clientID + "'";
 
   static String getFullARMUrl(String Entrypoint) {
+    print("getFullARMUrl => $ARM_URL");
     if (ARM_URL == "") {
       var data = AppStorage().retrieveValue(AppStorage.ARM_URL) ?? "";
       return data.endsWith("/") ? data + Entrypoint : data + "/" + Entrypoint;

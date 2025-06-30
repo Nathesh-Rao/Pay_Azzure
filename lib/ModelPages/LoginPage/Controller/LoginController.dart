@@ -14,6 +14,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
+import '../../../Utils/LogServices/LogService.dart';
+
 class LoginController extends GetxController {
   ServerConnections serverConnections = ServerConnections();
   final googleLoginIn = GoogleSignIn();
@@ -137,29 +139,95 @@ class LoginController extends GetxController {
     return true;
   }
 
+  // getSignInBody() async {
+  //   Map body = {
+  //     "deviceid": Const.DEVICE_ID,
+  //     "appname": currentProjectName.value,
+  //     "username": userNameController.text.toString().trim(),
+  //     "userGroup": ddSelectedValue.value.toString().toLowerCase(),
+  //     "biometricType": "LOGIN",
+  //     "password": userPasswordController.text.toString().trim()
+  //   };
+  //   return jsonEncode(body);
+  // }
+  // static String getFullARMUrl(String Entrypoint) {
+  //   if (ARM_URL == "") {
+  //     var data = AppStorage().retrieveValue(AppStorage.ARM_URL) ?? "";
+  //     return data.endsWith("/") ? data + Entrypoint : data + "/" + Entrypoint;
+  //   } else
+  //     return ARM_URL.endsWith("/") ? ARM_URL + Entrypoint : ARM_URL + "/" + Entrypoint;
+  // }
   getSignInBody() async {
     Map body = {
-      "deviceid": Const.DEVICE_ID,
-      "appname": currentProjectName.value,
+      "appname": Const.PROJECT_NAME,
       "username": userNameController.text.toString().trim(),
-      "userGroup": ddSelectedValue.value.toString().toLowerCase(),
-      "biometricType": "LOGIN",
-      "password": userPasswordController.text.toString().trim()
+      "password": userPasswordController.text.toString().trim(),
+      "Language": "English"
+      //"deviceid": Const.DEVICE_ID,
+      //"userGroup": "power",
+      // "userGroup": ddSelectedValue.value.toString().toLowerCase(),
+      //"biometricType": "LOGIN",
     };
     return jsonEncode(body);
   }
 
+  // void loginButtonClicked({bodyArgs = ''}) async {
+  //   if (validateForm()) {
+  //     FocusManager.instance.primaryFocus?.unfocus();
+  //     LoadingScreen.show();
+  //     var body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
+  //     var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
+  //     // print(body.toString());
+  //     // var response = await http.post(Uri.parse(url),
+  //     //     headers: {"Content-Type": "application/json"}, body: body);
+  //     // var data = serverConnections.parseData(response);
+  //     var response = await serverConnections.postToServer(url: url, body: body);
+  //     if (response != "") {
+  //       var json = jsonDecode(response);
+  //       // print(json["result"]["sessionid"].toString());
+  //       if (json["result"]["success"].toString().toLowerCase() == "true") {
+  //         await appStorage.storeValue(AppStorage.TOKEN, json["result"]["token"].toString());
+  //         await appStorage.storeValue(AppStorage.SESSIONID, json["result"]["sessionid"].toString());
+  //         await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
+  //         await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
+  //         storeLastLoginData(body);
+  //         print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+  //         //Save Data
+  //         if (rememberMe.value) {
+  //           rememberCredentials();
+  //         } else {
+  //           dontRememberCredentials();
+  //         }
+  //
+  //         await _processLoginAndGoToHomePage();
+  //       } else {
+  //         Get.snackbar("Error ", json["result"]["message"],
+  //             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+  //       }
+  //     }
+  //     LoadingScreen.dismiss();
+  //   }
+  // }
   void loginButtonClicked({bodyArgs = ''}) async {
+    var _armUrl = Const.ARM_URL;
+    var _body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
+    var _url = Const.getFullARMUrl(ServerConnections.API_AX_START_SESSION);
+
+    LogService.writeOnConsole(message: "loginButtonClicked\nBody=> $_body\nurl=> $_url\narm_url=> $_armUrl");
+  }
+
+  void loginButtonClicked1({bodyArgs = ''}) async {
+    LogService.writeLog(message: "[i] LoginController\nSelected UserGroup : power");
     if (validateForm()) {
       FocusManager.instance.primaryFocus?.unfocus();
       LoadingScreen.show();
-      var body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
-      var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
-      // print(body.toString());
-      // var response = await http.post(Uri.parse(url),
-      //     headers: {"Content-Type": "application/json"}, body: body);
-      // var data = serverConnections.parseData(response);
-      var response = await serverConnections.postToServer(url: url, body: body);
+      var _body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
+      //var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
+      var _url = Const.getFullARMUrl(ServerConnections.API_AX_START_SESSION);
+
+      var response = await serverConnections.postToServer(url: _url, body: _body);
+      // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
+
       if (response != "") {
         var json = jsonDecode(response);
         // print(json["result"]["sessionid"].toString());
@@ -168,8 +236,14 @@ class LoginController extends GetxController {
           await appStorage.storeValue(AppStorage.SESSIONID, json["result"]["sessionid"].toString());
           await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
           await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
-          storeLastLoginData(body);
+          await appStorage.storeValue(
+              AppStorage.NICK_NAME, json["result"]["NickName"].toString() ?? userNameController.text.trim());
+          storeLastLoginData(_body);
           print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+          LogService.writeLog(
+              message:
+                  "[-] LoginController\nScope: loginButtonClicked()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+
           //Save Data
           if (rememberMe.value) {
             rememberCredentials();

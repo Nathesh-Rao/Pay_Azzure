@@ -26,7 +26,7 @@ class WidgetTopHeaderSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Obx(() => Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Visibility(
                     visible: menuHomePageController.client_info_companyTitle.value != "",
@@ -36,7 +36,8 @@ class WidgetTopHeaderSection extends StatelessWidget {
                         padding: EdgeInsets.only(top: 2),
                         child: Text(
                           menuHomePageController.client_info_companyTitle.value,
-                          style: GoogleFonts.poppins(textStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                          style: GoogleFonts.poppins(
+                              textStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
                         ),
                       ),
                     ),
@@ -46,13 +47,15 @@ class WidgetTopHeaderSection extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.only(top: 10),
                       child: Text(
-                        "Hello, ${CommonMethods.capitalize(menuHomePageController.client_info_userNickname.value != "" ? menuHomePageController.client_info_userNickname.value : landingPageController.userName.value)}",
+                        "Hello, ${CommonMethods.capitalize(menuHomePageController.user_nickName.value)}",
                         // + CommonMethods.capitalize(landingPageController.userName.value),
                         style: GoogleFonts.poppins(
                             textStyle: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
-                                fontWeight: menuHomePageController.client_info_companyTitle.value != "" ? FontWeight.w500 : FontWeight.w700)),
+                                fontWeight: menuHomePageController.client_info_companyTitle.value != ""
+                                    ? FontWeight.w500
+                                    : FontWeight.w700)),
                       ),
                     ),
                   )

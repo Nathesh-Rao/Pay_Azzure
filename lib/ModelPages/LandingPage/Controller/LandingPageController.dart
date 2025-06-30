@@ -47,7 +47,10 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var showOldPass = false.obs;
   var showNewPass = false.obs;
   var showConNewPass = false.obs;
-  var userName = 'Demo'.obs; //update with user name
+  var userName = 'Demo'.obs;
+  var userNickName = 'Demo'.obs;
+
+  ///update with user name
   var bottomIndex = 0.obs;
   var carouselIndex = 0.obs;
   var carouselBannerIndex = 0.obs;
@@ -108,7 +111,36 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     });
     showChangePassword_PopUp();
     getBiometricStatus();
+    getClientInfo();
     getBannerDetailList();
+  }
+
+  getClientInfo() async {
+    // var dataSourceUrl = baseUrl + GlobalConfiguration().get("HomeCardDataResponse").toString();
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_HOMEPAGE_CARDSDATASOURCE);
+    var body = {
+      "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
+      "username": appStorage.retrieveValue(AppStorage.USER_NAME),
+      "appname": Const.PROJECT_NAME, //"agilepost113",
+      "datasource": "Company_Logo",
+      "sqlParams": {"username": appStorage.retrieveValue(AppStorage.USER_NAME)}
+    };
+
+    var dsResp = await serverConnections.postToServer(url: dataSourceUrl, isBearer: true, body: jsonEncode(body));
+
+    if (dsResp != "") {
+      var jsonDSResp = jsonDecode(dsResp);
+      if (jsonDSResp['result']['success'].toString() == "true") {
+        var dsDataList = jsonDSResp['result']['data'];
+        for (var item in dsDataList) {
+          try {
+            userNickName.value = item['user_nickname'] ?? "";
+          } catch (e) {
+            print(e);
+          }
+        }
+      }
+    }
   }
 
   getBiometricStatus() async {
@@ -686,7 +718,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 ),
                 SizedBox(height: 5),
                 TextScroll(
-                  CommonMethods.capitalize(userName.value),
+                  CommonMethods.capitalize(userNickName.value),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 )
               ],
