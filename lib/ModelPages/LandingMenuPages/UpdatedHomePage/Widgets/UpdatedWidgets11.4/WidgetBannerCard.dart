@@ -17,7 +17,6 @@ class WidgetBannerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CarouselSliderController bannerController = CarouselSliderController();
-
     return Obx(
       () {
         if (!menuHomePageController.bannerCardData.value.isEmpty) {
@@ -30,8 +29,8 @@ class WidgetBannerCard extends StatelessWidget {
                   child: CarouselSlider(
                     items: List.generate(
                         menuHomePageController.bannerCardData[0].carddata.length,
-                        (index) => _bannerCard(menuHomePageController.bannerCardData[0].carddata[index],
-                            menuHomePageController.bannerCardData[0].cardname)),
+                        (index) =>
+                            _bannerCard(menuHomePageController.bannerCardData[0].carddata[index], menuHomePageController.bannerCardData[0].cardname)),
                     carouselController: bannerController,
                     options: CarouselOptions(
                       height: double.maxFinite,
@@ -82,7 +81,7 @@ class WidgetBannerCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Color(0xFFA61E2A),//Color(0xff5c61f1),
+        color: Color(0xFFA61E2A), //Color(0xff5c61f1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Stack(
@@ -126,16 +125,22 @@ class WidgetBannerCard extends StatelessWidget {
                         color: MyColors.white1,
                       ),
                     ),
-                    SizedBox(height: 15),
-                    Text(
-                      bannerData.title ?? '',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: MyColors.white2,
+                    SizedBox(height: 10),
+
+                    Container(
+                      width: Get.width * 0.6, // 60% of screen width
+                      child: Text(
+                        bannerData.title ?? '',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: MyColors.white2,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 5),
                     SizedBox(
                       width: Get.width / 1.7,
                       child: Row(
@@ -187,6 +192,7 @@ class WidgetBannerCard1 extends StatelessWidget {
   WidgetBannerCard1({super.key, required this.cardModel});
 
   final UpdatedHomeCardDataModel cardModel;
+
   @override
   Widget build(BuildContext context) {
     CarouselSliderController bannerController = CarouselSliderController();
@@ -201,8 +207,7 @@ class WidgetBannerCard1 extends StatelessWidget {
               SizedBox(
                 height: Get.height * 0.24,
                 child: CarouselSlider(
-                  items: List.generate(
-                      cardModel.carddata.length, (index) => _bannerCard(cardModel.carddata[index], cardModel.cardname)),
+                  items: List.generate(cardModel.carddata.length, (index) => _bannerCard(cardModel.carddata[index], cardModel.cardname)),
                   carouselController: bannerController,
                   options: CarouselOptions(
                     height: double.maxFinite,

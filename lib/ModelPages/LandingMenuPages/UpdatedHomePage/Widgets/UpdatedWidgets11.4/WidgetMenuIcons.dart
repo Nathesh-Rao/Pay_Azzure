@@ -34,8 +34,7 @@ class _WidgetMenuIconsState extends State<WidgetMenuIcons> {
           visible: menuHomePageController.menuIconsData.isNotEmpty,
           child: Column(
             children: List.generate(menuHomePageController.menuIconsData.length, (index) {
-              List<Color> colors = List.generate(
-                  menuHomePageController.menuIconsData[index].carddata.length, (index) => MyColors.getRandomColor());
+              List<Color> colors = List.generate(menuHomePageController.menuIconsData[index].carddata.length, (index) => MyColors.getRandomColor());
               return MenuIconsPanel(
                 card: menuHomePageController.menuIconsData[index],
                 colors: colors,
@@ -91,8 +90,7 @@ class _MenuIconsPanelState extends State<MenuIconsPanel> {
         // bHeight = bHeight2;
         card_height = (widget.card.carddata.length > 10 ? card_heightAfterExpand : _getHeight_card(widget.card.carddata.length));
       } else {
-        scrollController.animateTo(scrollController.position.minScrollExtent,
-            duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+        scrollController.animateTo(scrollController.position.minScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.decelerate);
         // bHeight = bHeight1;
         card_height = card_heightBeforeExpand;
       }
@@ -109,8 +107,7 @@ class _MenuIconsPanelState extends State<MenuIconsPanel> {
         )).then((_) {
       setState(() {
         if (isSeeMore) {
-          scrollController.animateTo(scrollController.position.minScrollExtent,
-              duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+          scrollController.animateTo(scrollController.position.minScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.decelerate);
           isSeeMore = !isSeeMore;
           // bHeight = bHeight1;
           card_height = card_heightBeforeExpand;
@@ -301,17 +298,16 @@ class _MenuIconsPanelState extends State<MenuIconsPanel> {
                 radius: 30,
                 backgroundColor: color.withAlpha(50),
                 child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CachedNetworkImage(
+                    imageUrl: Const.getFullProjectUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
+                    errorWidget: (context, url, error) => //Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
+                        Text(
                       menuIconData.name != null ? menuIconData.name!.getInitials() : "0",
                       style: GoogleFonts.urbanist(fontSize: 18, fontWeight: FontWeight.w700, color: color.darken(0.4)),
-                    )
-                    //       CachedNetworkImage(
-                    //   imageUrl: Const.getFullProjectUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
-                    //   errorWidget: (context, url, error) =>
-                    //       Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
-                    // ),
                     ),
+                  ),
+                ),
               )),
           // Expanded(flex: 2, child: ),
           Padding(
@@ -346,8 +342,7 @@ class QuickLinksBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: menuIconsData.length > 9 ? Get.height * 0.75 : Get.height / 2.5,
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
       child: Column(
         children: [
           Padding(
@@ -418,16 +413,15 @@ class QuickLinksBottomSheet extends StatelessWidget {
                 radius: 30,
                 backgroundColor: color.withAlpha(50),
                 child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    // child: CachedNetworkImage(
-                    //   imageUrl: Const.getFullProjectUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
-                    //   errorWidget: (context, url, error) =>
-                    //       Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
-                    // ),
-                    child: Text(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CachedNetworkImage(
+                    imageUrl: Const.getFullProjectUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
+                    errorWidget: (context, url, error) => Text(
                       menuIconData.name != null ? menuIconData.name!.getInitials() : "0",
                       style: GoogleFonts.urbanist(fontSize: 18, fontWeight: FontWeight.w700, color: color.darken(0.4)),
-                    )),
+                    ),
+                  ),
+                ),
               )),
           // Expanded(flex: 2, child: ),
           Padding(

@@ -74,6 +74,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     useHybridComposition: false,
     hardwareAcceleration: false,
     geolocationEnabled: true,
+    clearCache: false,
   );
 
   void _download(String url) async {
