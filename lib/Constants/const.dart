@@ -50,15 +50,15 @@ class Const {
   //   return "http://20.244.123.19/ARM113/" + Entrypoint;
   // }
 
-  static String getFullProjectUrl(String Entrypoint) {
-    if (globalVariableController.PROJECT_URL.value == "") {
+  static String getFullWebUrl(String Entrypoint) {
+    if (globalVariableController.WEB_URL.value == "") {
       var data = AppStorage().retrieveValue(AppStorage.PROJECT_URL) ?? "";
       return data.endsWith("/") ? data + Entrypoint : data + "/" + Entrypoint;
     } else
       // print("form const" + PROJECT_URL);
-      return globalVariableController.PROJECT_URL.value.endsWith("/")
-          ? globalVariableController.PROJECT_URL.value + Entrypoint
-          : globalVariableController.PROJECT_URL.value + "/" + Entrypoint;
+      return globalVariableController.WEB_URL.value.endsWith("/")
+          ? globalVariableController.WEB_URL.value + Entrypoint
+          : globalVariableController.WEB_URL.value + "/" + Entrypoint;
   }
 
   static String getAppBody() => "{\"Appname\":\"" + globalVariableController.PROJECT_NAME.value + "\"}";

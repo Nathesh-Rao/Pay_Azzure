@@ -904,7 +904,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
 
   void openWebView(String item) {
     try {
-      var url = Const.getFullProjectUrl('aspx/AxMain.aspx?authKey=AXPERT-') + appStorage.retrieveValue(AppStorage.SESSIONID);
+      var url = Const.getFullWebUrl('aspx/AxMain.aspx?authKey=AXPERT-') + appStorage.retrieveValue(AppStorage.SESSIONID);
       var jsonData = jsonDecode(item);
       var messageClicked = jsonData["msg_onclick"] ?? "";
       print(messageClicked);
@@ -1376,7 +1376,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   getBannerDetailList() async {
     try {
       list_bannerItem.clear();
-      var baseUrl = globalVariableController.PROJECT_URL.value;
+      var baseUrl = globalVariableController.WEB_URL.value;
       baseUrl += baseUrl.endsWith("/") ? "" : "/";
       var url = baseUrl + ServerConnections.BANNER_JSON_NAME;
       // url = "https://demo.agilecloud.biz/mainpagebanner.json";
@@ -1391,11 +1391,11 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
           }
         }
       } else {
-        if (globalVariableController.PROJECT_URL.value.endsWith("/")) {
-          var URL = globalVariableController.PROJECT_URL.value.substring(0, globalVariableController.PROJECT_URL.value.length - 1);
+        if (globalVariableController.WEB_URL.value.endsWith("/")) {
+          var URL = globalVariableController.WEB_URL.value.substring(0, globalVariableController.WEB_URL.value.length - 1);
           baseUrl = URL.substring(0, URL.lastIndexOf('/'));
         } else {
-          baseUrl = globalVariableController.PROJECT_URL.value.substring(0, globalVariableController.PROJECT_URL.value.lastIndexOf('/'));
+          baseUrl = globalVariableController.WEB_URL.value.substring(0, globalVariableController.WEB_URL.value.lastIndexOf('/'));
         }
 
         baseUrl += baseUrl.endsWith("/") ? "" : "/";

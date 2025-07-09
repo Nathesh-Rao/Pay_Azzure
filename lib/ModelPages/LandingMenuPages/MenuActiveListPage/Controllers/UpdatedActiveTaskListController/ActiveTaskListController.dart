@@ -331,7 +331,7 @@ class ActiveTaskListController extends GetxController {
     switch (pendingModel.tasktype.toString().toUpperCase()) {
       case "MAKE":
         var URL = CommonMethods.activeList_CreateURL_MAKE(pendingModel);
-        if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)]);
+        if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
         break;
       // break;
       case "CHECK":
@@ -351,7 +351,7 @@ class ActiveTaskListController extends GetxController {
       case "CACHED SAVE":
         var URL = CommonMethods.activeList_CreateURL_MESSAGE(pendingModel);
         if (!URL.isEmpty)
-          Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullProjectUrl(URL)])?.then((_) {
+          Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)])?.then((_) {
             pageNumber--;
             _parseTaskMap();
           });

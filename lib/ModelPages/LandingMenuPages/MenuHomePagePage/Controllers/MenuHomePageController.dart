@@ -343,7 +343,7 @@ class MenuHomePageController extends GetxController {
       print("hit $btnType");
       print("pname: $btnOpen");
       if (btnType.toLowerCase() == "button" && btnOpen != "") {
-        webUrl = Const.getFullProjectUrl("aspx/AxMain.aspx?authKey=AXPERT-") +
+        webUrl = Const.getFullWebUrl("aspx/AxMain.aspx?authKey=AXPERT-") +
             appStorage.retrieveValue(AppStorage.SESSIONID) +
             "&pname=" +
             btnOpen;
@@ -593,7 +593,7 @@ class MenuHomePageController extends GetxController {
         // LogService.writeLog(message: "[i] FolderPanel : Open in webview {$link_id}");
 
         if (await internetConnectivity.connectionStatus) {
-          webUrl = Const.getFullProjectUrl("aspx/AxMain.aspx?authKey=AXPERT-") +
+          webUrl = Const.getFullWebUrl("aspx/AxMain.aspx?authKey=AXPERT-") +
               appStorage.retrieveValue(AppStorage.SESSIONID) +
               "&pname=" +
               link_id;

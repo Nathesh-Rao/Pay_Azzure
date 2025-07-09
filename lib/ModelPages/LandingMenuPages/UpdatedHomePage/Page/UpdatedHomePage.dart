@@ -61,6 +61,7 @@ class UpdatedHomePage extends StatelessWidget {
           body: SingleChildScrollView(
             child: Column(
               children: [
+                _buildLoadingIndicator(),
                 //Banner panel
                 // WidgetBannerSlidingPanel(),
                 //::: WidgetSlidingNotificationPanel(),
@@ -106,6 +107,20 @@ class UpdatedHomePage extends StatelessWidget {
       //         })
       //   ],
       // ),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return  Obx(
+          () => menuHomePageController.isLoading.value
+          ? Padding(
+        padding: EdgeInsets.only(top: 1),
+        child: LinearProgressIndicator(
+          minHeight: 1,
+          borderRadius: BorderRadius.circular(100),
+        ),
+      )
+          : SizedBox.shrink(),
     );
   }
 }

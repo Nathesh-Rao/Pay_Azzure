@@ -50,9 +50,9 @@ class WidgetMenuFolderPanelInnerItem extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CachedNetworkImage(
-                    imageUrl: Const.getFullProjectUrl("images/homepageicon/") + item.caption.toString() + '.png',
+                    imageUrl: Const.getFullWebUrl("images/homepageicon/") + item.caption.toString() + '.png',
                     errorWidget: (context, url, error) =>
-                        Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
+                        Image.network(Const.getFullWebUrl('images/homepageicon/default.png')),
                   ),
                 ), /*Icon(
                 Icons.airplane_ticket,

@@ -300,7 +300,7 @@ class _MenuIconsPanelState extends State<MenuIconsPanel> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CachedNetworkImage(
-                    imageUrl: Const.getFullProjectUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
+                    imageUrl: Const.getFullWebUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
                     errorWidget: (context, url, error) => //Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
                         Text(
                       menuIconData.name != null ? menuIconData.name!.getInitials() : "0",
@@ -415,7 +415,7 @@ class QuickLinksBottomSheet extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CachedNetworkImage(
-                    imageUrl: Const.getFullProjectUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
+                    imageUrl: Const.getFullWebUrl("images/homepageicon/") + menuIconData.name.toString() + '.png',
                     errorWidget: (context, url, error) => Text(
                       menuIconData.name != null ? menuIconData.name!.getInitials() : "0",
                       style: GoogleFonts.urbanist(fontSize: 18, fontWeight: FontWeight.w700, color: color.darken(0.4)),

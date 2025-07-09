@@ -373,7 +373,7 @@ void openWebPage(ChartData chartData) {
   try {
     if (chartData.link != "") {
       MenuHomePageController menuHPC = Get.find();
-      String url = Const.getFullProjectUrl('aspx/AxMain.aspx?pname=hDashboard&authKey=AXPERT-') +
+      String url = Const.getFullWebUrl('aspx/AxMain.aspx?pname=hDashboard&authKey=AXPERT-') +
           AppStorage().retrieveValue(AppStorage.SESSIONID) +
           '&plink=' +
           chartData.link;

@@ -50,7 +50,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
           projectModel = ProjectModel.fromJson(jsonProject);
           globalVariableController.PROJECT_NAME.value = projectModel!.projectname;
-          globalVariableController.PROJECT_URL.value = projectModel!.web_url;
+          globalVariableController.WEB_URL.value = projectModel!.web_url;
           globalVariableController.ARM_URL.value = projectModel!.arm_url;
           Get.offAllNamed(Routes.Login);
         }

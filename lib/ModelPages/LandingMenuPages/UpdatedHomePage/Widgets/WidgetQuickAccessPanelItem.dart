@@ -55,13 +55,13 @@ class QuickAccessTileWidget extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: CachedNetworkImage(
-                        imageUrl: Const.getFullProjectUrl("images/homepageicon/") + cardModel.caption.toString() + '.png',
+                        imageUrl: Const.getFullWebUrl("images/homepageicon/") + cardModel.caption.toString() + '.png',
                         errorWidget: (context, url, error) =>
-                            Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
+                            Image.network(Const.getFullWebUrl('images/homepageicon/default.png')),
                         errorListener: (e) {
                           LogService.writeLog(
                               message:
-                                  "[IMAGE ERROR] \nImageURL: ${Const.getFullProjectUrl("images/homepageicon/") + cardModel.caption.toString() + '.png'}\nError: $e");
+                                  "[IMAGE ERROR] \nImageURL: ${Const.getFullWebUrl("images/homepageicon/") + cardModel.caption.toString() + '.png'}\nError: $e");
                         },
                       ),
                     ),

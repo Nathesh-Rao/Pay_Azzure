@@ -4,7 +4,7 @@ import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplication
 import 'package:flutter/material.dart';
 
 class WebViewActiveList extends StatefulWidget {
-  final String weburl = Const.getFullProjectUrl('aspx/AxMain.aspx?pname=hNewActiveList&authKey=AXPERT-') +
+  final String weburl = Const.getFullWebUrl('aspx/AxMain.aspx?pname=hNewActiveList&authKey=AXPERT-') +
       (AppStorage().retrieveValue(AppStorage.SESSIONID) ?? "");
 
   WebViewActiveList();

@@ -32,7 +32,7 @@ class ProjectItemListTile extends StatelessWidget {
         await appStorage.storeValue(AppStorage.CACHED, projectModel!.projectCaption);
         await appStorage.storeValue(projectModel!.projectCaption, projectModel);
         globalVariableController.PROJECT_NAME.value = projectModel!.projectname;
-        globalVariableController.PROJECT_URL.value = projectModel!.web_url;
+        globalVariableController.WEB_URL.value = projectModel!.web_url;
         globalVariableController.ARM_URL.value = projectModel!.arm_url;
         await appStorage.storeValue(AppStorage.PROJECT_NAME, projectModel!.projectname);
         await appStorage.storeValue(AppStorage.PROJECT_URL, projectModel!.web_url);

@@ -80,7 +80,7 @@ class PendingListItemDetails extends StatelessWidget {
                       // height: size.height - 200,
                       // width: double.maxFinite,
                       // color: Colors.red,
-                      child: InApplicationWebViewer(Const.getFullProjectUrl(CommonMethods.activeList_CreateURL_MAKE(
+                      child: InApplicationWebViewer(Const.getFullWebUrl(CommonMethods.activeList_CreateURL_MAKE(
                         listItemDetailsController.openModel,
                       ))),
                     )),

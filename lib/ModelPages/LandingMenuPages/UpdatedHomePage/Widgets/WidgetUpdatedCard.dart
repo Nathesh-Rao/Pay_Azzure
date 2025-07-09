@@ -39,9 +39,9 @@ class WidgetUpdatedCards extends StatelessWidget {
                     border: Border.all(width: 1, color: Colors.blue.shade900.withOpacity(0.1))),
                 padding: EdgeInsets.all(5),
                 child: CachedNetworkImage(
-                  imageUrl: Const.getFullProjectUrl("images/homepageicon/") + cardModel.caption + '.png',
+                  imageUrl: Const.getFullWebUrl("images/homepageicon/") + cardModel.caption + '.png',
                   errorWidget: (context, url, error) =>
-                      Image.network(Const.getFullProjectUrl('images/homepageicon/default.png')),
+                      Image.network(Const.getFullWebUrl('images/homepageicon/default.png')),
                   width: 40,
                 ),
                 // child: Icon(
