@@ -19,6 +19,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_downloader_flutter/file_downloader_flutter.dart';
 
+import '../../../Utils/Utility/Utility.dart';
+
 class InApplicationWebViewer extends StatefulWidget {
   InApplicationWebViewer(this.data);
 
@@ -31,6 +33,8 @@ class InApplicationWebViewer extends StatefulWidget {
 class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
   dynamic argumentData = Get.arguments;
   MenuHomePageController menuHomePageController = Get.find();
+  Map<int, InAppWebViewController> windowControllers = {};
+  BuildContext? context_popUpScreen;
 
   // final Completer<InAppWebViewController> _controller = Completer<InAppWebViewController>();
   late InAppWebViewController _webViewController;
@@ -75,6 +79,8 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     hardwareAcceleration: false,
     geolocationEnabled: true,
     clearCache: false,
+
+    supportMultipleWindows: true,
   );
 
   void _download(String url) async {
@@ -258,6 +264,37 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   }
                   return Future.value(NavigationActionPolicy.ALLOW);
                 },
+                onCreateWindow: (controller, createWindowRequest) async {
+                  final windowId = createWindowRequest.windowId;
+                  if (windowId != null) {
+                    // // Open a new window for the given windowId
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => NewWindowPage(
+                    //       windowId: windowId,
+                    //       onWindowCreated: (newController) {
+                    //         windowControllers[windowId] = newController;
+                    //         context_popUpScreen = context;
+                    //       },
+                    //     ),
+                    //   ),
+                    // );
+
+                    Get.to(
+                        () => NewWindowPage(
+                              windowId: windowId,
+                              onWindowCreated: (newController) {
+                                windowControllers[windowId] = newController;
+                                context_popUpScreen = context;
+                              },
+                            ),
+                        transition: Transition.cupertino,
+                        duration: Duration(milliseconds: 500));
+                    return true; // Allow the window creation
+                  }
+                  return false;
+                },
               ),
               _progressBarActive
                   ? Container(
@@ -323,5 +360,61 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
   void clearCookie() async {
     await cookieManager.deleteAllCookies();
     print("Cookie cleared");
+  }
+}
+
+class NewWindowPage extends StatefulWidget {
+  final int windowId;
+  final Function(InAppWebViewController) onWindowCreated;
+  const NewWindowPage({
+    required this.windowId,
+    required this.onWindowCreated,
+  });
+  @override
+  _NewWindowPageState createState() => _NewWindowPageState();
+}
+
+class _NewWindowPageState extends State<NewWindowPage> {
+  late InAppWebViewController newWebViewController;
+  @override
+  Widget build(BuildContext context) {
+    print("new-Window => ${widget.windowId}");
+    return Scaffold(
+      // appBar: AppBar(
+      //   title: Text('New Window'),
+      // ),
+      body: SafeArea(
+        child: InAppWebView(
+            initialSettings: InAppWebViewSettings(
+              javaScriptEnabled: true,
+            ),
+            windowId: widget.windowId, // Associate this WebView with the windowId
+            onWebViewCreated: (controller) {
+              newWebViewController = controller;
+              widget.onWindowCreated(controller);
+            },
+            onConsoleMessage: (controller, consoleMessage) {
+              print("Console Message_new_window $consoleMessage");
+            },
+            onDownloadStartRequest: (controller, downloadStartRequest) {
+              Utility.downloadFile_inAppWebView(
+                  controller: controller,
+                  downloadStartRequest: downloadStartRequest,
+                  onDownloadComplete: (path) {
+                    print("Download path => $path");
+                    Get.back();
+                  },
+                  onDownloadError: (e) {
+                    print("Download Error => $e");
+                    Get.back();
+                  });
+            }
+
+            // onPageCommitVisible: (controller,consolemsg){
+            //
+            // },
+            ),
+      ),
+    );
   }
 }
