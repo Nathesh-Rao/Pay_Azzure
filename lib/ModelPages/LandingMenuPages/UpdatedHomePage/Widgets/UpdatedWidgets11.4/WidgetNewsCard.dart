@@ -28,8 +28,8 @@ class _WidgetNewsCardState extends State<WidgetNewsCard> {
       () => Visibility(
         visible: menuHomePageController.newsCardData.isNotEmpty,
         child: Column(
-          children: List.generate(menuHomePageController.newsCardData.length,
-              (index) => NewsPanel(newsCardData: menuHomePageController.newsCardData[index])),
+          children: List.generate(
+              menuHomePageController.newsCardData.length, (index) => NewsPanel(newsCardData: menuHomePageController.newsCardData[index])),
         ),
       ),
     );
@@ -78,12 +78,9 @@ class _NewsPanelState extends State<NewsPanel> {
     setState(() {
       isSeeMore = !isSeeMore;
       if (isSeeMore) {
-        card_height = (widget.newsCardData.carddata.length > 10
-            ? card_heightAfterExpand
-            : _getHeight_card(widget.newsCardData.carddata.length));
+        card_height = (widget.newsCardData.carddata.length > 10 ? card_heightAfterExpand : _getHeight_card(widget.newsCardData.carddata.length));
       } else {
-        scrollController.animateTo(scrollController.position.minScrollExtent,
-            duration: Duration(milliseconds: 300), curve: Curves.decelerate);
+        scrollController.animateTo(scrollController.position.minScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.decelerate);
         card_height = card_heightBeforeExpand;
       }
     });
@@ -248,14 +245,14 @@ class _NewsPanelState extends State<NewsPanel> {
               ),
               child: CachedNetworkImage(
                 fit: BoxFit.cover,
-                imageUrl: newsData.image ?? '',
-                errorWidget: (context, url, error) => Image.network(Const.getFullWebUrl('images/homepageicon/default.png')),
+                imageUrl: newsData.image == "" ? '' : Const.getFullWebUrl(newsData.image.toString().replaceAll("\$APP_NAME\$", globalVariableController.PROJECT_NAME.value)) ,
+                errorWidget: (context, url, error) => Image.network(Const.getFullWebUrl('images/NotificationIcons/Announcement.png'),height: 50,),
               ),
             )),
             Expanded(
                 flex: 2,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2,),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -278,9 +275,9 @@ class _NewsPanelState extends State<NewsPanel> {
                             fontWeight: FontWeight.w400,
                             fontSize: 12,
                           ),
-
                         ),
                       ),
+
                       Flexible(
                         child: Text(
                           newsData.time ?? '',

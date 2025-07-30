@@ -103,6 +103,12 @@ class MenuHomePageController extends GetxController {
 
   _sortDataByPluginName({required List<UpdatedHomeCardDataModel> dataList}) {
     for (var data in dataList) {
+      if (data.carddata == null ||
+          (data.carddata is List && data.carddata.isEmpty) ||
+          (data.carddata is String && data.carddata.trim().isEmpty) ||
+          (data.carddata is Map && data.carddata.isEmpty)) {
+        continue;
+      }
       switch (data.pluginname?.toUpperCase()) {
         case "BANNER CARD":
           bannerCardData.add(data);

@@ -24,7 +24,7 @@ class NewsCardModel {
         subtitle: json["subtitle"],
         time: json["time"],
         link: json["link"],
-        image: json["image"],
+        image: json["image"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
