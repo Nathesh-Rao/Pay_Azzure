@@ -64,7 +64,7 @@ class _SignUpUserState extends State<SignUpUser> {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: MediaQuery.of(context).size.height * 0.02,
-                                color: MyColors.blue2,
+                                color: MyColors.PayAzzureColor2,
                                 fontFamily: 'opensansbold'),
                           ),
                           SizedBox(height: 20),
@@ -84,7 +84,7 @@ class _SignUpUserState extends State<SignUpUser> {
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: MediaQuery.of(context).size.height * 0.02,
-                                color: MyColors.blue2,
+                                color: MyColors.PayAzzureColor2,
                                 fontFamily: 'opensansbold'),
                           ),
                           SizedBox(height: 30),
@@ -99,7 +99,7 @@ class _SignUpUserState extends State<SignUpUser> {
                               obscureText: true,
                               otpFieldStyle: OtpFieldStyle(
                                 backgroundColor: MyColors.white2,
-                                borderColor: MyColors.blue2,
+                                borderColor: MyColors.PayAzzureColor2,
                               ),
                               textFieldAlignment: MainAxisAlignment.spaceAround,
                               fieldStyle: FieldStyle.box,
@@ -146,7 +146,7 @@ class _SignUpUserState extends State<SignUpUser> {
                           signUpController.showTimer.value
                               ? Text(
                                   "Resend OTP in " + signUpController.timerText.value.toString(),
-                                  style: const TextStyle(color: MyColors.blue2, fontSize: 15, fontWeight: FontWeight.w700),
+                                  style: const TextStyle(color: MyColors.PayAzzureColor2, fontSize: 15, fontWeight: FontWeight.w700),
                                 )
                               : GestureDetector(
                                   onTap: () {
@@ -156,11 +156,11 @@ class _SignUpUserState extends State<SignUpUser> {
                                     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(25),
-                                        border: Border.all(width: 2, color: MyColors.blue2)),
+                                        border: Border.all(width: 2, color: MyColors.PayAzzureColor2)),
                                     child: Text(
                                       "Resend OTP",
                                       style: TextStyle(
-                                          color: MyColors.blue2,
+                                          color: MyColors.PayAzzureColor2,
                                           fontFamily: 'redhabold',
                                           fontSize: MediaQuery.of(context).size.height * 0.02),
                                     ),

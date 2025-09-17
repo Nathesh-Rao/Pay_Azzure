@@ -226,7 +226,7 @@ class _ProjectListingPageState extends State<ProjectListingPage> {
                                                           height: 50,
                                                           width: 250,
                                                           decoration: BoxDecoration(
-                                                              color: MyColors.blue2, borderRadius: BorderRadius.circular(30)),
+                                                              color: MyColors.PayAzzureColor2, borderRadius: BorderRadius.circular(30)),
                                                           child: Center(
                                                             child: Text(
                                                               "+ Add Connection",
@@ -259,7 +259,7 @@ class _ProjectListingPageState extends State<ProjectListingPage> {
             () => Visibility(
               visible: projectController.projects.isNotEmpty,
               child: FloatingActionButton.extended(
-                backgroundColor: MyColors.blue2,
+                backgroundColor: MyColors.PayAzzureColor2,
                 tooltip: 'Add Connection',
                 onPressed: () {
                   projectController.clearAllData();

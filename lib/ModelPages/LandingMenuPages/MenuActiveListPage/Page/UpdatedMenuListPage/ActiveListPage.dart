@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../../../../LandingPage/Widgets/EmptyInfoWidget.dart';
 import '../../Controllers/CompletedListController.dart';
 import '../../Controllers/PendingListController.dart';
 import 'Widgets/WidgetActiveListTile.dart';
@@ -47,57 +48,57 @@ class ActiveListPage extends StatelessWidget {
             ),
           ),
           Obx(
-            () => activeTaskListController.isListLoading.value
+                () => activeTaskListController.isListLoading.value
                 ? LinearProgressIndicator(
-                    minHeight: 1,
-                    borderRadius: BorderRadius.circular(100),
-                  )
+              minHeight: 1,
+              borderRadius: BorderRadius.circular(100),
+            )
                 : SizedBox.shrink(),
           ),
           Expanded(
               child: Obx(
-            () => Visibility(
-              visible: activeTaskListController.activeTaskMap.keys.isNotEmpty,
-              child: ListView(
-                controller: activeTaskListController.taskListScrollController,
-                // padding: EdgeInsets.only(top: 20),
-                physics: BouncingScrollPhysics(),
-                children: List.generate(
-                  activeTaskListController.activeTaskMap.keys.length,
-                  (index) {
-                    var _key = activeTaskListController.activeTaskMap.keys.toList()[index];
-                    var _currentList = activeTaskListController.activeTaskMap[_key];
+                    () => Visibility(
+                  visible: activeTaskListController.activeTaskMap.keys.isNotEmpty,
+                  child: ListView(
+                    controller: activeTaskListController.taskListScrollController,
+                    // padding: EdgeInsets.only(top: 20),
+                    physics: BouncingScrollPhysics(),
+                    children: List.generate(
+                      activeTaskListController.activeTaskMap.keys.length,
+                          (index) {
+                        var _key = activeTaskListController.activeTaskMap.keys.toList()[index];
+                        var _currentList = activeTaskListController.activeTaskMap[_key];
 
-                    return ExpandedTile(
-                      contentseparator: 0,
-                      theme: ExpandedTileThemeData(
-                        titlePadding: EdgeInsets.all(0),
-                        contentPadding: EdgeInsets.all(0),
-                        headerColor: MyColors.grey2,
-                        headerSplashColor: MyColors.grey1,
-                        contentBackgroundColor: Colors.white,
-                        contentSeparatorColor: Colors.white,
-                      ),
-                      controller: ExpandedTileController(isExpanded: true),
-                      title: Text(
-                        _key.toString(),
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                      ),
-                      content: Column(
-                        children: List.generate(_currentList!.length, (i) => WidgetActiveLisTile(model: _currentList[i])),
-                      ),
-                      onTap: () {
-                        // debugPrint("tapped!!");
+                        return ExpandedTile(
+                          contentseparator: 0,
+                          theme: ExpandedTileThemeData(
+                            titlePadding: EdgeInsets.all(0),
+                            contentPadding: EdgeInsets.all(0),
+                            headerColor: MyColors.grey2,
+                            headerSplashColor: MyColors.grey1,
+                            contentBackgroundColor: Colors.white,
+                            contentSeparatorColor: Colors.white,
+                          ),
+                          controller: ExpandedTileController(isExpanded: true),
+                          title: Text(
+                            _key.toString(),
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                          ),
+                          content: Column(
+                            children: List.generate(_currentList!.length, (i) => WidgetActiveLisTile(model: _currentList[i])),
+                          ),
+                          onTap: () {
+                            // debugPrint("tapped!!");
+                          },
+                          onLongTap: () {
+                            // debugPrint("long tapped!!");
+                          },
+                        );
                       },
-                      onLongTap: () {
-                        // debugPrint("long tapped!!");
-                      },
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          )),
+              )),
           _bottomTextInfoWidget(),
         ],
       ),
@@ -128,39 +129,42 @@ class ActiveListPage extends StatelessWidget {
 
   Widget _floatingActionButton() {
     return Obx(
-      () => activeTaskListController.activeTaskList.isEmpty
-          ? SizedBox.shrink()
+          () => activeTaskListController.activeTaskList.isEmpty
+          ? EmptyInfoWidget(
+        title: "No Task Data Available",
+        subTitle: "There is no task data to show you\nright now",
+      )
           : FloatingActionButton(
-              backgroundColor: MyColors.blue9,
-              foregroundColor: MyColors.white1,
-              child: activeTaskListController.isListLoading.value
-                  ? Center(
-                      child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: MyColors.white1,
-                            strokeWidth: 2,
-                            strokeCap: StrokeCap.round,
-                          )),
-                    )
-                  : Icon(activeTaskListController.isRefreshable.value ? Icons.refresh_rounded : Icons.arrow_upward_rounded),
-              onPressed: activeTaskListController.refreshList,
-            ),
+        backgroundColor: MyColors.blue9,
+        foregroundColor: MyColors.white1,
+        child: activeTaskListController.isListLoading.value
+            ? Center(
+          child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: MyColors.white1,
+                strokeWidth: 2,
+                strokeCap: StrokeCap.round,
+              )),
+        )
+            : Icon(activeTaskListController.isRefreshable.value ? Icons.refresh_rounded : Icons.arrow_upward_rounded),
+        onPressed: activeTaskListController.refreshList,
+      ),
     );
   }
 
   Widget _bottomTextInfoWidget() {
     return Obx(() => activeTaskListController.showFetchInfo.value
         ? Padding(
-            padding: const EdgeInsets.all(5),
-            child: Text(
-              "No more records to display",
-              style: GoogleFonts.poppins(
-                color: MyColors.baseRed,
-              ),
-            ),
-          )
+      padding: const EdgeInsets.all(5),
+      child: Text(
+        "No more records to display",
+        style: GoogleFonts.poppins(
+          color: MyColors.baseRed,
+        ),
+      ),
+    )
         : SizedBox.shrink());
   }
 }

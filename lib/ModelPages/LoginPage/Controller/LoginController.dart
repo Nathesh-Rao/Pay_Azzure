@@ -18,10 +18,13 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 
+import '../../../Constants/Enums.dart';
 import '../../../Utils/LogServices/LogService.dart';
 
 import '../../../Utils/LogServices/LogService.dart';
 import '../../location_permission.dart';
+import '../Models/AuthUserDetailsModel.dart';
+import '../Page/LoginPage.dart';
 
 class LoginController extends GetxController {
   GlobalVariableController globalVariableController = Get.find();
@@ -35,11 +38,25 @@ class LoginController extends GetxController {
   var showPassword = true.obs;
   TextEditingController userNameController = TextEditingController();
   TextEditingController userPasswordController = TextEditingController();
+  TextEditingController otpFieldController = TextEditingController();
+  final passwordFocus = FocusNode();
   var errUserName = ''.obs;
   var errPassword = ''.obs;
   var fcmId;
   var willAuthenticate = false.obs;
   var currentProjectName = ''.obs;
+  var isUserDataLoading = false.obs;
+  var isOtpLoading = false.obs;
+  var isOTP_auth = false.obs;
+  var isPWD_auth = false.obs;
+  var otpChars = '4'.obs;
+  var otpExpiryTime = '2'.obs;
+  var authType = AuthType.none.obs;
+  var otpMsg = ''.obs;
+  var otpLoginKey = ''.obs;
+  var otpErrorText = ''.obs;
+  bool isDuplicate_session = false;
+
   LoginController() {
     _askLocationPermission();
     // fetchUserTypeList();
@@ -112,9 +129,9 @@ class LoginController extends GetxController {
       MaterialState.focused,
     };
     if (states.any(interactiveStates.contains)) {
-      return MyColors.blue2;
+      return MyColors.PayAzzureColor2;
     }
-    return MyColors.blue2;
+    return MyColors.PayAzzureColor2;
   }
 
   // fetchSignInDetail() async {
@@ -156,8 +173,21 @@ class LoginController extends GetxController {
       errUserName.value = "Enter User Name";
       return false;
     }
-    if (userPasswordController.text.toString().trim() == "") {
-      errPassword.value = "Enter Password";
+    if (isPWD_auth.value) {
+      if (userPasswordController.text.toString().trim() == "") {
+        errPassword.value = "Enter Password";
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool validateOTPField() {
+    otpErrorText.value = "";
+    print("OTP text length: ${otpFieldController.text.length}");
+    if (otpFieldController.text.length < int.parse(otpChars.value)) {
+      otpErrorText.value = "Enter full ${int.parse(otpChars.value)}-digit OTP'";
+      print("Enter full ");
       return false;
     }
     return true;
@@ -388,8 +418,8 @@ class LoginController extends GetxController {
     String packageName = packageInfo.packageName;
     var version = packageInfo.version;
     String buildNumber = packageInfo.buildNumber;
-    Const.APP_VERSION = version;
-    return version;
+    Const.APP_VERSION = version+"."+Const.APP_RELEASE_ID;
+    return  Const.APP_VERSION;
   }
 
   void rememberCredentials() {
@@ -478,5 +508,282 @@ class LoginController extends GetxController {
     var projectName = globalVariableController.PROJECT_NAME.value;
     Map lastData = appStorage.retrieveValue(AppStorage.LAST_LOGIN_DATA) ?? {};
     return lastData[projectName] ?? '';
+  }
+
+  //// New Login Flow Methods and vars
+
+  startLoginProcess() async {
+    authType.value = await getLoginUserDetailsAndAuthType();
+
+    if (authType.value == AuthType.otpOnly) {
+      await callSignInAPI();
+    }
+
+    if (isPWD_auth.value) {
+      FocusScope.of(Get.context!).requestFocus(passwordFocus);
+    }
+
+    switch (authType.value) {
+      case AuthType.both:
+        print("✅ Both Password and OTP authentication are required.");
+        break;
+      case AuthType.passwordOnly:
+        print("🔐 Only Password authentication is required.");
+        break;
+      case AuthType.otpOnly:
+        print("📲 Only OTP authentication is required.");
+        break;
+      case AuthType.none:
+        print("❌ No authentication required.");
+        break;
+    }
+  }
+
+  getLoginUserDetailsAndAuthType() async {
+    isUserDataLoading.value = true;
+    var _url = Const.getFullARMUrl(ServerConnections.API_GET_LOGINUSER_DETAILS);
+    var body = {
+      "appname": globalVariableController.PROJECT_NAME.value,
+      "UserName": userNameController.text.toString().trim(),
+    };
+
+    var response = await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+    isUserDataLoading.value = false;
+    if (response != "") {
+      var json = jsonDecode(response);
+      if (json["result"]["success"].toString().toLowerCase() == "true") {
+        FocusManager.instance.primaryFocus?.unfocus();
+        final authUserdetails = AuthUserDetailsModel.fromJson(json["result"]);
+        isPWD_auth.value = authUserdetails.pwdauth!;
+        if (authUserdetails.otpauth!) {
+          isOTP_auth.value = authUserdetails.otpauth!;
+          otpChars.value = authUserdetails.otpsettings!.otpchars!;
+          otpExpiryTime.value = authUserdetails.otpsettings!.otpexpiry!;
+        }
+
+        if (isPWD_auth.value && isOTP_auth.value) return AuthType.both;
+        if (isPWD_auth.value) return AuthType.passwordOnly;
+        if (isOTP_auth.value) return AuthType.otpOnly;
+      } else {
+        Get.snackbar("Error ", json["result"]["message"],
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+      }
+    }
+
+    return AuthType.none;
+  }
+
+  callSignInAPI() async {
+    if (validateForm()) {
+      var signInBody = {
+        "appname": globalVariableController.PROJECT_NAME.value,
+        "username": userNameController.text.toString().trim(),
+        "password": generateMd5(userPasswordController.text.toString().trim()),
+        "Language": "English",
+        "SessionId": getGUID(), //GUID
+        "Globalvars": false
+      };
+
+      signInBody.addIf(isDuplicate_session, "ClearPreviousSession", true);
+
+      // signInBody.addIf(isPWD_auth.value, "password", generateMd5(userPasswordController.text.toString().trim()));
+      signInBody.addIf(isOTP_auth.value, "OtpAuth", "T");
+      FocusManager.instance.primaryFocus?.unfocus();
+      LoadingScreen.show();
+      var _url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
+
+      var response = await serverConnections.postToServer(url: _url, body: jsonEncode(signInBody));
+      // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
+
+      if (response != "") {
+        var json = jsonDecode(response);
+        if (json["result"]["success"].toString().toLowerCase() == "true") {
+          if (json["result"]["message"].toString() == "Login Successful.") {
+            await processSignInDataResponse(json["result"]);
+          } else if (json["result"]?.containsKey("OTPLoginKey")) {
+            // OTPPage
+            otpMsg.value = json["result"]["message"].toString();
+            otpLoginKey.value = json["result"]["OTPLoginKey"].toString();
+            print("Otpmsg: ${otpMsg.value} \nOtpkey: ${otpLoginKey.value}");
+            Get.toNamed(Routes.OtpPage);
+          }
+        } else if (json["result"]["success"].toString().toLowerCase() == "false" && json["result"].containsKey('duplicate_session')) {
+          isDuplicate_session = true;
+          showDialog_duplicateSession(json["result"]["message"].toString());
+        } else {
+          if (Get.isDialogOpen ?? false) {
+            Get.back(); // closes the dialog
+          }
+          Get.snackbar("Error ", json["result"]["message"],
+              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+        }
+      }
+      LoadingScreen.dismiss();
+    }
+  }
+
+  callVerifyOTP() async {
+    if (validateOTPField()) {
+      LoadingScreen.show();
+      isOtpLoading.value = true;
+      var _url = Const.getFullARMUrl(ServerConnections.API_VALIDATE_OTP);
+      var body = {
+        "OtpLoginKey": otpLoginKey.value,
+        "OTP": otpFieldController.text.toString().trim(),
+      };
+
+      var response = await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+      isOtpLoading.value = false;
+      if (response != "") {
+        var json = jsonDecode(response);
+        if (json["result"]["success"].toString().toLowerCase() == "true") {
+          await processSignInDataResponse(json["result"]);
+        } else {
+          otpErrorText.value = json["result"]["message"].toString();
+          /* Get.snackbar("Error ", json["result"]["message"],
+              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);*/
+        }
+      }
+    }
+    LoadingScreen.dismiss();
+  }
+
+  processSignInDataResponse(json) async {
+    await appStorage.storeValue(AppStorage.TOKEN, json["token"].toString());
+    await appStorage.storeValue(AppStorage.SESSIONID, json["ARMSessionId"].toString());
+    await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
+    //await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
+    await appStorage.storeValue(AppStorage.NICK_NAME, json["nickname"].toString() ?? userNameController.text.trim());
+    //storeLastLoginData(_body);
+    //print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+    LogService.writeLog(
+        message: "[-] LoginController\nScope:SignInResponse()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+
+    //Save Data
+    if (rememberMe.value) {
+      rememberCredentials();
+    } else {
+      dontRememberCredentials();
+    }
+    await _processLoginAndGoToHomePage();
+  }
+
+  callResendOTP() async {
+    otpErrorText.value = '';
+    otpFieldController.clear();
+    isOtpLoading.value = true;
+    var _url = Const.getFullARMUrl(ServerConnections.API_RESEND_OTP);
+    var body = {"OtpLoginKey": otpLoginKey.value};
+
+    var response = await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+    isOtpLoading.value = false;
+    if (response != "") {
+      var json = jsonDecode(response);
+      if (json["result"]["success"].toString().toLowerCase() == "true") {
+        Get.snackbar("Success", json["result"]["message"],
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+      } else {
+        otpErrorText.value = json["result"]["message"].toString();
+        /* Get.snackbar("Error ", json["result"]["message"],
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);*/
+      }
+    }
+  }
+  void showDialog_duplicateSession(String message) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Title
+              Text(
+                "Duplicate Session",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: MyColors.PayAzzureColor2,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Message
+              Text(
+                message,
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 24),
+
+              // Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Cancel button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade400,
+                      //foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.offAll(LoginPage());
+                    },
+                    child: const Text("No"),
+                  ),
+
+                  // Confirm button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: MyColors.PayAzzureColor2,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                    ),
+                    onPressed: () async {
+                      callSignInAPI();
+                    },
+                    child: const Text("Yes"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+
+    /* Get.defaultDialog(
+              barrierDismissible: false,
+              titleStyle: TextStyle(color: MyColors.blue2),
+              titlePadding: EdgeInsets.only(top: 20,),
+              contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              title: "Duplicate Session",
+              middleText: json["result"]["message"].toString(),
+              confirm: ElevatedButton(
+                  onPressed: () async {
+                    Get.back();
+                  },
+                  child: Text("Yes")),
+              cancel: ElevatedButton(
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.grey)),
+                  onPressed: () {
+                    Get.offAll(LoginPage());
+                    Get.back();
+                  },
+                  child: Text("No")));*/
   }
 }

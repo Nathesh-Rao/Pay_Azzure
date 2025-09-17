@@ -141,7 +141,7 @@ reBuild_old(MenuMorePageController menuMorePageController) {
                   return Center(
                       child: Text(
                     "Loading Please Wait...",
-                    style: TextStyle(color: MyColors.blue2, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: MyColors.PayAzzureColor2, fontWeight: FontWeight.bold),
                   )); //Center(child: CircularProgressIndicator());
                 }
               }

@@ -199,7 +199,7 @@ class _TaskListPanelState extends State<TaskListPanel> {
         radius: 18,
         child: Icon(
           isCompleted ? Icons.done_rounded : Icons.pending_actions,
-          color: isCompleted ? MyColors.white1 : MyColors.blue2,
+          color: isCompleted ? MyColors.white1 : MyColors.PayAzzureColor2,
           size: 16,
         ),
       ),

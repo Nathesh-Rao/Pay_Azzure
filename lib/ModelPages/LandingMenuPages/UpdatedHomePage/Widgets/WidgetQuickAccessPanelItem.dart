@@ -392,7 +392,7 @@ class QuickAccessTileMoreWidget extends StatelessWidget {
           splashColor: Colors.white60,
           child: CircleAvatar(
             foregroundColor: Colors.white,
-            backgroundColor: MyColors.blue2,
+            backgroundColor: MyColors.PayAzzureColor2,
             radius: baseSize / 9,
             child: Icon(
               Icons.keyboard_arrow_down_rounded,

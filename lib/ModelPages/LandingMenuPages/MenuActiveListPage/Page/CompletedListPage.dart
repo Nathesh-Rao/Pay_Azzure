@@ -11,11 +11,13 @@ import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 import '../../../../Constants/CommonMethods.dart';
+import '../../../InApplicationWebView/controller/webview_controller.dart';
 
 class CompletedListPage extends StatelessWidget {
   CompletedListPage({super.key});
 
   final CompletedListController completedListController = Get.put(CompletedListController());
+  final webViewController = Get.find<WebViewController>();
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +166,8 @@ class CompletedListPage extends StatelessWidget {
                               completedListController.completed_activeList[index],
                             );
                             if (!URL.isEmpty)
-                              Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                             // Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                              webViewController.openWebView(url: Const.getFullWebUrl(URL));
                             break;
                           case "CHECK":
                           case "APPROVE":
@@ -179,7 +182,8 @@ class CompletedListPage extends StatelessWidget {
                             var URL =
                                 CommonMethods.activeList_CreateURL_MESSAGE(completedListController.completed_activeList[index]);
                             if (!URL.isEmpty)
-                              Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                             // Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                              webViewController.openWebView(url: Const.getFullWebUrl(URL));
                             break;
                           default:
                             break;

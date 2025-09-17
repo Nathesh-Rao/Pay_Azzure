@@ -18,12 +18,14 @@ import 'package:material_icons_named/material_icons_named.dart';
 
 import '../../../../Constants/Routes.dart';
 import '../../../../Utils/LogServices/LogService.dart';
+import '../../../InApplicationWebView/controller/webview_controller.dart';
 import '../../UpdatedHomePage/Models/UpdatedHomeCardDataModel.dart';
 import '../../UpdatedHomePage/Widgets/WidgetMenuFolderPanelItem.dart';
 import '../Models/MenuFolderModel.dart';
 
 class MenuHomePageController extends GetxController {
   final globalVariableController = Get.find<GlobalVariableController>();
+  final webViewController = Get.find<WebViewController>();
   // final AttendanceController c = Get.put(AttendanceController());
   InternetConnectivity internetConnectivity = Get.find();
   var colorList = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
@@ -605,7 +607,8 @@ class MenuHomePageController extends GetxController {
               link_id;
           print("Web_URL_card: $webUrl");
           // LogService.writeLog(message: "Web url => $webUrl");
-          Get.toNamed(Routes.InApplicationWebViewer, arguments: [webUrl]);
+          //Get.toNamed(Routes.InApplicationWebViewer, arguments: [webUrl]);
+          webViewController.openWebView(url: webUrl);
         }
       }
     } /*else {
@@ -623,9 +626,17 @@ class MenuHomePageController extends GetxController {
       final match = RegExp(r'(\w+)\((.*?)\)').firstMatch(input);
       if (match != null) {
         String base = match.group(1) ?? '';
-        String params = match.group(2) ?? '';
-
-        return params.isNotEmpty ? '$base&params=^$params' : base;
+        String inputParams = match.group(2) ?? '';
+        String outputParams = '';
+        if (inputParams != '') {
+          outputParams = inputParams.split('~').map((pair) {
+            var parts = pair.split('=');
+            var key = parts[0];
+            var value = parts.sublist(1).join('=');
+            return '$key~$value';
+          }).join('^');
+        }
+        return outputParams.isNotEmpty ? '$base&params=$outputParams' : base;
       }
     }
     return input;

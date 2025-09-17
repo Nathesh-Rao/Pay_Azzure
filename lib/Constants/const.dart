@@ -8,7 +8,8 @@ final globalVariableController = Get.find<GlobalVariableController>();
 
 class Const {
   static DateTime DEMO_END_DATE = DateTime(2025, 2, 8);
-  static String RELEASE_ID = ".0_testRelease300725";
+  static String APP_RELEASE_ID = "1";
+  static String APP_RELEASE_DATE = "release110925";
   static String DEVICE_ID = "";
   static String GUID = "";
   static String APP_VERSION = "";
@@ -71,11 +72,11 @@ class Const {
     brightness: Brightness.light,
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
-            backgroundColor: WidgetStateColor.resolveWith((states) => MyColors.blue2),
+            backgroundColor: WidgetStateColor.resolveWith((states) => MyColors.PayAzzureColor2),
             foregroundColor: WidgetStateColor.resolveWith((states) => Colors.white))),
     primaryColor: Color(0xff003AA5),
     scaffoldBackgroundColor: Colors.white,
-    colorScheme: ThemeData().colorScheme.copyWith(primary: MyColors.blue2),
+    colorScheme: ThemeData().colorScheme.copyWith(primary: MyColors.PayAzzureColor2),
     // textButtonTheme:
     //     TextButtonThemeData(style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((states) => Colors.grey)))
   );

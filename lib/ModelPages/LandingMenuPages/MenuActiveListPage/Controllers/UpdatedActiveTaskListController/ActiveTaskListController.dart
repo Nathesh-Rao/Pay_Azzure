@@ -14,16 +14,20 @@ import '../../../../../Constants/Const.dart';
 import '../../../../../Constants/MyColors.dart';
 import '../../../../../Constants/Routes.dart';
 import '../../../../../Utils/ServerConnections/ServerConnections.dart';
+import '../../../../InApplicationWebView/controller/webview_controller.dart';
 import '../ListItemDetailsController.dart';
 
 class ActiveTaskListController extends GetxController {
   //----
   ListItemDetailsController listItemDetailsController = Get.put(ListItemDetailsController());
+  final webViewController = Get.find<WebViewController>();
+
   // PendingListController
   ServerConnections serverConnections = ServerConnections();
   AppStorage appStorage = AppStorage();
   var body = {};
   var url = Const.getFullARMUrl(ServerConnections.API_GET_ALL_ACTIVE_TASKS);
+
   //----
   int pageNumber = 1;
   static const int pageSize = 40;
@@ -34,14 +38,17 @@ class ActiveTaskListController extends GetxController {
   var activeTaskList = [].obs;
 
   List<ActiveTaskListModel> activeTempList = [];
+
   //--------
   //--------
   var activeTaskMap = {}.obs;
   var taskSearchText = ''.obs;
   TextEditingController searchTextController = TextEditingController();
+
   //-----
   late ScrollController taskListScrollController;
   late List<ExpandedTileController> expandedListControllers;
+
   //-----
   var isFilterOn = false.obs;
   TextEditingController processNameController = TextEditingController();
@@ -50,6 +57,7 @@ class ActiveTaskListController extends GetxController {
   TextEditingController dateToController = TextEditingController();
   var errDateFrom = ''.obs;
   var errDateTo = ''.obs;
+
   //-----
   @override
   void onInit() {
@@ -67,8 +75,7 @@ class ActiveTaskListController extends GetxController {
         fetchActiveTaskLists();
       }
 
-      if (taskListScrollController.position.pixels >= taskListScrollController.position.maxScrollExtent - 100 &&
-          !hasMoreData.value) {
+      if (taskListScrollController.position.pixels >= taskListScrollController.position.maxScrollExtent - 100 && !hasMoreData.value) {
         showFetchInfo.value = true;
       } else {
         showFetchInfo.value = false;
@@ -91,8 +98,7 @@ class ActiveTaskListController extends GetxController {
     pageNumber = 1;
     hasMoreData.value = true;
     taskListScrollController
-        .animateTo(taskListScrollController.position.minScrollExtent,
-            duration: Duration(milliseconds: 700), curve: Curves.decelerate)
+        .animateTo(taskListScrollController.position.minScrollExtent, duration: Duration(milliseconds: 700), curve: Curves.decelerate)
         .then((_) {
       fetchActiveTaskLists(isRefresh: true);
     });
@@ -331,7 +337,8 @@ class ActiveTaskListController extends GetxController {
     switch (pendingModel.tasktype.toString().toUpperCase()) {
       case "MAKE":
         var URL = CommonMethods.activeList_CreateURL_MAKE(pendingModel);
-        if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+        //if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+        if (!URL.isEmpty) webViewController.openWebView(url: Const.getFullWebUrl(URL));
         break;
       // break;
       case "CHECK":
@@ -350,11 +357,13 @@ class ActiveTaskListController extends GetxController {
       case "NULL":
       case "CACHED SAVE":
         var URL = CommonMethods.activeList_CreateURL_MESSAGE(pendingModel);
-        if (!URL.isEmpty)
-          Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)])?.then((_) {
-            pageNumber--;
-            _parseTaskMap();
-          });
+        if (!URL.isEmpty) webViewController.openWebView(url: Const.getFullWebUrl(URL));
+        pageNumber--;
+        _parseTaskMap();
+        // Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)])?.then((_) {
+        //   pageNumber--;
+        //   _parseTaskMap();
+        // });
         break;
       default:
         break;
@@ -412,9 +421,8 @@ class ActiveTaskListController extends GetxController {
                           hintText: "Process Name "),
                     ),
                     Center(
-                        child: Padding(
-                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                            child: Text("OR", style: TextStyle(fontWeight: FontWeight.bold)))),
+                        child:
+                            Padding(padding: EdgeInsets.only(top: 10, bottom: 10), child: Text("OR", style: TextStyle(fontWeight: FontWeight.bold)))),
                     TextField(
                       controller: fromUserController,
                       decoration: InputDecoration(
@@ -432,9 +440,8 @@ class ActiveTaskListController extends GetxController {
                           hintText: "From User "),
                     ),
                     Center(
-                        child: Padding(
-                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                            child: Text("OR", style: TextStyle(fontWeight: FontWeight.bold)))),
+                        child:
+                            Padding(padding: EdgeInsets.only(top: 10, bottom: 10), child: Text("OR", style: TextStyle(fontWeight: FontWeight.bold)))),
                     TextField(
                       controller: dateFromController,
                       textAlign: TextAlign.center,
@@ -521,10 +528,8 @@ class ActiveTaskListController extends GetxController {
   void selectDate(BuildContext context, TextEditingController text) async {
     FocusManager.instance.primaryFocus?.unfocus();
     const months = <String>['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final DateTime? picked =
-        await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(1990), lastDate: DateTime.now());
+    final DateTime? picked = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(1990), lastDate: DateTime.now());
     if (picked != null)
-      text.text =
-          picked.day.toString().padLeft(2, '0') + "-" + months[picked.month - 1] + "-" + picked.year.toString().padLeft(2, '0');
+      text.text = picked.day.toString().padLeft(2, '0') + "-" + months[picked.month - 1] + "-" + picked.year.toString().padLeft(2, '0');
   }
 }

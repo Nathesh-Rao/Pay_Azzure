@@ -59,7 +59,7 @@ class _AddNewConnectionState extends State<AddNewConnection> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(connectionController.heading.value),
-          foregroundColor: MyColors.blue2,
+          foregroundColor: MyColors.PayAzzureColor2,
           backgroundColor: Colors.white,
           centerTitle: true,
         ),
@@ -94,7 +94,7 @@ class _AddNewConnectionState extends State<AddNewConnection> {
                             Container(
                               width: MediaQuery.of(context).size.width * 0.32,
                               child: RadioListTile(
-                                activeColor: MyColors.blue2,
+                                activeColor: MyColors.PayAzzureColor2,
                                 contentPadding: EdgeInsets.zero,
                                 visualDensity: const VisualDensity(horizontal: VisualDensity.minimumDensity),
                                 value: "QR",
@@ -116,7 +116,7 @@ class _AddNewConnectionState extends State<AddNewConnection> {
                             Container(
                               width: MediaQuery.of(context).size.width * 0.32,
                               child: RadioListTile(
-                                activeColor: MyColors.blue2,
+                                activeColor: MyColors.PayAzzureColor2,
                                 contentPadding: EdgeInsets.zero,
                                 visualDensity: const VisualDensity(horizontal: VisualDensity.minimumDensity),
                                 value: "CC",
@@ -138,7 +138,7 @@ class _AddNewConnectionState extends State<AddNewConnection> {
                             Container(
                               width: MediaQuery.of(context).size.width * 0.32,
                               child: RadioListTile(
-                                activeColor: MyColors.blue2,
+                                activeColor: MyColors.PayAzzureColor2,
                                 contentPadding: EdgeInsets.zero,
                                 visualDensity: const VisualDensity(horizontal: VisualDensity.minimumDensity),
                                 value: "URL",

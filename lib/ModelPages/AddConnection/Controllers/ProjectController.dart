@@ -88,6 +88,7 @@ class ProjectController extends GetxController {
   Future<void> saveProjects() async {
     if (projects.isEmpty) {
       await appStorage.storeValue("projects", null);
+      appStorage.remove(AppStorage.CACHED);
     } else {
       String encodedData = ProjectModel.encode(projects);
       await appStorage.storeValue("projects", encodedData);
@@ -104,10 +105,10 @@ class ProjectController extends GetxController {
       //     "https://dev.payazzure.com/metaspeedarm", "vagmay");
       /*var project = ProjectModel(DateTime.now().toString(), "meta", "https://dev.payazzure.com/metaspeed/aspx/mainnew.aspx",
           "https://dev.payazzure.com/metaspeedarmmobile", "meta");*/
-      var project = ProjectModel(
+      /* var project = ProjectModel(
           DateTime.now().toString(), Const.PAYAZZURE_PROJECT_NAME, Const.PAYAZZURE_WEB_URL, Const.PAYAZZURE_ARM_URL, Const.PAYAZZURE_PROJECT_NAME);
 
-      await addProject(project);
+      await addProject(project);*/
     } else {
       projects.assignAll(ProjectModel.decode(storedData));
     }

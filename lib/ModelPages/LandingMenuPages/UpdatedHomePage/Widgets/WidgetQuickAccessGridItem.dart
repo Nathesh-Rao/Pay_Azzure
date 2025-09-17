@@ -30,7 +30,7 @@ class WidgetQuickAccessGridItems extends StatelessWidget {
                       elevation: 10,
                       padding: EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
                       badgeColor: Colors.white,
-                      borderSide: BorderSide(width: 1, color: MyColors.blue2)),
+                      borderSide: BorderSide(width: 1, color: MyColors.PayAzzureColor2)),
                   badgeContent: Text(
                     model.count,
                     style: TextStyle(fontSize: 10),
@@ -40,7 +40,7 @@ class WidgetQuickAccessGridItems extends StatelessWidget {
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
                     child: Icon(
                       menuHomePageController.generateIcon(model),
-                      color: MyColors.blue2,
+                      color: MyColors.PayAzzureColor2,
                     ),
                   ),
                 ),

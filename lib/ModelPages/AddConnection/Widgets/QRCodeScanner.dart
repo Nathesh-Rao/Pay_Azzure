@@ -68,7 +68,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                 children: [
                   Visibility(
                     visible: !projectController.doesDeviceHasFlash(),
-                    child: IconButton(onPressed: null, icon: Icon(Icons.no_flash, color: MyColors.blue2)),
+                    child: IconButton(onPressed: null, icon: Icon(Icons.no_flash, color: MyColors.PayAzzureColor2)),
                   ),
                   Visibility(
                     visible: projectController.doesDeviceHasFlash(),
@@ -78,8 +78,8 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                           projectController.isFlashOn.toggle();
                         },
                         icon: Obx(() => projectController.isFlashOn.value
-                            ? Icon(Icons.flash_on, color: MyColors.blue2)
-                            : Icon(Icons.flash_off, color: MyColors.blue2))),
+                            ? Icon(Icons.flash_on, color: MyColors.PayAzzureColor2)
+                            : Icon(Icons.flash_off, color: MyColors.PayAzzureColor2))),
                   ),
                   IconButton(
                       onPressed: () async {
@@ -92,18 +92,18 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
                         }
                       },
                       icon: Obx(() => !projectController.isPlayPauseOn.value
-                          ? Icon(Icons.pause, color: MyColors.blue2)
-                          : Icon(Icons.play_arrow_sharp, color: MyColors.blue2))),
+                          ? Icon(Icons.pause, color: MyColors.PayAzzureColor2)
+                          : Icon(Icons.play_arrow_sharp, color: MyColors.PayAzzureColor2))),
                   IconButton(
                       onPressed: () {
                         projectController.scannerController!.switchCamera();
                       },
-                      icon: Icon(Icons.flip_camera_ios, color: MyColors.blue2)),
+                      icon: Icon(Icons.flip_camera_ios, color: MyColors.PayAzzureColor2)),
                   IconButton(
                       onPressed: () {
                         projectController.pickImageFromGalleryCalled();
                       },
-                      icon: Icon(Icons.filter, color: MyColors.blue2)),
+                      icon: Icon(Icons.filter, color: MyColors.PayAzzureColor2)),
                 ],
               ),
             ],
@@ -118,7 +118,7 @@ class _QRCodeScannerState extends State<QRCodeScanner> {
     return MobileScanner(
       controller: projectController.scannerController,
       overlayBuilder: (ctx, cts) => Container(
-        decoration: BoxDecoration(border: Border.all(color: MyColors.blue2)),
+        decoration: BoxDecoration(border: Border.all(color: MyColors.PayAzzureColor2)),
       ),
       onDetect: (capture) {
         final List<Barcode> barcodes = capture.barcodes;

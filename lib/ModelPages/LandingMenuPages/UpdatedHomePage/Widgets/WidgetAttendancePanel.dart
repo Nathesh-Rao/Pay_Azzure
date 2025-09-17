@@ -34,13 +34,13 @@ class WidgetAttendancePanel extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                   color: Colors.white,
-                                  border: Border.all(width: 1, color: MyColors.blue2),
+                                  border: Border.all(width: 1, color: MyColors.PayAzzureColor2),
                                   borderRadius: BorderRadius.circular(20)),
                               child: Padding(
                                 padding: EdgeInsets.all(10),
                                 child: Text(
                                   "Am off today",
-                                  style: TextStyle(color: MyColors.blue2),
+                                  style: TextStyle(color: MyColors.PayAzzureColor2),
                                 ),
                               ),
                             ),
@@ -54,8 +54,8 @@ class WidgetAttendancePanel extends StatelessWidget {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                    color: MyColors.blue2,
-                                    border: Border.all(width: 1, color: MyColors.blue2),
+                                    color: MyColors.PayAzzureColor2,
+                                    border: Border.all(width: 1, color: MyColors.PayAzzureColor2),
                                     borderRadius: BorderRadius.circular(20)),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -75,8 +75,8 @@ class WidgetAttendancePanel extends StatelessWidget {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                    color: MyColors.blue2,
-                                    border: Border.all(width: 1, color: MyColors.blue2),
+                                    color: MyColors.PayAzzureColor2,
+                                    border: Border.all(width: 1, color: MyColors.PayAzzureColor2),
                                     borderRadius: BorderRadius.circular(20)),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -178,7 +178,7 @@ class WidgetAttendancePanel extends StatelessWidget {
                                           border: Border.all(width: 1, color: Colors.black.withOpacity(0.1))),
                                       child: Icon(
                                         Icons.person,
-                                        color: MyColors.blue2.withOpacity(0.5),
+                                        color: MyColors.PayAzzureColor2.withOpacity(0.5),
                                         size: 18,
                                       ),
                                     ),
@@ -199,7 +199,7 @@ class WidgetAttendancePanel extends StatelessWidget {
                                           border: Border.all(width: 1, color: Colors.black.withOpacity(0.1))),
                                       child: Icon(
                                         Icons.location_on,
-                                        color: MyColors.blue2.withOpacity(0.5),
+                                        color: MyColors.PayAzzureColor2.withOpacity(0.5),
                                         size: 18,
                                       ),
                                     ),

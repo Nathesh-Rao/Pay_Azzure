@@ -13,8 +13,11 @@ import 'package:get_storage/get_storage.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:material_icons_named/material_icons_named.dart';
 
+import '../../../InApplicationWebView/controller/webview_controller.dart';
+
 class MenuMorePageController extends GetxController {
   InternetConnectivity internetConnectivity = Get.find();
+  final webViewController = Get.find<WebViewController>();
   var needRefresh = true.obs;
   var menu_finalList = [].obs;
   var searchList = [].obs;
@@ -144,7 +147,8 @@ class MenuMorePageController extends GetxController {
       if (itemModel.url != "") {
         // menuHomePageController.webUrl = Const.getFullProjectUrl(itemModel.url);
         // menuHomePageController.switchPage.value = true;
-        Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(itemModel.url)]);
+      //  Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(itemModel.url)]);
+        webViewController.openWebView(url: Const.getFullWebUrl(itemModel.url));
       }
     }
   }

@@ -11,6 +11,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
+import '../../../InApplicationWebView/controller/webview_controller.dart';
+
 class PendingListPage extends StatelessWidget {
   PendingListPage({super.key});
 
@@ -29,6 +31,7 @@ class PendingListPage extends StatelessWidget {
 }
 
 reBuild(PendingListController pendingListController, BuildContext context) {
+  final webViewController = Get.find<WebViewController>();
   return Column(
     mainAxisAlignment: MainAxisAlignment.start,
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,7 +214,8 @@ reBuild(PendingListController pendingListController, BuildContext context) {
                           var URL = CommonMethods.activeList_CreateURL_MAKE(
                             pendingListController.pending_activeList[index],
                           );
-                          if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                         // if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                          if (!URL.isEmpty) webViewController.openWebView(url: Const.getFullWebUrl(URL));
                           break;
                           break;
                         case "CHECK":
@@ -225,7 +229,8 @@ reBuild(PendingListController pendingListController, BuildContext context) {
                         case "NULL":
                         case "CACHED SAVE":
                           var URL = CommonMethods.activeList_CreateURL_MESSAGE(pendingListController.pending_activeList[index]);
-                          if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                         // if (!URL.isEmpty) Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(URL)]);
+                          if (!URL.isEmpty) webViewController.openWebView(url: Const.getFullWebUrl(URL));
                           break;
                         default:
                           break;

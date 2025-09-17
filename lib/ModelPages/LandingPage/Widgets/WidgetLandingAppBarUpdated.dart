@@ -20,7 +20,7 @@ class WidgetLandingAppBarUpdated extends StatelessWidget implements PreferredSiz
       elevation: 0,
       foregroundColor: Colors.white,
       flexibleSpace: Container(
-        decoration: BoxDecoration(color: MyColors.blue2),
+        decoration: BoxDecoration(color: MyColors.PayAzzureColor2),
       ),
       titleSpacing: 5,
       title: Container(

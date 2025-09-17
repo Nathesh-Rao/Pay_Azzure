@@ -32,12 +32,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:text_scroll/text_scroll.dart';
 
+import '../../InApplicationWebView/controller/webview_controller.dart';
 import '../../LandingMenuPages/MenuActiveListPage/Page/UpdatedMenuListPage/ActiveListPage.dart';
 import '../../LandingMenuPages/MenuHomePagePage/Models/BannerModel.dart';
+import '../Widgets/EmptyWidget.dart';
 import '../Widgets/WidgetBanner.dart';
 
 class LandingPageController extends GetxController with WidgetsBindingObserver {
   final globalVariableController = Get.find<GlobalVariableController>();
+  final webViewController = Get.find<WebViewController>();
   final MenuMorePageController menuMorePageController = Get.put(MenuMorePageController());
 
   TextEditingController userCtrl = TextEditingController();
@@ -77,6 +80,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   late var pageList;
   var list = [WidgetNotification(FirebaseMessageModel("Title 1", "Body 1"))];
   var list_bannerItem = [].obs;
+  bool isAxpertConnectEstablished = false;
 
   getPage() {
     if (bottomIndex.value == 0) {
@@ -100,22 +104,15 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
 
         ///NOTE Pass a [ValueKey] with a unique identifier to force widget rebuilds.
         //NOTE to open the WebViewCalendar page
-        WebViewFromBottomBar(
-          key: ValueKey(Const.BOTTOMBAR_CALENDAR),
-          url: Const.BOTTOMBAR_CALENDAR,
-        ),
-        //NOTE to open the WebViewAnalytics page
-        WebViewFromBottomBar(
-          key: ValueKey(Const.BOTTOMBAR_ANALYTICS),
-          url: Const.BOTTOMBAR_ANALYTICS,
-        ),
+        EmptyWidget(), //NOTE to open the WebViewCalendar page handled in indexchange() method
+        EmptyWidget(), //NOTE to open the WebViewAnalytics page handled in indexchange() method
         //MenuMorePage(),
       ];
     });
     showChangePassword_PopUp();
-    getBiometricStatus();
+    // getBiometricStatus();
     getClientInfo();
-    getBannerDetailList();
+    // getBannerDetailList();
   }
 
   getClientInfo() async {
@@ -169,7 +166,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                   child: Center(
                     child: Icon(
                       Icons.fingerprint_outlined,
-                      color: MyColors.blue2,
+                      color: MyColors.PayAzzureColor2,
                       size: 80,
                     ),
                   ),
@@ -184,8 +181,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                 SizedBox(height: 20),
                 Text(
                   "Log into your project account using your phone's biometric credentials..",
-                  style: GoogleFonts.poppins(
-                      textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.grey.shade600)),
+                  style: GoogleFonts.poppins(textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Colors.grey.shade600)),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                 ),
@@ -250,10 +246,25 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       willAuth = willAuthLocal;
   }
 
-  indexChange(value) {
+  indexChange(index) async {
     MenuHomePageController menuHomePageController = Get.find();
     menuHomePageController.switchPage.value = false;
-    bottomIndex.value = value;
+    bottomIndex.value = index;
+
+    if (pageList[index] is EmptyWidget) {
+      if (index == 3) {
+        //NOTE to open the WebViewCalendar page
+        await webViewController.openWebView(
+          url: Const.getFullWebUrl(Const.BOTTOMBAR_CALENDAR) + AppStorage().retrieveValue(AppStorage.SESSIONID),
+        );
+      } else if (index == 4) {
+        //NOTE to open the WebViewAnalytics page
+        await webViewController.openWebView(
+          url: Const.getFullWebUrl(Const.BOTTOMBAR_ANALYTICS) + AppStorage().retrieveValue(AppStorage.SESSIONID),
+        );
+      }
+      bottomIndex.value = 0;
+    }
   }
 
   showNotificationIconPressed() {}
@@ -422,6 +433,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
               appStorage.storeValue(AppStorage.USER_NAME, "");
               await serverConnections.postToServer(url: url, body: jsonEncode(body));
               LoadingScreen.dismiss();
+              webViewController.signOut(url: Const.getFullWebUrl("aspx/AxMain.aspx?signout=true"));
               Get.offAllNamed(Routes.Login);
               // if (resp != "" && !resp.toString().contains("error")) {
               //   var jsonResp = jsonDecode(resp);
@@ -604,8 +616,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         var projectDet = jsonDecode(val['project_details']);
         // print("notiiii: " + projectDet["projectname"].toString());
         if (projectDet["projectname"].toString() == appStorage.retrieveValue(AppStorage.PROJECT_NAME).toString() &&
-            notify_to.contains(userName.toString().toLowerCase()))
-          list.add(WidgetNotification(FirebaseMessageModel.fromJson(val)));
+            notify_to.contains(userName.toString().toLowerCase())) list.add(WidgetNotification(FirebaseMessageModel.fromJson(val)));
       } catch (e) {
         print(e.toString());
       }
@@ -701,8 +712,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     menuList.add(
       Container(
         height: 70,
-        decoration: BoxDecoration(
-            color: Colors.grey.shade400, border: Border(bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.7)))),
+        decoration: BoxDecoration(color: MyColors.PayAzzureColor2.withAlpha(450), border: Border(bottom: BorderSide(width: 1, color: Colors.black.withOpacity(0.7)))),
         child: Row(
           children: [
             SizedBox(width: 30),
@@ -818,9 +828,25 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       color: Colors.white,
       height: 70,
       child: Center(
-          child: Text(
-        'App Version: ${Const.APP_VERSION}\n© agile-labs.com ${DateTime.now().year}',
-        textAlign: TextAlign.center,
+          child: Column(
+        children: [
+          Text(
+            'App Version: ${Const.APP_VERSION}',
+            textAlign: TextAlign.center,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/axpert_03.png',
+                height: Get.height * 0.03,
+                // width: MediaQuery.of(context).size.width * 0.075,
+                fit: BoxFit.fill,
+              ),
+              Text(" © ${DateTime.now().year} Powered by Axpert"),
+            ],
+          )
+        ],
       )),
     ));
 
@@ -857,8 +883,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
           tilePadding: EdgeInsets.only(left: leftPadding, right: 10),
           title: Text(tile.caption),
           children: ListTile.divideTiles(
-              context: Get.context,
-              tiles: model_tile.childList.map((tile) => build_innerListTile(tile, leftPadding: leftPadding + 15))).toList(),
+              context: Get.context, tiles: model_tile.childList.map((tile) => build_innerListTile(tile, leftPadding: leftPadding + 15))).toList(),
         ),
       );
     }
@@ -880,8 +905,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         child: Padding(
           padding: EdgeInsets.only(left: 20),
           // menuMorePageController.IconList[index++ % 8]
-          child: ListTile(
-              leading: Icon(menuMorePageController.generateIcon(subMenu, index++)), title: Text(subMenu.caption.toString())),
+          child: ListTile(leading: Icon(menuMorePageController.generateIcon(subMenu, index++)), title: Text(subMenu.caption.toString())),
         ),
       ));
 
@@ -915,7 +939,8 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         var msgValue = jsonMainClickData['value'].replaceAll("transid~", "").replaceAll("ivname~", "");
         url += "&pname=" + msgType + msgValue;
         print(url);
-        Get.toNamed(Routes.InApplicationWebViewer, arguments: [url]);
+        // Get.toNamed(Routes.InApplicationWebViewer, arguments: [url]);
+        webViewController.openWebView(url: url);
       }
     } catch (e) {
       print("Can not open web view: error- " + e.toString());
@@ -1334,9 +1359,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                     ),
                     padding: const EdgeInsets.fromLTRB(3.0, 6.0, 3.0, 3.0),
                     child: Column(children: const [
-                      Text('Cancel',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "nunitoreg"))
+                      Text('Cancel', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "nunitoreg"))
                     ]),
                   ),
                 ),
@@ -1415,5 +1438,69 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       print(e);
     }
+  }
+
+  signOut_withoutDialog() async {
+    var body = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
+    var url = Const.getFullARMUrl(ServerConnections.API_SIGNOUT);
+    try {
+      await FirebaseAuth.instance.signOut();
+      await GoogleSignIn().signOut();
+      clearCacheData();
+    } catch (e) {}
+    appStorage.storeValue(AppStorage.USER_NAME, "");
+    await serverConnections.postToServer(url: url, body: jsonEncode(body));
+    LoadingScreen.dismiss();
+    //webViewController.signOut(url: Const.getFullWebUrl("aspx/AxMain.aspx?signout=true"));
+    Get.offAllNamed(Routes.Login);
+  }
+
+  Future<void> callApiForConnectToAxpert() async {
+    var connectBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
+    var cUrl = Const.getFullARMUrl(ServerConnections.API_CONNECTTOAXPERT);
+    var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
+    print(connectResp);
+    // getArmMenu
+
+    var jsonResp = jsonDecode(connectResp);
+    if (jsonResp != "") {
+      if (jsonResp['result']['success'].toString() == "true") {
+        print("callApiForConnectToAxpert: ${jsonResp.toString()}");
+        isAxpertConnectEstablished = true;
+        // Get.offAllNamed(Routes.LandingPage);
+      } else {
+        var message = jsonResp['result']['message'].toString();
+        showErrorSnack(title: "Error - Connect To Axpert", message: message);
+      }
+    } else {
+      showErrorSnack();
+    }
+  }
+
+  void showSignOutDialog_sessionExpired() {
+    webViewController..signOut(url: Const.getFullWebUrl("aspx/AxMain.aspx?signout=true"));
+    Get.defaultDialog(
+      barrierDismissible: false,
+      titleStyle: TextStyle(color: MyColors.PayAzzureColor2),
+      titlePadding: EdgeInsets.only(top: 20),
+      contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      title: "Session Expired",
+      content: PopScope(
+        canPop: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Your session has expired. Please log in again to continue."),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                signOut_withoutDialog();
+              },
+              child: const Text("Login"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

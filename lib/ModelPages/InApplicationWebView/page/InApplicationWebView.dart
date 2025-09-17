@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:axpertflutter/Constants/MyColors.dart';
+import 'package:axpertflutter/ModelPages/InApplicationWebView/controller/webview_controller.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
 import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
@@ -14,16 +15,21 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:lottie/lottie.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_downloader_flutter/file_downloader_flutter.dart';
 
+import '../../../Constants/Const.dart';
+import '../../../Constants/Routes.dart';
 import '../../../Utils/Utility/Utility.dart';
+import '../../LandingPage/Controller/LandingPageController.dart';
 
 class InApplicationWebViewer extends StatefulWidget {
   InApplicationWebViewer(this.data);
 
+  WebViewController webViewController = Get.find();
   String data;
 
   @override
@@ -33,18 +39,24 @@ class InApplicationWebViewer extends StatefulWidget {
 class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
   dynamic argumentData = Get.arguments;
   MenuHomePageController menuHomePageController = Get.find();
+  LandingPageController landingPageController = Get.find();
   Map<int, InAppWebViewController> windowControllers = {};
   BuildContext? context_popUpScreen;
 
   // final Completer<InAppWebViewController> _controller = Completer<InAppWebViewController>();
-  late InAppWebViewController _webViewController;
+  // late InAppWebViewController _webViewController;
 
   // final _key = UniqueKey();
   var hasAppBar = false;
-  bool _progressBarActive = true;
   late StreamSubscription subscription;
   CookieManager cookieManager = CookieManager.instance();
   final imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'xlsx', 'xls', 'docx', 'doc', 'pdf'];
+  bool isCalendarPage = false;
+  bool _showButton = false;
+  bool _handled = false;
+  bool _longPressActive = false;
+  double _startY = 0;
+  Timer? _longPressTimer;
 
   @override
   void initState() {
@@ -61,6 +73,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
   @override
   void dispose() {
     super.dispose();
+    _longPressTimer?.cancel(); // kill timer safely
     WidgetsBinding.instance.addPostFrameCallback((_) {
       menuHomePageController.switchPage.value = false;
     });
@@ -73,6 +86,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     // incognito: true,
     javaScriptCanOpenWindowsAutomatically: true,
     useOnDownloadStart: true,
+    domStorageEnabled: true,
     useShouldOverrideUrlLoading: true,
     // mediaPlaybackRequiresUserGesture: false,
     useHybridComposition: false,
@@ -83,12 +97,37 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     supportMultipleWindows: true,
   );
 
+  perform_backButtonClick() async {
+    if (isCalendarPage) {
+      widget.webViewController.closeWebView();
+      return true;
+    }
+
+    bool handledInWeb = await widget.webViewController.inAppWebViewController.value!.evaluateJavascript(source: """
+      (function() {
+        var btn = document.querySelector('.appBackBtn');
+        if (btn) {
+          btn.click();
+          return true;   //handled inside web
+        }
+        return false;    //button not found
+      })();
+    """) ?? false;
+
+    if (!handledInWeb) {
+      widget.webViewController.closeWebView();
+      return true;
+    }
+
+    return false;
+  }
+
   void _download(String url) async {
     try {
       print("download Url: $url");
       String fname = url.split('/').last.split('.').first;
       print("download FileName: $fname");
-      FileDownloaderFlutter().urlFileSaver(url: url, fileName: fname);
+      await FileDownloaderFlutter().urlFileSaver(url: url, fileName: fname);
     } catch (e) {
       print(e.toString());
     }
@@ -161,35 +200,65 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     }
   }
 
+  Future<void> _onLongSwipe() async {
+    print("Longpress");
+    if (_handled) return;
+    _handled = true;
+
+    setState(() => _showButton = true);
+
+    // auto hide after 3 sec
+    await Future.delayed(const Duration(seconds: 3));
+    if (mounted) {
+      setState(() => _showButton = false);
+      _handled = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (await _webViewController.canGoBack()) {
-          _webViewController.goBack();
-          return Future.value(false);
-        } else {
-          return Future.value(true);
+        // if (await _webViewController.canGoBack()) {
+        // _webViewController.goBack();
+        if (widget.webViewController.currentIndex == 1) {
+          bool val = perform_backButtonClick();
+          return Future.value(val);
+          /*widget.webViewController.closeWebView();
+          if (widget.webViewController.inAppWebViewController.value == null) return Future.value(true);
+
+          if (await widget.webViewController.inAppWebViewController.value!.canGoBack()) {
+            widget.webViewController.inAppWebViewController.value!.goBack();
+            return Future.value(false);
+          } else {
+            //return Future.value(false);
+            return Future.value(true);
+          }*/
         }
+        return Future.value(true);
       },
       child: Scaffold(
         appBar: hasAppBar == true
             ? AppBar(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                centerTitle: false,
-                title: Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Image.asset(
-                        "assets/images/axAppLogo.png",
-                        // height: 25,
-                      ),
-                    ],
-                  ),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          centerTitle: false,
+          title: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image.asset(
+                  "assets/images/axAppLogo.png",
+                  // height: 25,
                 ),
-              )
+              ],
+            ),
+          ),
+        )
+        // : AppBar(
+        //     actions: [Icon(Icons.cancel)],
+        //   ),
+
             : null,
         body: SafeArea(
           child: Builder(builder: (BuildContext context) {
@@ -198,7 +267,20 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                 initialUrlRequest: URLRequest(url: WebUri.uri(Uri.parse(widget.data))),
                 initialSettings: settings,
                 onWebViewCreated: (controller) {
-                  _webViewController = controller;
+                  // _webViewController = controller;
+                  widget.webViewController.inAppWebViewController.value = controller;
+                },
+                onLoadStart: (controller, url) {
+                  url.toString().toLowerCase().contains("dcalendar") ? isCalendarPage = true : isCalendarPage = false;
+
+                  setState(() {
+                    widget.webViewController.isProgressBarActive.value = true;
+                  });
+                },
+                onLoadStop: (controller, url) {
+                  setState(() {
+                    widget.webViewController.isProgressBarActive.value = false;
+                  });
                 },
                 onGeolocationPermissionsShowPrompt: (InAppWebViewController controller, String origin) async {
                   var status = await Permission.locationWhenInUse.status;
@@ -219,8 +301,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   }
                 },
                 onDownloadStartRequest: (controller, downloadStartRequest) {
-                  LogService.writeLog(
-                      message: "onDownloadStartRequest\nwith requested url: ${downloadStartRequest.url.toString()}");
+                  LogService.writeLog(message: "onDownloadStartRequest\nwith requested url: ${downloadStartRequest.url.toString()}");
                   print("Download...");
                   print("Requested url: ${downloadStartRequest.url.toString()}");
                   _download(downloadStartRequest.url.toString());
@@ -233,11 +314,13 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   print(consoleMessage.toString());
                   if (consoleMessage.toString().contains("axm_mainpageloaded")) {
                     try {
-                      if (menuHomePageController.switchPage.value == true) {
-                        menuHomePageController.switchPage.toggle();
-                      } else {
-                        Get.back();
-                      }
+                      // if (menuHomePageController.switchPage.value == true) {
+                      //   menuHomePageController.switchPage.toggle();
+                      // } else {
+                      //   Get.back();
+                      // }
+
+                      widget.webViewController.closeWebView();
                     } catch (e) {}
                   }
                 },
@@ -247,7 +330,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   print('Progress---: $value : DT ${DateTime.now()}');
                   if (value == 100) {
                     setState(() {
-                      _progressBarActive = false;
+                      widget.webViewController.isProgressBarActive.value = false;
                     });
                   }
                 },
@@ -255,6 +338,17 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   var uri = navigationAction.request.url!;
                   print("Override url: $uri");
                   LogService.writeLog(message: "shouldOverrideUrlLoading: url=> $uri");
+                  if (uri.toString().toLowerCase().contains("sess.aspx")) {
+                    await controller
+                        .loadUrl(
+                      urlRequest: URLRequest(
+                        url: WebUri(uri.toString() + "?axmain=true"),
+                      ),
+                    )
+                        .then((_) {});
+                    //showSignOutDialog();
+                    landingPageController.showSignOutDialog_sessionExpired();
+                  }
 
                   if (imageExtensions.any((ext) => uri.toString().endsWith(ext))) {
                     _download(uri.toString());
@@ -266,6 +360,7 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                 },
                 onCreateWindow: (controller, createWindowRequest) async {
                   final windowId = createWindowRequest.windowId;
+                  print("newWindowCreated");
                   if (windowId != null) {
                     // // Open a new window for the given windowId
                     // Navigator.push(
@@ -282,13 +377,13 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                     // );
 
                     Get.to(
-                        () => NewWindowPage(
-                              windowId: windowId,
-                              onWindowCreated: (newController) {
-                                windowControllers[windowId] = newController;
-                                context_popUpScreen = context;
-                              },
-                            ),
+                            () => NewWindowPage(
+                          windowId: windowId,
+                          onWindowCreated: (newController) {
+                            windowControllers[windowId] = newController;
+                            context_popUpScreen = context;
+                          },
+                        ),
                         transition: Transition.cupertino,
                         duration: Duration(milliseconds: 500));
                     return true; // Allow the window creation
@@ -296,20 +391,87 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
                   return false;
                 },
               ),
-              _progressBarActive
-                  ? Container(
-                      color: Colors.white,
-                      child: Center(
-                        child: SpinKitRotatingCircle(
-                          size: 40,
-                          itemBuilder: (context, index) {
-                            final colors = [MyColors.blue2, MyColors.blue2, MyColors.blue2];
-                            final color = colors[index % colors.length];
-                            return DecoratedBox(decoration: BoxDecoration(color: color, shape: BoxShape.circle));
-                          },
-                        ),
-                      ))
-                  : Stack(),
+              Positioned.fill(
+                child: Listener(
+                  behavior: HitTestBehavior.translucent,
+                  onPointerDown: (event) {
+                    _startY = event.position.dy;
+                    _longPressTimer = Timer(const Duration(milliseconds: 300), () {
+                      _longPressActive = true;
+                    });
+                  },
+                  onPointerMove: (event) {
+                    if (_longPressActive) {
+                      final dy = event.position.dy - _startY;
+                      if (dy > 100 && !_handled) {
+                        // _onLongSwipeTriggered();
+                        _onLongSwipe();
+                      }
+                    }
+                  },
+                  onPointerUp: (_) {
+                    _longPressTimer?.cancel();
+                    _longPressActive = false;
+                  },
+                ),
+              ),
+              Obx(
+                    () => widget.webViewController.isProgressBarActive.value
+                    ? Container(
+                    color: Colors.white,
+                    child: Center(
+                      child: SpinKitRotatingCircle(
+                        size: 40,
+                        itemBuilder: (context, index) {
+                          final colors = [MyColors.PayAzzureColor2, MyColors.PayAzzureColor2, MyColors.PayAzzureColor2];
+                          final color = colors[index % colors.length];
+                          return DecoratedBox(decoration: BoxDecoration(color: color, shape: BoxShape.circle));
+                        },
+                      ),
+                    ))
+                    : Stack(),
+              ),
+              Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Visibility(visible: false, child: GestureDetector(onTap: perform_backButtonClick, child: Icon(Icons.cancel)))),
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                top: _showButton ? 20.0 : -100.0,
+                left: 0,
+                right: 0,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  opacity: _showButton ? 1.0 : 0.0,
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(16),
+                      ),
+                      onPressed: () {
+                        widget.webViewController.closeWebView();
+                      },
+                      child: const Icon(Icons.home, size: 32),
+                    ),
+                  ),
+                ),
+              ),
+              Obx(
+                    () => widget.webViewController.isFileDownloading.value
+                    ? Container(
+                  color: Colors.black.withValues(alpha: 0.6), // dim background
+                  child: Center(
+                    child: Lottie.asset(
+                      "assets/lotties/download.json",
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                )
+                    : Stack(),
+              ),
             ]);
           }),
         ),
@@ -361,21 +523,43 @@ class _InApplicationWebViewerState extends State<InApplicationWebViewer> {
     await cookieManager.deleteAllCookies();
     print("Cookie cleared");
   }
+
+  void showSignOutDialog() {
+    widget.webViewController..signOut(url: Const.getFullWebUrl("aspx/AxMain.aspx?signout=true"));
+    Get.defaultDialog(
+      barrierDismissible: false,
+      titleStyle: TextStyle(color: MyColors.PayAzzureColor2),
+      titlePadding: EdgeInsets.only(
+        top: 20,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      title: "Session Expired",
+      middleText: "Your session has expired. Please log in again to continue.",
+      confirm: ElevatedButton(
+          onPressed: () async {
+            landingPageController.signOut_withoutDialog();
+          },
+          child: Text("Login")),
+    );
+  }
 }
 
 class NewWindowPage extends StatefulWidget {
   final int windowId;
   final Function(InAppWebViewController) onWindowCreated;
+
   const NewWindowPage({
     required this.windowId,
     required this.onWindowCreated,
   });
+
   @override
   _NewWindowPageState createState() => _NewWindowPageState();
 }
 
 class _NewWindowPageState extends State<NewWindowPage> {
   late InAppWebViewController newWebViewController;
+
   @override
   Widget build(BuildContext context) {
     print("new-Window => ${widget.windowId}");
@@ -388,7 +572,8 @@ class _NewWindowPageState extends State<NewWindowPage> {
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
             ),
-            windowId: widget.windowId, // Associate this WebView with the windowId
+            windowId: widget.windowId,
+            // Associate this WebView with the windowId
             onWebViewCreated: (controller) {
               newWebViewController = controller;
               widget.onWindowCreated(controller);
@@ -396,24 +581,24 @@ class _NewWindowPageState extends State<NewWindowPage> {
             onConsoleMessage: (controller, consoleMessage) {
               print("Console Message_new_window $consoleMessage");
             },
-            onDownloadStartRequest: (controller, downloadStartRequest) {
-              Utility.downloadFile_inAppWebView(
+            onDownloadStartRequest: (controller, downloadStartRequest) async {
+              await Utility.downloadFile_inAppWebView(
                   controller: controller,
                   downloadStartRequest: downloadStartRequest,
                   onDownloadComplete: (path) {
+                    Get.until((route) => route.settings.name == Routes.LandingPage);
                     print("Download path => $path");
-                    Get.back();
                   },
                   onDownloadError: (e) {
+                    Get.until((route) => route.settings.name == Routes.LandingPage);
                     print("Download Error => $e");
-                    Get.back();
                   });
             }
 
-            // onPageCommitVisible: (controller,consolemsg){
-            //
-            // },
-            ),
+          // onPageCommitVisible: (controller,consolemsg){
+          //
+          // },
+        ),
       ),
     );
   }

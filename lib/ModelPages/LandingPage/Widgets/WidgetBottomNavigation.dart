@@ -22,7 +22,7 @@ class AppBottomNavigation extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
           child: BottomNavigationBar(
             currentIndex: landingPageController.bottomIndex.value,
-            fixedColor: MyColors.blue2,
+            fixedColor: MyColors.PayAzzureColor2,
             unselectedItemColor: MyColors.grey,
             showUnselectedLabels: true,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),

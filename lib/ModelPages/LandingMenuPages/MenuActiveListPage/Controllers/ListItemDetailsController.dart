@@ -14,8 +14,11 @@ import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../InApplicationWebView/controller/webview_controller.dart';
+
 class ListItemDetailsController extends GetxController {
   final globalVariableController = Get.find<GlobalVariableController>();
+  final webViewController = Get.find<WebViewController>();
   AppStorage appStorage = AppStorage();
   String selectedTaskID = "";
   PendingListModel? openModel;
@@ -336,7 +339,16 @@ class ListItemDetailsController extends GetxController {
         pendingTaskModel!.keyvalue +
         "~pprocess=" +
         pendingTaskModel!.processname;
-    Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(url)]);
+
+    var urlNew = "aspx/AxMain.aspx?authKey=AXPERT-" +
+        appStorage.retrieveValue(AppStorage.SESSIONID) +
+        "&pname=iad___pth&params=pkeyvalue~" +
+        pendingTaskModel!.keyvalue +
+        "^pprocess~" +
+        pendingTaskModel!.processname;
+    // Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(urlNew)]);
+
+    webViewController.openWebView(url: Const.getFullWebUrl(urlNew));
   }
 
   void viewBtnClicked() {
@@ -346,6 +358,13 @@ class ListItemDetailsController extends GetxController {
         pendingTaskModel!.transid +
         "&params=~act=load~recordid=" +
         pendingTaskModel!.recordid;
-    Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(url)]);
+    var urlNew = "aspx/AxMain.aspx?authKey=AXPERT-" +
+        appStorage.retrieveValue(AppStorage.SESSIONID) +
+        "&pname=t" +
+        pendingTaskModel!.transid +
+        "&params=act~load^recordid~" +
+        pendingTaskModel!.recordid;
+    // Get.toNamed(Routes.InApplicationWebViewer, arguments: [Const.getFullWebUrl(urlNew)]);
+    webViewController.openWebView(url: Const.getFullWebUrl(urlNew));
   }
 }

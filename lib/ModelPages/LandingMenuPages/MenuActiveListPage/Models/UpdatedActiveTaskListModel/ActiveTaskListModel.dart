@@ -21,7 +21,7 @@ class ActiveTaskListModel {
   dynamic keyvalue;
   String? transid;
   double? priorindex;
-  double? indexno;
+  dynamic indexno;
   double? subindexno;
   dynamic approvereasons;
   dynamic defapptext;

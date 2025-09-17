@@ -60,8 +60,8 @@ void configureEasyLoading() {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.circle
     ..progressColor = Colors.red
-    ..indicatorColor = MyColors.blue2
-    ..textColor = MyColors.blue2
+    ..indicatorColor = MyColors.PayAzzureColor2
+    ..textColor = MyColors.PayAzzureColor2
     ..backgroundColor = Colors.white
     ..loadingStyle = EasyLoadingStyle.custom
     ..indicatorSize = 55.0

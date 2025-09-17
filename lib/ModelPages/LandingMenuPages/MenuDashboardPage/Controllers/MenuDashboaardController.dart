@@ -22,59 +22,20 @@ import '../../UpdatedHomePage/Widgets/UpdatedWidgets11.4/WidgetTaskList.dart';
 class MenuDashboardController extends GetxController {
   AppStorage appStorage = AppStorage();
   ServerConnections serverConnections = ServerConnections();
-  List<ChartCardModel> chartList = [];
+  RxList<ChartCardModel> chartList = <ChartCardModel>[].obs;
   var dashBoardWidgetList = [].obs;
+
+
   MenuDashboardController() {
     fetchDataFromServer();
     print('Session: ${appStorage.retrieveValue(AppStorage.SESSIONID)}');
     print('Token: ${appStorage.retrieveValue(AppStorage.TOKEN)}');
   }
 
-  // fetchDataFromServer() async {
-  //   LoadingScreen.show();
-  //   var dBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
-  //   var url = Const.getFullARMUrl(ServerConnections.API_GET_DASHBOARD_DATA);
-  //   var resp = await serverConnections.postToServer(url: url, body: jsonEncode(dBody), isBearer: true);
-  //   LoadingScreen.dismiss();
-  //   if (resp.toString() != "") {
-  //     var jsonResp = jsonDecode(resp);
-  //     if (jsonResp['result']['success'].toString().toLowerCase() == "true") {
-  //       var cards = jsonResp['result']['cards']['data'];
-  //       for (var card in cards) {
-  //         //cards
-  //         if (card['cardtype'].toString().toLowerCase() == "chart" || card['cardtype'].toString().toLowerCase() == "kpi") {
-  //           switch (card['charttype'].toString().toLowerCase()) {
-  //             case 'bar':
-  //             case 'stacked-bar':
-  //             case 'donut':
-  //             case 'semi-donut':
-  //             case 'pie':
-  //             case 'line':
-  //             case 'column':
-  //             case 'stacked-column':
-  //             case 'stacked-percentage-column':
-  //             case '':
-  //               try {
-  //                 var jsonSqlData = jsonDecode(card['cardsql']);
-  //                 var rows = jsonSqlData['row'];
-  //                 List<ChartData> bar = [];
-  //                 for (var eachData in rows) {
-  //                   ChartData bmodel = ChartData.fromJson(eachData);
-  //                   bar.add(bmodel);
-  //                 }
-  //                 if (validate(bar))
-  //                   chartList.add(ChartCardModel(card['cardname'], card['cardtype'], card['charttype'], bar,
-  //                       cardbgclr: card['cardbgclr'] ?? "null"));
-  //               } catch (e) {}
-  //               break;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   // print("charts:");
-  //   // print(chartData);
-  // }
+  init(){
+
+  }
+
   fetchDataFromServer() async {
     LoadingScreen.show();
     var url = Const.getFullARMUrl(ServerConnections.API_GET_CARDS_WITH_DATA);
@@ -161,19 +122,25 @@ class MenuDashboardController extends GetxController {
     LogService.writeLog(message: "dataList-length\n${dataList.length}");
 
     for (var data in dataList) {
+      if (data.carddata == null ||
+          (data.carddata is List && data.carddata.isEmpty) ||
+          (data.carddata is String && data.carddata.trim().isEmpty) ||
+          (data.carddata is Map && data.carddata.isEmpty)) {
+        continue;
+      }
       switch (data.pluginname?.toUpperCase()) {
         case "BANNER CARD":
-          // bannerCardData.add(data);
+        // bannerCardData.add(data);
           LogService.writeLog(message: "${data.carddata}");
           dashBoardWidgetList.add(WidgetBannerCard1(cardModel: data));
 
           break;
         case "TASK LIST":
-          // taskListData.add(data);
+        // taskListData.add(data);
           dashBoardWidgetList.add(TaskListPanel(taskListData: data));
           break;
         case "NEWS CARD":
-          // newsCardData.add(data);
+        // newsCardData.add(data);
           dashBoardWidgetList.add(NewsPanel(newsCardData: data));
           break;
         case "KPI LIST":
@@ -188,13 +155,13 @@ class MenuDashboardController extends GetxController {
 
           break;
         case "MENU ICONS":
-          // menuIconsData.add(data);
+        // menuIconsData.add(data);
           List<Color> colors = List.generate(data.carddata.length, (index) => MyColors.getRandomColor());
           dashBoardWidgetList.add(MenuIconsPanel(card: data, colors: colors));
 
           break;
         case "ACTIVITY LIST":
-          // activityListData.add(data);
+        // activityListData.add(data);
           List<Color> colors = List.generate(data.carddata.length, (index) => MyColors.getRandomColor());
           dashBoardWidgetList.add(ActivityListPanel(colors: colors, activityListData: data));
 

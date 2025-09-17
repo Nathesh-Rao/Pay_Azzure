@@ -309,7 +309,7 @@ class WidgetBannerCard1 extends StatelessWidget {
                     style: GoogleFonts.urbanist(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: MyColors.blue2,
+                      color: MyColors.PayAzzureColor2,
                     ),
                   ),
                   SizedBox(height: 8),

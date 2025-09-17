@@ -13,6 +13,8 @@ import 'package:axpertflutter/ModelPages/ShowLogs/Pages/ShowLog.dart';
 import 'package:axpertflutter/ModelPages/SpalshPage/page/SplashPageUI.dart';
 import 'package:get/get.dart';
 
+import '../ModelPages/LoginPage/Page/OtpPage.dart';
+
 class Routes {
   static const String SplashScreen = "/SplashScreen";
   static const String AddNewConnection = "/AddConnection";
@@ -20,6 +22,7 @@ class Routes {
   static const String ProjectListingPage = "/ProjectListingPage";
   static const String ProjectListingPageDetails = "/ProjectListingPage/Details";
   static const String Login = "/Login";
+  static const String OtpPage = "/OtpPage";
   static const String SignUp = "/SignUp";
   static const String ForgetPassword = "/ForgetPassword";
   static const String LandingPage = "/LandingPage";
@@ -58,6 +61,11 @@ class RoutePages {
     GetPage(
       name: Routes.Login,
       page: () => LoginPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: Routes.OtpPage,
+      page: () => OtpPage(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

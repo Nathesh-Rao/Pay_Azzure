@@ -53,7 +53,7 @@ class ProjectItemListTile extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 5),
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: <Widget>[
               CircleAvatar(
-                backgroundColor: MyColors.blue2,
+                backgroundColor: MyColors.PayAzzureColor2,
                 child: Text(projectModel!.projectname.characters.first.toUpperCase()),
               ),
               Container(

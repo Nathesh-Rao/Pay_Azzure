@@ -16,16 +16,16 @@ class ForgetPassword extends StatelessWidget {
                 icon: new Icon(
                   Icons.arrow_back,
                   size: 30,
-                  color: MyColors.blue2,
+                  color: MyColors.PayAzzureColor2,
                 ),
                 onPressed: () {
                   Get.back();
                 }),
             title: Text(
               "Forgot Password",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: MyColors.blue2, fontFamily: 'redhatsmbold'),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0, color: MyColors.PayAzzureColor2, fontFamily: 'redhatsmbold'),
             ),
-            actions: [
+            /*actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: Image.asset(
@@ -34,7 +34,7 @@ class ForgetPassword extends StatelessWidget {
                   height: 35,
                 ),
               ),
-            ],
+            ],*/
           ),
           body: SingleChildScrollView(
             child: Card(
@@ -71,13 +71,13 @@ class ForgetPassword extends StatelessWidget {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: MediaQuery.of(context).size.height * 0.02,
-                                    color: MyColors.blue2,
+                                    color: MyColors.PayAzzureColor2,
                                     fontFamily: 'poppinssemibold'),
                               ),
                               forgetPasswordController.showTimer.value
                                   ? Text(
                                       "Resend OTP in " + forgetPasswordController.timerText.value.toString(),
-                                      style: const TextStyle(color: MyColors.blue2, fontSize: 15, fontWeight: FontWeight.w700),
+                                      style: const TextStyle(color: MyColors.PayAzzureColor2, fontSize: 15, fontWeight: FontWeight.w700),
                                     )
                                   : GestureDetector(
                                       onTap: () {
@@ -87,11 +87,11 @@ class ForgetPassword extends StatelessWidget {
                                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(25),
-                                            border: Border.all(width: 2, color: MyColors.blue2)),
+                                            border: Border.all(width: 2, color: MyColors.PayAzzureColor2)),
                                         child: Text(
                                           "Resend OTP",
                                           style: TextStyle(
-                                              color: MyColors.blue2,
+                                              color: MyColors.PayAzzureColor2,
                                               fontFamily: 'redhabold',
                                               fontSize: MediaQuery.of(context).size.height * 0.01),
                                         ),
@@ -151,7 +151,7 @@ class ForgetPassword extends StatelessWidget {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: MediaQuery.of(context).size.height * 0.02,
-                                    color: MyColors.blue2,
+                                    color: MyColors.PayAzzureColor2,
                                     fontFamily: 'poppinssemibold'),
                               ),
                             ],
@@ -209,7 +209,7 @@ class ForgetPassword extends StatelessWidget {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: MediaQuery.of(context).size.height * 0.02,
-                                    color: MyColors.blue2,
+                                    color: MyColors.PayAzzureColor2,
                                     fontFamily: 'poppinssemibold'),
                               ),
                             ],
@@ -298,7 +298,7 @@ class ForgetPassword extends StatelessWidget {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: MediaQuery.of(context).size.height * 0.03,
-                                color: MyColors.blue2,
+                                color: MyColors.PayAzzureColor2,
                                 fontFamily: 'redhatsmbold'),
                           ),
                           SizedBox(height: 20),
@@ -307,7 +307,7 @@ class ForgetPassword extends StatelessWidget {
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: MediaQuery.of(context).size.height * 0.02,
-                                color: MyColors.blue2),
+                                color: MyColors.PayAzzureColor2),
                           ),
                           SizedBox(height: 30),
                           TextField(
@@ -384,7 +384,7 @@ class ForgetPassword extends StatelessWidget {
                               },
                               child: Container(
                                 height: 50,
-                                decoration: BoxDecoration(color: MyColors.blue2, borderRadius: BorderRadius.circular(20)),
+                                decoration: BoxDecoration(color: MyColors.PayAzzureColor2, borderRadius: BorderRadius.circular(20)),
                                 child: Center(
                                   child: Text(
                                     'Proceed',

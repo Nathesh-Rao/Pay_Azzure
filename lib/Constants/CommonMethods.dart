@@ -1,17 +1,21 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
 import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
+import 'package:uuid/uuid.dart';
 
 final globalVariableController = Get.find<GlobalVariableController>();
 
@@ -244,4 +248,21 @@ getWillBiometricAuthenticateForThisUser(user) async {
       return userWise;
     }
   }
+}
+
+getGUID() {
+  final uuid = Uuid();
+// Generate a v4 (random) GUID
+  String guid = uuid.v4();
+  return guid;
+}
+
+String generateMd5(String input) {
+  return md5.convert(utf8.encode(input)).toString();
+}
+
+String getFormattedDate(format) {
+  final now = DateTime.now();
+  final formatter = DateFormat(format); //'ddMMyy'
+  return formatter.format(now);
 }

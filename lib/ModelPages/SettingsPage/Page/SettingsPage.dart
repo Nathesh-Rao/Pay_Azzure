@@ -27,7 +27,7 @@ class SettingsPage extends StatelessWidget {
         children: [
           Container(
             height: 330,
-            decoration: BoxDecoration(color: MyColors.blue2, borderRadius: BorderRadius.vertical(bottom: Radius.circular(0))),
+            decoration: BoxDecoration(color: MyColors.PayAzzureColor2, borderRadius: BorderRadius.vertical(bottom: Radius.circular(0))),
           ),
           SafeArea(
             child: Padding(
@@ -182,7 +182,7 @@ class SettingsPage extends StatelessWidget {
                                       height: 30,
                                       value: settingsPageController.notificationOnOffValue.value,
                                       showOnOff: true,
-                                      activeColor: MyColors.blue2,
+                                      activeColor: MyColors.PayAzzureColor2,
                                       onToggle: (bool values) {
                                         settingsPageController.onChangeNotifyStatus();
                                       },
@@ -219,7 +219,7 @@ class SettingsPage extends StatelessWidget {
                                       height: 30,
                                       value: settingsPageController.logOnOffValue.value,
                                       showOnOff: true,
-                                      activeColor: MyColors.blue2,
+                                      activeColor: MyColors.PayAzzureColor2,
                                       onToggle: (bool values) {
                                         settingsPageController.onChangeLogStatus();
                                       },
@@ -266,8 +266,13 @@ class SettingsPage extends StatelessWidget {
                     padding: EdgeInsets.only(left: 5, right: 5),
                     height: 40,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text("© agile-labs.com ${DateTime.now().year}"), Text("Version: " + Const.APP_VERSION)],
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [Image.asset(
+                        'assets/images/axpert_03.png',
+                        height: MediaQuery.of(context).size.height * 0.03,
+                        // width: MediaQuery.of(context).size.width * 0.075,
+                        fit: BoxFit.fill,
+                      ),Text(" © ${DateTime.now().year} Powered by Axpert"),  Spacer(),Text("Version: " + Const.APP_VERSION)],
                     ),
                   ),
                 ],

@@ -13,7 +13,7 @@ class MyColors {
   static const Color baseRed = Color(0xffDD2025);
   static const Color basegray = Color(0xffDEDEDE);
   // static const Color blue2 = Color(0xFF2a2b8f);
-  static const Color blue2 = Color(0xFFa81f2c);
+  static const Color PayAzzureColor2 = Color(0xFFa81f2c);
   static const Color blue3 = Color(0xFF4fc3f7);
   static const Color blue4 = Color(0xFF8591B0);
   static const Color blue5 = Color(0xFF0D47A1);
@@ -69,7 +69,9 @@ class MyColors {
   static const Color white3 = Color(0xffECECEC);
   static const Color text1 = Color(0xff626262);
   static const Color text2 = Color(0xff919191);
-  static const LinearGradient updatedUIBackgroundGradient = LinearGradient(colors: [blue2, blue2]);
+  static const Color AXMDark = Color(0xff363942);
+  static const Color AXMGray = Color(0xff61677D);
+  static const LinearGradient updatedUIBackgroundGradient = LinearGradient(colors: [PayAzzureColor2, PayAzzureColor2]);
 
   static const LinearGradient subBGGradientVertical =
       LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [

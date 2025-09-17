@@ -15,14 +15,15 @@ class WidgetCharts extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(6),
-      decoration: BoxDecoration(border: Border.all(width: 2, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: Colors.white, border: Border.all(width: 2, color: HexColor('EDF0F8')), borderRadius: BorderRadius.circular(10)),
       child: Theme(
         data: ThemeData().copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: true,
           title: Text(cardModel.cardname,
               style:
-                  GoogleFonts.nunito(textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: HexColor('495057')))),
+              GoogleFonts.nunito(textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: HexColor('495057')))),
           children: [
             SizedBox(height: 3),
             Container(height: 2, color: HexColor('EDF0F8')),
@@ -373,13 +374,15 @@ void openWebPage(ChartData chartData) {
   try {
     if (chartData.link != "") {
       MenuHomePageController menuHPC = Get.find();
-      String url = Const.getFullWebUrl('aspx/AxMain.aspx?pname=hDashboard&authKey=AXPERT-') +
+      menuHPC.captionOnTapFunctionNew(chartData.link);
+
+      /*String url = Const.getFullWebUrl('aspx/AxMain.aspx?pname=ddashboard&authKey=AXPERT-') +
           AppStorage().retrieveValue(AppStorage.SESSIONID) +
           '&plink=' +
           chartData.link;
       print(url);
       menuHPC.webUrl = url;
-      menuHPC.switchPage.value = true;
+      menuHPC.switchPage.value = true;*/
     }
   } catch (e) {}
 }
