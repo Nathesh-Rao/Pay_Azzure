@@ -1,3 +1,4 @@
+import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:flutter/material.dart';
 
 class WidgetRotatingSuffixField extends StatefulWidget {
@@ -7,10 +8,12 @@ class WidgetRotatingSuffixField extends StatefulWidget {
   });
   final double width;
   @override
-  State<WidgetRotatingSuffixField> createState() => _WidgetRotatingSuffixFieldState();
+  State<WidgetRotatingSuffixField> createState() =>
+      _WidgetRotatingSuffixFieldState();
 }
 
-class _WidgetRotatingSuffixFieldState extends State<WidgetRotatingSuffixField> with SingleTickerProviderStateMixin {
+class _WidgetRotatingSuffixFieldState extends State<WidgetRotatingSuffixField>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
@@ -35,6 +38,7 @@ class _WidgetRotatingSuffixFieldState extends State<WidgetRotatingSuffixField> w
       child: Image.asset(
         "assets/images/loading_circle.png",
         width: widget.width,
+        color: MyColors.maroon,
       ), // or Image.network
     );
   }

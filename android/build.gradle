@@ -26,18 +26,22 @@ allprojects {
 }
 allprojects {
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-        if (project.name == "device_info_plus" || project.name == "package_info_plus") {//||project.name == "background_location_tracker") {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        } else if (project.name == "flutter_downloader" || project.name == "fluttertoast" || project.name == "webview_flutter_android" || project.name == "shared_preferences_android") {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        } else {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
+        // if (project.name == "device_info_plus" || project.name == "package_info_plus") {//||project.name == "background_location_tracker") {
+        //     kotlinOptions {
+        //         jvmTarget = "17"
+        //     }
+        // } else if (project.name == "flutter_downloader" || project.name == "fluttertoast" || project.name == "webview_flutter_android" || project.name == "shared_preferences_android") {
+        //     kotlinOptions {
+        //         jvmTarget = "11"
+        //     }
+        // } else {
+        //     kotlinOptions {
+        //         jvmTarget = "1.8"
+        //     }
+        // }
+
+               if (project.name == "qr_code_scanner"||project.name=="flutter_logs") {
+            kotlinOptions { jvmTarget = "1.8" }
         }
     }
 }
@@ -52,7 +56,7 @@ subprojects {
         if (project.plugins.hasPlugin("com.android.application") ||
                 project.plugins.hasPlugin("com.android.library")) {
             project.android {
-                compileSdkVersion 35
+                compileSdkVersion 36
 //                buildToolsVersion "35.0.0"
             }
         }

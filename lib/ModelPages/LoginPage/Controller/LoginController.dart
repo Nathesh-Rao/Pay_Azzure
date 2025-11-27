@@ -8,15 +8,16 @@ import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 
 import '../../../Constants/Enums.dart';
 import '../../../Utils/LogServices/LogService.dart';
@@ -29,7 +30,7 @@ import '../Page/LoginPage.dart';
 class LoginController extends GetxController {
   GlobalVariableController globalVariableController = Get.find();
   ServerConnections serverConnections = ServerConnections();
-  final googleLoginIn = GoogleSignIn();
+  // final googleLoginIn = GoogleSignIn();
   AppStorage appStorage = AppStorage();
   var rememberMe = false.obs;
   var googleSignInVisible = false.obs;
@@ -62,11 +63,15 @@ class LoginController extends GetxController {
     // fetchUserTypeList();
     fetchRememberedData();
     dropDownItemChanged(ddSelectedValue);
-    if (userNameController.text.toString().trim() != "") rememberMe.value = true;
+    if (userNameController.text.toString().trim() != "")
+      rememberMe.value = true;
 
     setWillAuthenticate();
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value) => fcmId = value);
+
+    // 16_KB_AMR
+    _initializeGoogleSignIn();
   }
 
   _askLocationPermission() async {
@@ -74,7 +79,9 @@ class LoginController extends GetxController {
       var permission = await Permission.locationAlways.request();
 
       // print("Location Permission: ${permission}");
-      LogService.writeLog(message: "[i] SplashPage \nScope: askLocationPermission() : $permission ");
+      LogService.writeLog(
+          message:
+              "[i] SplashPage \nScope: askLocationPermission() : $permission ");
       if (permission != PermissionStatus.granted) {
         await Get.to(RequestLocationPage());
       }
@@ -85,7 +92,8 @@ class LoginController extends GetxController {
   }
 
   setWillAuthenticate() async {
-    var willAuth = await getWillBiometricAuthenticateForThisUser(userNameController.text.toString().trim());
+    var willAuth = await getWillBiometricAuthenticateForThisUser(
+        userNameController.text.toString().trim());
     print(("Login willAuth: $willAuth"));
     if (willAuth != null) {
       willAuthenticate.value = willAuth;
@@ -122,11 +130,11 @@ class LoginController extends GetxController {
   //   }
   // }
 
-  Color getColor(Set<MaterialState> states) {
-    const Set<MaterialState> interactiveStates = <MaterialState>{
-      MaterialState.pressed,
-      MaterialState.hovered,
-      MaterialState.focused,
+  Color getColor(Set<WidgetState> states) {
+    const Set<WidgetState> interactiveStates = <WidgetState>{
+      WidgetState.pressed,
+      WidgetState.hovered,
+      WidgetState.focused,
     };
     if (states.any(interactiveStates.contains)) {
       return MyColors.PayAzzureColor2;
@@ -267,11 +275,14 @@ class LoginController extends GetxController {
     var _body = bodyArgs == '' ? await getSignInBody() : bodyArgs;
     var _url = Const.getFullARMUrl(ServerConnections.API_AX_START_SESSION);
 
-    LogService.writeOnConsole(message: "loginButtonClicked\nBody=> $_body\nurl=> $_url\narm_url=> $_armUrl");
+    LogService.writeOnConsole(
+        message:
+            "loginButtonClicked\nBody=> $_body\nurl=> $_url\narm_url=> $_armUrl");
   }
 
   void loginButtonClicked({bodyArgs = ''}) async {
-    LogService.writeLog(message: "[i] LoginController\nSelected UserGroup : power");
+    LogService.writeLog(
+        message: "[i] LoginController\nSelected UserGroup : power");
     if (validateForm()) {
       FocusManager.instance.primaryFocus?.unfocus();
       LoadingScreen.show();
@@ -279,21 +290,29 @@ class LoginController extends GetxController {
       //var url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
       var _url = Const.getFullARMUrl(ServerConnections.API_AX_START_SESSION);
 
-      var response = await serverConnections.postToServer(url: _url, body: _body);
+      var response =
+          await serverConnections.postToServer(url: _url, body: _body);
       // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
 
       if (response != "") {
         var json = jsonDecode(response);
         // print(json["result"]["sessionid"].toString());
         if (json["result"]["success"].toString().toLowerCase() == "true") {
-          await appStorage.storeValue(AppStorage.TOKEN, json["result"]["token"].toString());
-          await appStorage.storeValue(AppStorage.SESSIONID, json["result"]["sessionid"].toString());
-          await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
-          await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
           await appStorage.storeValue(
-              AppStorage.NICK_NAME, json["result"]["NickName"].toString() ?? userNameController.text.trim());
+              AppStorage.TOKEN, json["result"]["token"].toString());
+          await appStorage.storeValue(
+              AppStorage.SESSIONID, json["result"]["sessionid"].toString());
+          await appStorage.storeValue(
+              AppStorage.USER_NAME, userNameController.text.trim());
+          await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD,
+              json["result"]["ChangePassword"].toString());
+          await appStorage.storeValue(
+              AppStorage.NICK_NAME,
+              json["result"]["NickName"].toString() ??
+                  userNameController.text.trim());
           storeLastLoginData(_body);
-          print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+          print(
+              "User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
           LogService.writeLog(
               message:
                   "[-] LoginController\nScope: loginButtonClicked()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
@@ -308,22 +327,50 @@ class LoginController extends GetxController {
           await _processLoginAndGoToHomePage();
         } else {
           Get.snackbar("Error ", json["result"]["message"],
-              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white);
         }
       }
       LoadingScreen.dismiss();
     }
   }
 
+  _initializeGoogleSignIn() async {
+    await GoogleSignIn.instance.initialize();
+    // GoogleSignIn.instance.authenticationEvents.listen((event) async {
+    //   if (event is GoogleSignInAuthenticationEventSignIn) {
+    //     // googleUser = event.user;
+
+    //     // LoadingScreen.show();
+
+    //     // LoadingScreen.dismiss();
+    //   }
+
+    //   if (event is GoogleSignInAuthenticationEventSignOut) {
+    //     await FirebaseAuth.instance.signOut();
+    //     update(['google_signin']);
+    //   }
+    // });
+  }
+
   void googleSignInClicked() async {
     try {
-      final googleUser = await googleLoginIn.signIn();
-      if (googleUser != null) {
+      // final googleUser = await googleLoginIn.signIn();
+      if (GoogleSignIn.instance.supportsAuthenticate()) {
         LoadingScreen.show();
+
+        final googleUser =
+            await GoogleSignIn.instance.authenticate(scopeHint: ['email']);
         final googleAuth = await googleUser.authentication;
+        final googleAuthorization = await googleUser.authorizationClient
+            .authorizationForScopes(["email"]);
+        final accessToken = await googleAuthorization?.accessToken;
+        final idToken = googleAuth.idToken;
+
         final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
+          accessToken: accessToken,
+          idToken: idToken,
         );
 
         await FirebaseAuth.instance.signInWithCredential(credential);
@@ -335,22 +382,28 @@ class LoginController extends GetxController {
           'ssoType': 'Google',
           'ssodetails': {
             'id': googleUser.id,
-            'token': googleAuth.accessToken.toString(),
+            'token': googleAuthorization?.accessToken.toString(),
           },
         };
 
         var url = Const.getFullARMUrl(ServerConnections.API_GOOGLESIGNIN_SSO);
-        var resp = await serverConnections.postToServer(url: url, body: jsonEncode(body));
+        var resp = await serverConnections.postToServer(
+            url: url, body: jsonEncode(body));
         if (resp != "") {
           var jsonResp = jsonDecode(resp);
           // print(jsonResp);
           if (jsonResp['result']['success'].toString() == "false") {
             Get.snackbar("Alert!", jsonResp['result']['message'].toString(),
-                snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
+                snackPosition: SnackPosition.BOTTOM,
+                colorText: Colors.white,
+                backgroundColor: Colors.red);
           } else {
-            await appStorage.storeValue(AppStorage.TOKEN, jsonResp["result"]["token"].toString());
-            await appStorage.storeValue(AppStorage.SESSIONID, jsonResp["result"]["sessionid"].toString());
-            await appStorage.storeValue(AppStorage.USER_NAME, googleUser.email.toString());
+            await appStorage.storeValue(
+                AppStorage.TOKEN, jsonResp["result"]["token"].toString());
+            await appStorage.storeValue(AppStorage.SESSIONID,
+                jsonResp["result"]["sessionid"].toString());
+            await appStorage.storeValue(
+                AppStorage.USER_NAME, googleUser.email.toString());
             //remove rememberer data
             // appStorage.remove(AppStorage.USERID);
             // appStorage.remove(AppStorage.USER_PASSWORD);
@@ -360,7 +413,9 @@ class LoginController extends GetxController {
           }
         } else {
           Get.snackbar("Error", "Some Error occured",
-              backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM);
         }
         LoadingScreen.dismiss();
         // print(resp);
@@ -368,7 +423,9 @@ class LoginController extends GetxController {
       }
     } catch (e) {
       Get.snackbar("Error", "User is not Registered!",
-          snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.red);
+          snackPosition: SnackPosition.BOTTOM,
+          colorText: Colors.white,
+          backgroundColor: Colors.red);
     }
   }
 
@@ -378,9 +435,12 @@ class LoginController extends GetxController {
 
     try {
       //connect to Axpert
-      var connectBody = {'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)};
+      var connectBody = {
+        'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID)
+      };
       var cUrl = Const.getFullARMUrl(ServerConnections.API_CONNECTTOAXPERT);
-      var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
+      var connectResp = await serverConnections.postToServer(
+          url: cUrl, body: jsonEncode(connectBody), isBearer: true);
       print(connectResp);
       // getArmMenu
       var jsonResp = jsonDecode(connectResp);
@@ -401,14 +461,29 @@ class LoginController extends GetxController {
   }
 
   _callApiForMobileNotification() async {
-    var imei = await PlatformDeviceId.getDeviceId ?? '0';
+    var imei = '';
+    // var imei = await PlatformDeviceId.getDeviceId ?? '0';
+
+    final deviceInfoPlugin = DeviceInfoPlugin();
+    final deviceInfo = defaultTargetPlatform == TargetPlatform.android
+        ? await deviceInfoPlugin.androidInfo
+        : defaultTargetPlatform == TargetPlatform.iOS
+            ? await deviceInfoPlugin.iosInfo
+            : null;
+    if (deviceInfo == null) {
+      Const.DEVICE_ID = '';
+    } else {
+      final allInfo = deviceInfo.data;
+      imei = allInfo['id'];
+    }
     var connectBody = {
       'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID),
       'firebaseId': fcmId ?? "0",
       'ImeiNo': imei,
     };
     var cUrl = Const.getFullARMUrl(ServerConnections.API_MOBILE_NOTIFICATION);
-    var connectResp = await serverConnections.postToServer(url: cUrl, body: jsonEncode(connectBody), isBearer: true);
+    var connectResp = await serverConnections.postToServer(
+        url: cUrl, body: jsonEncode(connectBody), isBearer: true);
     print("Mobile: " + connectResp);
   }
 
@@ -418,8 +493,8 @@ class LoginController extends GetxController {
     String packageName = packageInfo.packageName;
     var version = packageInfo.version;
     String buildNumber = packageInfo.buildNumber;
-    Const.APP_VERSION = version+"."+Const.APP_RELEASE_ID;
-    return  Const.APP_VERSION;
+    Const.APP_VERSION = version + "." + Const.APP_RELEASE_ID;
+    return Const.APP_VERSION;
   }
 
   void rememberCredentials() {
@@ -427,15 +502,18 @@ class LoginController extends GetxController {
     try {
       count++;
       var users = appStorage.retrieveValue(AppStorage.USERID) ?? {};
-      users[globalVariableController.PROJECT_NAME.value] = userNameController.text.trim();
+      users[globalVariableController.PROJECT_NAME.value] =
+          userNameController.text.trim();
       appStorage.storeValue(AppStorage.USERID, users);
 
       var passes = appStorage.retrieveValue(AppStorage.USER_PASSWORD) ?? {};
-      passes[globalVariableController.PROJECT_NAME.value] = userPasswordController.text;
+      passes[globalVariableController.PROJECT_NAME.value] =
+          userPasswordController.text;
       appStorage.storeValue(AppStorage.USER_PASSWORD, passes);
 
       var groups = appStorage.retrieveValue(AppStorage.USER_GROUP) ?? {};
-      groups[globalVariableController.PROJECT_NAME.value] = ddSelectedValue.value;
+      groups[globalVariableController.PROJECT_NAME.value] =
+          ddSelectedValue.value;
       appStorage.storeValue(AppStorage.USER_GROUP, groups);
     } catch (e) {
       appStorage.remove(AppStorage.USERID);
@@ -460,20 +538,24 @@ class LoginController extends GetxController {
   }
 
   onLoad() async {
-    currentProjectName.value = await appStorage.retrieveValue(AppStorage.PROJECT_NAME) ?? '';
+    currentProjectName.value =
+        await appStorage.retrieveValue(AppStorage.PROJECT_NAME) ?? '';
   }
 
   Future<void> fetchRememberedData() async {
     try {
       var users = appStorage.retrieveValue(AppStorage.USERID) ?? {};
       print(users);
-      userNameController.text = users[globalVariableController.PROJECT_NAME.value].trim() ?? "";
+      userNameController.text =
+          users[globalVariableController.PROJECT_NAME.value].trim() ?? "";
 
       var passes = appStorage.retrieveValue(AppStorage.USER_PASSWORD) ?? {};
-      userPasswordController.text = passes[globalVariableController.PROJECT_NAME.value] ?? "";
+      userPasswordController.text =
+          passes[globalVariableController.PROJECT_NAME.value] ?? "";
 
       var groups = appStorage.retrieveValue(AppStorage.USER_GROUP) ?? {};
-      ddSelectedValue.value = groups[globalVariableController.PROJECT_NAME.value] ?? "Power";
+      ddSelectedValue.value =
+          groups[globalVariableController.PROJECT_NAME.value] ?? "Power";
     } catch (e) {
       // appStorage.remove(AppStorage.USERID);
       // appStorage.remove(AppStorage.USER_PASSWORD);
@@ -489,7 +571,8 @@ class LoginController extends GetxController {
         }
       } catch (e) {
         print(e.toString());
-        if (e.toString().contains('NotAvailable') && e.toString().contains('Authentication failure'))
+        if (e.toString().contains('NotAvailable') &&
+            e.toString().contains('Authentication failure'))
           showErrorSnack(title: "Oops!", message: "Only Biometric is allowed.");
       }
     }
@@ -547,7 +630,8 @@ class LoginController extends GetxController {
       "UserName": userNameController.text.toString().trim(),
     };
 
-    var response = await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+    var response =
+        await serverConnections.postToServer(url: _url, body: jsonEncode(body));
     isUserDataLoading.value = false;
     if (response != "") {
       var json = jsonDecode(response);
@@ -566,7 +650,9 @@ class LoginController extends GetxController {
         if (isOTP_auth.value) return AuthType.otpOnly;
       } else {
         Get.snackbar("Error ", json["result"]["message"],
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white);
       }
     }
 
@@ -592,7 +678,8 @@ class LoginController extends GetxController {
       LoadingScreen.show();
       var _url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
 
-      var response = await serverConnections.postToServer(url: _url, body: jsonEncode(signInBody));
+      var response = await serverConnections.postToServer(
+          url: _url, body: jsonEncode(signInBody));
       // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
 
       if (response != "") {
@@ -607,7 +694,9 @@ class LoginController extends GetxController {
             print("Otpmsg: ${otpMsg.value} \nOtpkey: ${otpLoginKey.value}");
             Get.toNamed(Routes.OtpPage);
           }
-        } else if (json["result"]["success"].toString().toLowerCase() == "false" && json["result"].containsKey('duplicate_session')) {
+        } else if (json["result"]["success"].toString().toLowerCase() ==
+                "false" &&
+            json["result"].containsKey('duplicate_session')) {
           isDuplicate_session = true;
           showDialog_duplicateSession(json["result"]["message"].toString());
         } else {
@@ -615,7 +704,9 @@ class LoginController extends GetxController {
             Get.back(); // closes the dialog
           }
           Get.snackbar("Error ", json["result"]["message"],
-              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white);
         }
       }
       LoadingScreen.dismiss();
@@ -632,7 +723,8 @@ class LoginController extends GetxController {
         "OTP": otpFieldController.text.toString().trim(),
       };
 
-      var response = await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+      var response = await serverConnections.postToServer(
+          url: _url, body: jsonEncode(body));
       isOtpLoading.value = false;
       if (response != "") {
         var json = jsonDecode(response);
@@ -650,14 +742,18 @@ class LoginController extends GetxController {
 
   processSignInDataResponse(json) async {
     await appStorage.storeValue(AppStorage.TOKEN, json["token"].toString());
-    await appStorage.storeValue(AppStorage.SESSIONID, json["ARMSessionId"].toString());
-    await appStorage.storeValue(AppStorage.USER_NAME, userNameController.text.trim());
+    await appStorage.storeValue(
+        AppStorage.SESSIONID, json["ARMSessionId"].toString());
+    await appStorage.storeValue(
+        AppStorage.USER_NAME, userNameController.text.trim());
     //await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
-    await appStorage.storeValue(AppStorage.NICK_NAME, json["nickname"].toString() ?? userNameController.text.trim());
+    await appStorage.storeValue(AppStorage.NICK_NAME,
+        json["nickname"].toString() ?? userNameController.text.trim());
     //storeLastLoginData(_body);
     //print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
     LogService.writeLog(
-        message: "[-] LoginController\nScope:SignInResponse()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+        message:
+            "[-] LoginController\nScope:SignInResponse()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
 
     //Save Data
     if (rememberMe.value) {
@@ -675,13 +771,16 @@ class LoginController extends GetxController {
     var _url = Const.getFullARMUrl(ServerConnections.API_RESEND_OTP);
     var body = {"OtpLoginKey": otpLoginKey.value};
 
-    var response = await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+    var response =
+        await serverConnections.postToServer(url: _url, body: jsonEncode(body));
     isOtpLoading.value = false;
     if (response != "") {
       var json = jsonDecode(response);
       if (json["result"]["success"].toString().toLowerCase() == "true") {
         Get.snackbar("Success", json["result"]["message"],
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white);
       } else {
         otpErrorText.value = json["result"]["message"].toString();
         /* Get.snackbar("Error ", json["result"]["message"],
@@ -689,6 +788,7 @@ class LoginController extends GetxController {
       }
     }
   }
+
   void showDialog_duplicateSession(String message) {
     Get.dialog(
       Dialog(
@@ -730,7 +830,8 @@ class LoginController extends GetxController {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade400,
                       //foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -746,7 +847,8 @@ class LoginController extends GetxController {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: MyColors.PayAzzureColor2,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

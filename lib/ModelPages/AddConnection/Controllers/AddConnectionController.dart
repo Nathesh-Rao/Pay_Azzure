@@ -10,8 +10,9 @@ import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:scan/scan.dart';
+// import 'package:qr_code_scanner/qr_code_scanner.dart';
+// import 'package:scan/scan.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class AddConnectionController extends GetxController {
   ProjectListingController projectListingController = Get.find();
@@ -36,8 +37,8 @@ class AddConnectionController extends GetxController {
   var isFlashOn = false.obs;
   var isPlayPauseOn = false.obs;
   var heading = "Add new Connection".obs;
-  QRViewController? qrViewController;
-  Barcode? barcodeResult;
+  MobileScannerController? scannerController;
+  // Barcode? barcodeResult;
   ServerConnections serverConnections = ServerConnections();
   AppStorage appStorage = AppStorage();
 
@@ -52,14 +53,13 @@ class AddConnectionController extends GetxController {
     super.dispose();
   }
 
-  requestPermissionForCamera(QRViewController ctrl, bool p) {}
-
   doesDeviceHasFlash() {
     return true;
   }
 
   bool validateProjectDetailsForm() {
-    Pattern pattern = r"(https?|http)://([-a-z-A-Z0-9.]+)(/[-a-z-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[a-zA-Z0-9+&@#/%=~_|!:,.;]*)?";
+    Pattern pattern =
+        r"(https?|http)://([-a-z-A-Z0-9.]+)(/[-a-z-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[a-zA-Z0-9+&@#/%=~_|!:,.;]*)?";
     RegExp regex = RegExp(pattern.toString());
     errWebUrl.value = '';
     errArmUrl.value = '';
@@ -108,12 +108,20 @@ class AddConnectionController extends GetxController {
       var url = baseUrl + ServerConnections.API_GET_APPSTATUS;
       final data = await serverConnections.getFromServer(url: url);
 
-      if (data != "" && data.toString().toLowerCase().contains("running successfully".toLowerCase())) {
+      if (data != "" &&
+          data
+              .toString()
+              .toLowerCase()
+              .contains("running successfully".toLowerCase())) {
         //check whether the entered Connection name is proper
         Future<bool> isValidConnName = validateConnectionName(baseUrl);
         if (await isValidConnName) {
-          projectModel = ProjectModel(DateTime.now().toString(), conNameController.text.trim(), webUrlController.text.trim(),
-              armUrlController.text.trim(), conCaptionController.text.trim());
+          projectModel = ProjectModel(
+              DateTime.now().toString(),
+              conNameController.text.trim(),
+              webUrlController.text.trim(),
+              armUrlController.text.trim(),
+              conCaptionController.text.trim());
           /*conNameController.text = "";
           webUrlController.text = "";
           armUrlController.text = "";
@@ -132,7 +140,7 @@ class AddConnectionController extends GetxController {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
-        qrViewController!.resumeCamera();
+        scannerController!.start();
       }
     }
   }
@@ -173,10 +181,12 @@ class AddConnectionController extends GetxController {
       projectList = jsonDecode(storedList);
       if (projectList.contains(projectModel.projectname)) {
         Get.snackbar("Element already exists", "",
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white);
         if (isQr) {
           Timer(Duration(seconds: 2), () {
-            qrViewController!.resumeCamera();
+            scannerController!.start();
           });
         }
         return false;
@@ -206,7 +216,9 @@ class AddConnectionController extends GetxController {
       FocusManager.instance.primaryFocus?.unfocus();
       LoadingScreen.show();
       isLoading.value = true;
-      var data = await serverConnections.postToServer(ClientID: connectionCodeController.text.toString().trim().toLowerCase());
+      var data = await serverConnections.postToServer(
+          ClientID:
+              connectionCodeController.text.toString().trim().toLowerCase());
       LoadingScreen.dismiss();
       if (data == "") {
         isLoading.value = false;
@@ -224,8 +236,11 @@ class AddConnectionController extends GetxController {
           connectionCodeController.text = "";
           saveDatAndRedirect(model, jsonObj);
         } catch (e) {
-          Get.snackbar("Invalid Project Code", "Please check project code and try again",
-              backgroundColor: Colors.redAccent, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white);
+          Get.snackbar(
+              "Invalid Project Code", "Please check project code and try again",
+              backgroundColor: Colors.redAccent,
+              snackPosition: SnackPosition.BOTTOM,
+              colorText: Colors.white);
         }
       }
     }
@@ -240,7 +255,8 @@ class AddConnectionController extends GetxController {
     conNameController.text = projectModel.projectname;
     conCaptionController.text = projectModel.projectCaption;
     tempProjectName = projectModel.projectname;
-    errArmUrl.value = errCaption.value = errCode.value = errName.value = errWebUrl.value = '';
+    errArmUrl.value =
+        errCaption.value = errCode.value = errName.value = errWebUrl.value = '';
     Get.toNamed(Routes.AddNewConnection, arguments: [2]);
   }
 
@@ -253,7 +269,8 @@ class AddConnectionController extends GetxController {
             deleteExistingProjectWithProjectName(keyValue);
             Get.back();
           },
-          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+          style:
+              ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.red)),
           child: Text("Yes"),
         ),
         cancel: TextButton(
@@ -307,35 +324,49 @@ class AddConnectionController extends GetxController {
         webUrlController.text = json['p_url'];
         conNameController.text = json['pname'];
         conCaptionController.text = json['pname'];
-        qrViewController!.stopCamera();
+        scannerController!.stop();
         projectDetailsClicked(isQr: true);
       } else {
         Get.snackbar("Invalid!", "Please choose a valid QR Code",
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
       }
     } catch (e) {}
   }
 
   void pickImageFromGalleryCalled() async {
-    qrViewController!.pauseCamera();
+    scannerController!.pause();
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image == null) {
-      qrViewController!.resumeCamera();
+      scannerController!.start();
       return;
     }
 
     print(image.path);
     String path = image.path;
-    String? result = await Scan.parse(path);
+    BarcodeCapture? result = await scannerController!
+        .analyzeImage(path, formats: [BarcodeFormat.all]);
     //print(result);
-    var data = result ?? "";
-    if (data == "" || !validateQRData(data)) {
-      qrViewController!.resumeCamera();
+
+    if (result == null) {
+      scannerController!.start();
       Get.snackbar("Invalid!", "Please choose a valid QR Code",
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-    } else
-      decodeQRResult(data);
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    } else {
+      var data = result.barcodes.first.rawValue ?? "";
+      if (data == "" || !validateQRData(data)) {
+        scannerController!.start();
+        Get.snackbar("Invalid Data!", "Please choose a valid QR Code",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
+      } else
+        decodeQRResult(data);
+    }
   }
 
   validateQRData(data) {

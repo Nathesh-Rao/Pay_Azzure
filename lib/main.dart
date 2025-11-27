@@ -9,8 +9,10 @@ import 'package:axpertflutter/Utils/FirebaseHandler/FirebaseMessagesHandler.dart
 import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:axpertflutter/Utils/ServerConnections/InternetConnectivity.dart';
 import 'package:axpertflutter/firebase_options.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -19,7 +21,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:platform_device_id/platform_device_id.dart';
+// import 'package:platform_device_id/platform_device_id.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -52,7 +54,18 @@ Future<void> main() async {
   runApp(MyApp());
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.black38));
   try {
-    Const.DEVICE_ID = await PlatformDeviceId.getDeviceId ?? "00";
+        final deviceInfoPlugin = DeviceInfoPlugin();
+    final deviceInfo = defaultTargetPlatform == TargetPlatform.android
+        ? await deviceInfoPlugin.androidInfo
+        : defaultTargetPlatform == TargetPlatform.iOS
+            ? await deviceInfoPlugin.iosInfo
+            : null;
+    if (deviceInfo == null) {
+      Const.DEVICE_ID = '';
+    } else {
+      final allInfo = deviceInfo.data;
+      Const.DEVICE_ID = allInfo['id'];
+    }
   } on PlatformException {}
 }
 

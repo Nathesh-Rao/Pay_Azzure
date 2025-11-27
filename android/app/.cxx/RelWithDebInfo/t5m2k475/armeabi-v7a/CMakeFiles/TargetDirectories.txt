@@ -1,0 +1,2 @@
+/Users/narasimhanatheshrao/Development/Pay_Azzure/android/app/.cxx/RelWithDebInfo/t5m2k475/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/narasimhanatheshrao/Development/Pay_Azzure/android/app/.cxx/RelWithDebInfo/t5m2k475/armeabi-v7a/CMakeFiles/rebuild_cache.dir
