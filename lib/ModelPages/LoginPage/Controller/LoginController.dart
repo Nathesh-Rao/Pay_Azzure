@@ -7,6 +7,8 @@ import 'package:axpertflutter/Constants/GlobalVariableController.dart';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/EmployeeData.dart';
+import 'package:axpertflutter/Utils/ServerConnections/ExecuteApi.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -457,7 +459,59 @@ class LoginController extends GetxController {
     } catch (e) {
       print(e);
     }
+
+    try {
+      await getEmployeeDetails();
+    } catch (e) {
+      LogService.writeLog(message: "Employee details failed $e");
+    }
+
     Get.offAllNamed(Routes.LandingPage);
+  }
+
+  getEmployeeDetails() async {
+    String secretKey = await getEncryptedSecretKey("1979902755375700");
+
+    LogService.writeLog(message: "getEmployeeDetails secret key: $secretKey");
+
+    var url = ServerConnections.API_PAYAZZURE_GLOBAL_ENDPOINT;
+    var body = {
+      "SecretKey": secretKey,
+      "PublicKey": "AXPKEY000000010013",
+      "Project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
+      "getsqldata": {"trace": true},
+      "sqlparams": {"pusername": appStorage.retrieveValue(AppStorage.USER_NAME)}
+    };
+
+    var resp = await serverConnections.postToServer(
+        url: url, body: jsonEncode(body), isBearer: false);
+    // LogService.writeLog(message: "getEmployeeDetails : $resp");
+    LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
+    var response = jsonDecode(resp);
+    String jsonString =
+        response["ds_get_employee_global_details"]["rows"][0]["jsondata"];
+    List<EmployeeData> employees = parseEmployeeJsonData(jsonString);
+    final emp = employees.first;
+    globalVariableController.currentEmployeeData = emp;
+    print(emp.arvCompanyc);
+    LogService.writeOnConsole(
+        message: "getEmployeeDetails emp.arvCompanyc: ${emp.arvCompanyc}");
+  }
+
+  List<EmployeeData> parseEmployeeJsonData(String jsonDataString) {
+    final List<dynamic> list = jsonDecode(jsonDataString);
+    return list.map((e) => EmployeeData.fromJson(e)).toList();
+  }
+
+  getEncryptedSecretKey(String key) async {
+    var url = Const.getFullARMUrl(ExecuteApi.API_GET_ENCRYPTED_SECRET_KEY);
+    Map<String, dynamic> body = {"secretkey": key};
+    var resp = await serverConnections.postToServer(
+        url: url, body: jsonEncode(body), isBearer: true);
+    print("Resp: $resp");
+    if (resp != "" && !resp.toString().contains("error")) {
+      return resp;
+    }
   }
 
   _callApiForMobileNotification() async {
@@ -749,6 +803,10 @@ class LoginController extends GetxController {
     //await appStorage.storeValue(AppStorage.USER_CHANGE_PASSWORD, json["result"]["ChangePassword"].toString());
     await appStorage.storeValue(AppStorage.NICK_NAME,
         json["nickname"].toString() ?? userNameController.text.trim());
+
+    globalVariableController.NICK_NAME.value = json["nickname"].toString();
+    globalVariableController.USER_NAME.value = json["username"].toString();
+    globalVariableController.USER_EMAIL.value = json["email_id"].toString();
     //storeLastLoginData(_body);
     //print("User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
     LogService.writeLog(

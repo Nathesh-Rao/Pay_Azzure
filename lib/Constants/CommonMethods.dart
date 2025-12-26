@@ -20,7 +20,12 @@ import 'package:uuid/uuid.dart';
 final globalVariableController = Get.find<GlobalVariableController>();
 
 isTablet() {
-  return MediaQueryData.fromView(WidgetsBinding.instance.window).size.shortestSide < 600 ? true : false;
+  return MediaQueryData.fromView(WidgetsBinding.instance.window)
+              .size
+              .shortestSide <
+          600
+      ? true
+      : false;
 }
 
 class CommonMethods {
@@ -40,7 +45,8 @@ class CommonMethods {
 
   static String activeList_CreateURL_MAKE(activeList) {
     var url = "";
-    if (activeList.recordid.toString().toLowerCase() == "" || activeList.recordid.toString().toLowerCase() == "null") {
+    if (activeList.recordid.toString().toLowerCase() == "" ||
+        activeList.recordid.toString().toLowerCase() == "null") {
       url = "aspx/AxMain.aspx?pname=t" +
           activeList.transid.toString() +
           "&authKey=AXPERT-" +
@@ -89,8 +95,11 @@ class CommonMethods {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Get.snackbar("Error", 'Location services are disabled. Please enable the services',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar(
+          "Error", 'Location services are disabled. Please enable the services',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white);
       return false;
     }
     permission = await Geolocator.checkPermission();
@@ -98,13 +107,18 @@ class CommonMethods {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         Get.snackbar("Error", 'Location permissions are denied',
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white);
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Get.snackbar("Error", 'Location permissions are permanently denied, we cannot request permissions.',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar("Error",
+          'Location permissions are permanently denied, we cannot request permissions.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white);
       return false;
     }
     return true;
@@ -113,14 +127,16 @@ class CommonMethods {
   static Future<Position?> getCurrentLocation() async {
     final hasPermission = await _handleLocationPermission();
     if (hasPermission)
-      return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
     else
       return null;
   }
 
   static Future<String> getAddressFromLatLng(Position position) async {
     var output = '';
-    await placemarkFromCoordinates(position.latitude, position.longitude).then((placemarks) {
+    await placemarkFromCoordinates(position.latitude, position.longitude)
+        .then((placemarks) {
       output = placemarks[0].toString();
     });
     return output;
@@ -130,7 +146,8 @@ class CommonMethods {
 class LoadingScreen {
   static const backName = "DisableBack";
 
-  static show({status = "Please Wait...", maskType = EasyLoadingMaskType.black}) {
+  static show(
+      {status = "Please Wait...", maskType = EasyLoadingMaskType.black}) {
     BackButtonInterceptor.add(myInterceptor, zIndex: 2, name: backName);
     EasyLoading.show(status: status, maskType: maskType, dismissOnTap: false);
     Timer(Duration(seconds: 20), () {
@@ -152,9 +169,15 @@ class LoadingScreen {
   }
 }
 
-showErrorSnack({title = 'Error', message = 'Server busy, Please try again later.', show_errorSnackbar = true}) {
+showErrorSnack(
+    {title = 'Error',
+    message = 'Server busy, Please try again later.',
+    show_errorSnackbar = true}) {
   if (show_errorSnackbar)
-    Get.snackbar(title, message, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, backgroundColor: Colors.redAccent);
+    Get.snackbar(title, message,
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.redAccent);
 }
 
 Future<bool> showBiometricDialog() async {
@@ -172,11 +195,11 @@ Future<bool> showBiometricDialog() async {
           cancelButton: 'No thanks',
         )
       ],
-      options: const AuthenticationOptions(
-        biometricOnly: true,
-        useErrorDialogs: false,
-        stickyAuth: false,
-      ),
+      // options: const AuthenticationOptions(
+      biometricOnly: true,
+      // useErrorDialogs: false,
+      // stickyAuth: false,
+      // ),
     );
 
     return isAuthenticated;
@@ -189,17 +212,18 @@ showBiometricDialogOld() async {
   try {
     LocalAuthentication auth = LocalAuthentication();
     return await auth.authenticate(
-        localizedReason: "Please use your touch id to login",
-        authMessages: const <AuthMessages>[
-          AndroidAuthMessages(
-            signInTitle: 'Biometric authentication required!',
-            cancelButton: 'No thanks',
-          ),
-          IOSAuthMessages(
-            cancelButton: 'No thanks',
-          )
-        ],
-        options: AuthenticationOptions(biometricOnly: true, useErrorDialogs: false));
+      localizedReason: "Please use your touch id to login",
+      authMessages: const <AuthMessages>[
+        AndroidAuthMessages(
+          signInTitle: 'Biometric authentication required!',
+          cancelButton: 'No thanks',
+        ),
+        IOSAuthMessages(
+          cancelButton: 'No thanks',
+        )
+      ],
+      biometricOnly: true,
+    );
   } catch (e) {
     // print(e.toString());
     // if (e.toString().contains('NotAvailable') && e.toString().contains('Authentication failure'))
@@ -210,7 +234,9 @@ showBiometricDialogOld() async {
 
 willShowSetBiometricDialog(user) async {
   AppStorage appStorage = AppStorage();
-  var data = await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ?? {};
+  var data =
+      await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ??
+          {};
   if (data.isEmpty) {
     return true;
   } else {
@@ -225,7 +251,9 @@ willShowSetBiometricDialog(user) async {
 
 setWillBiometricAuthenticateForThisUser(user, willAuthenticate) async {
   AppStorage appStorage = AppStorage();
-  var data = await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ?? {};
+  var data =
+      await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ??
+          {};
   var projectWise = data[globalVariableController.PROJECT_NAME.value] ?? {};
   projectWise[user] = willAuthenticate;
   data[globalVariableController.PROJECT_NAME.value] = projectWise;
@@ -234,9 +262,12 @@ setWillBiometricAuthenticateForThisUser(user, willAuthenticate) async {
 
 getWillBiometricAuthenticateForThisUser(user) async {
   AppStorage appStorage = AppStorage();
-  if ((await appStorage.retrieveValue(AppStorage.CAN_AUTHENTICATE) ?? false) == false) return false;
+  if ((await appStorage.retrieveValue(AppStorage.CAN_AUTHENTICATE) ?? false) ==
+      false) return false;
 
-  var data = await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ?? {};
+  var data =
+      await appStorage.retrieveValue(AppStorage.WILL_AUTHENTICATE_FOR_USER) ??
+          {};
   if (data.isEmpty) {
     return null;
   } else {

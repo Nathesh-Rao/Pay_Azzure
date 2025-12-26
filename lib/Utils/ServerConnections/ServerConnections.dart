@@ -16,22 +16,27 @@ class ServerConnections {
   InternetConnectivity internetConnectivity = Get.find();
   static const String API_GET_USERGROUPS = "api/v1/ARMUserGroups";
   static const String API_GET_SIGNINDETAILS = "api/v1/ARMSigninDetails";
-  static const String API_SIGNIN = "api/v1/Signin";//"api/v1/ARMSignIn";
+  static const String API_SIGNIN = "api/v1/Signin"; //"api/v1/ARMSignIn";
   static const String API_GET_LOGINUSER_DETAILS = "api/v1/GetLoginUserDetails";
   static const String API_VALIDATE_OTP = "api/v1/ValidateOTP";
   static const String API_RESEND_OTP = "api/v1/ResendOTP";
   static const String API_AX_START_SESSION = "api/v1/AxStartSession";
-
+  static const String API_DATASOURCE = "api/v1/ARMGetDataResponse";
   static const String API_GET_APPSTATUS = "api/v1/ARMAppStatus";
   static const String API_ADDUSER = "api/v1/ARMAddUser";
   static const String API_OTP_VALIDATE_USER = "api/v1/ARMValidateAddUser";
   static const String API_FORGOTPASSWORD = "api/v1/ARMForgotPassword";
-  static const String API_VALIDATE_FORGETPASSWORD = "api/v1/ARMValidateForgotPassword";
+  static const String API_VALIDATE_FORGETPASSWORD =
+      "api/v1/ARMValidateForgotPassword";
   static const String API_GOOGLESIGNIN_SSO = "api/v1/ARMSigninSSO";
   static const String API_CONNECTTOAXPERT = "api/v1/ARMConnectToAxpert";
   static const String API_GET_HOMEPAGE_CARDS = "api/v1/ARMGetHomePageCards";
   static const String API_GET_HOMEPAGE_CARDS_v2 = "api/v2/ARMGetHomePageCards";
-  static const String API_GET_HOMEPAGE_CARDSDATASOURCE = "api/v1/ARMGetDataResponse";
+  static const String API_GET_HOMEPAGE_CARDSDATASOURCE =
+      "api/v1/ARMGetDataResponse";
+  static const String API_AXSCRIPT = "api/v1/AxScript";
+  static const String ARM_EXECUTE_PUBLISHED_API =
+      "api/v1/ARMExecutePublishedAPI";
 
 //-------------------->
   //NOTE AXPERT 11.4
@@ -45,10 +50,13 @@ class ServerConnections {
     "vdim3": "",
     "vdim4": "",
     "AxMailFrom": "agilebiz.support@agile-labs.com",
-    "APPLogo": "\\\\172.16.0.85\\AgileBizDocs\\Attachments\\Agileerpdemo\\agcloud-biz.png",
-    "axpegemailactionurl": "https://demo.agilecloud.biz/demoarm/api/v1/ARMMailTaskAction",
+    "APPLogo":
+        "\\\\172.16.0.85\\AgileBizDocs\\Attachments\\Agileerpdemo\\agcloud-biz.png",
+    "axpegemailactionurl":
+        "https://demo.agilecloud.biz/demoarm/api/v1/ARMMailTaskAction",
     "AxSingnalRapiURL": "https://dev.agilecloud.biz/devarm/api/v1/SendSignalR",
-    "AxRMQAPIURL": "https://dev.agilecloud.biz/devarm11.4/api/v1/ARMPushToQueue",
+    "AxRMQAPIURL":
+        "https://dev.agilecloud.biz/devarm11.4/api/v1/ARMPushToQueue",
     "axdecimal": "4",
     "tor_dashboard_logdate_from": "ALL",
     "tor_dashboard_logdate_to": "ALL",
@@ -60,11 +68,15 @@ class ServerConnections {
     "torusername": "ALL",
     "AxDisallowCreate": "instk,stock",
     "AxpDbDirPath": "\\\\172.16.93.4\\Attachment_QA\\import\\AxImportDbDir",
-    "AxSignalRapiURL": "https://dev.agilecloud.biz/devarm11.4/api/v1/SendSignalR",
-    "AxScriptsAPIURL": "https://dev.agilecloud.biz/devarmscripts/ASBScriptRest.dll/datasnap/rest/TASBScriptRest/scriptsapi",
-    "AxFCMSendMsgURL": "https://dev.agilecloud.biz/devarmtest/api/v1/SendFCMNotification",
+    "AxSignalRapiURL":
+        "https://dev.agilecloud.biz/devarm11.4/api/v1/SendSignalR",
+    "AxScriptsAPIURL":
+        "https://dev.agilecloud.biz/devarmscripts/ASBScriptRest.dll/datasnap/rest/TASBScriptRest/scriptsapi",
+    "AxFCMSendMsgURL":
+        "https://dev.agilecloud.biz/devarmtest/api/v1/SendFCMNotification",
     "AxPEGMailFrom": "agilebiz.support@agile-labs.com",
-    "AxRapidSaveURL": "https://dev.agilecloud.biz/devarmscripts/ASBRapidSaveRest.dll/datasnap/rest/TASBRapidSaveRest/RapidSave",
+    "AxRapidSaveURL":
+        "https://dev.agilecloud.biz/devarmscripts/ASBRapidSaveRest.dll/datasnap/rest/TASBRapidSaveRest/RapidSave",
     "axglo_recordid": "1970880000000",
     "m_company": "AGILE ERP DEMO",
     "m_branch": "HEAD OFFICE",
@@ -76,7 +88,8 @@ class ServerConnections {
     "m_currency": "INR",
     "m_spinterval": "",
     "fromuserlogin": "F",
-    "axp_displaytext": "For the User:admin,Company:AGILE ERP DEMO,Branch:HEAD OFFICE,Financial Year:2024",
+    "axp_displaytext":
+        "For the User:admin,Company:AGILE ERP DEMO,Branch:HEAD OFFICE,Financial Year:2024",
     "axglo_hide": "T",
     "m_fyenddate": "31/03/2025",
     "axpimageserver": "",
@@ -111,7 +124,8 @@ class ServerConnections {
     "axp_apipath": "http://localhost/AxpertWebScripts113/",
     "axp_devschema": "agileerpdemoaxdef",
     "axp_appschema": "agileerpdemo",
-    "axp_clientlocale": "en-US*Asia/Calcutta^english*1/24/2025 11:20:53 AM*1443",
+    "axp_clientlocale":
+        "en-US*Asia/Calcutta^english*1/24/2025 11:20:53 AM*1443",
     "transidlist": "0D000000B950DB15186FFB53D708363D7251C798",
     "appvartypes": "cccccccccccccccccccccccccccnccccdcccccccdcccccnnnccccddccd",
     "auth_path": "D:\\Codeset\\11\\Axpert11.3\\AxpertWebScripts"
@@ -127,16 +141,24 @@ class ServerConnections {
   static const String API_GET_MENU_V2 = "api/v2/ARMGetMenu";
   static const String API_SIGNOUT = "api/v1/ARMSignOut";
 
-  static const String API_GET_PENDING_ACTIVETASK = "api/v1/ARMGetPendingActiveTasks";
-  static const String API_GET_PENDING_ACTIVETASK_COUNT = "api/v1/ARMGetPendingActiveTasksCount";
-  static const String API_GET_ACTIVETASK_DETAILS = "api/v1/ARMPEGGetTaskDetails";
-  static const String API_GET_FILTERED_PENDING_TASK = "api/v1/ARMGetFilteredActiveTasks";
-  static const String API_GET_COMPLETED_ACTIVETASK = "api/v1/ARMGetCompletedTasks";
-  static const String API_GET_COMPLETED_ACTIVETASK_COUNT = "api/v1/ARMGetCompletedTasksCount";
-  static const String API_GET_FILTERED_COMPLETED_TASK = "api/v1/ARMGetFilteredCompletedTasks";
+  static const String API_GET_PENDING_ACTIVETASK =
+      "api/v1/ARMGetPendingActiveTasks";
+  static const String API_GET_PENDING_ACTIVETASK_COUNT =
+      "api/v1/ARMGetPendingActiveTasksCount";
+  static const String API_GET_ACTIVETASK_DETAILS =
+      "api/v1/ARMPEGGetTaskDetails";
+  static const String API_GET_FILTERED_PENDING_TASK =
+      "api/v1/ARMGetFilteredActiveTasks";
+  static const String API_GET_COMPLETED_ACTIVETASK =
+      "api/v1/ARMGetCompletedTasks";
+  static const String API_GET_COMPLETED_ACTIVETASK_COUNT =
+      "api/v1/ARMGetCompletedTasksCount";
+  static const String API_GET_FILTERED_COMPLETED_TASK =
+      "api/v1/ARMGetFilteredCompletedTasks";
   static const String API_DO_TASK_ACTIONS = "api/v1/ARMDoTaskAction";
   static const String API_GET_ALL_ACTIVE_TASKS = "api/v1/ARMGetAllActiveTasks";
-  static const String API_GET_BULK_APPROVAL_COUNT = "api/v1/ARMGetBulkApprovalCount";
+  static const String API_GET_BULK_APPROVAL_COUNT =
+      "api/v1/ARMGetBulkApprovalCount";
   static const String API_GET_BULK_ACTIVETASKS = "api/v1/ARMGetBulkActiveTasks";
   static const String API_POST_BULK_DO_BULK_ACTION = "api/v1/ARMDoBulkAction";
   static const String API_GET_SENDTOUSERS = "api/v1/ARMGetSendToUsers";
@@ -151,7 +173,11 @@ class ServerConnections {
 
   var _baseBody = "";
 
-  String _baseUrl = "http://demo.agile-labs.com/axmclientidscripts/asbmenurest.dll/datasnap/rest/Tasbmenurest/getchoices";
+  String _baseUrl =
+      "http://demo.agile-labs.com/axmclientidscripts/asbmenurest.dll/datasnap/rest/Tasbmenurest/getchoices";
+
+  static String API_PAYAZZURE_GLOBAL_ENDPOINT =
+      "https://client.payazzure.com/arm/api/v1/ARMExecutePublishedAPI";
 
   postToServer(
       {String url = '',
@@ -170,12 +196,15 @@ class ServerConnections {
         if (isBearer)
           header = {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + appStorage.retrieveValue(AppStorage.TOKEN).toString() ?? "",
+            'Authorization': 'Bearer ' +
+                    appStorage.retrieveValue(AppStorage.TOKEN).toString() ??
+                "",
           };
         print("API_POST_URL: $url");
         // print("Post header: $header");
         print("API_POST_BODY:" + body);
-        var response = await client.post(Uri.parse(url), headers: header, body: body);
+        var response =
+            await client.post(Uri.parse(url), headers: header, body: body);
 
         // print("API_RESPONSE_DATA: $API_NAME: ${response.body}\n");
         // print("");
@@ -193,18 +222,24 @@ class ServerConnections {
                   "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
 
           Get.snackbar("Error " + response.statusCode.toString(), "Invalid Url",
-              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
-          showErrorSnack(title: "Error!", message: response.statusCode.toString(), show_errorSnackbar: show_errorSnackbar);
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white);
+          showErrorSnack(
+              title: "Error!",
+              message: response.statusCode.toString(),
+              show_errorSnackbar: show_errorSnackbar);
         } else {
           if (response.statusCode == 400) {
             LogService.writeLog(
                 message:
-                "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
-            if (response.body.toString().toLowerCase().contains("sessionid is not valid")) {
-
+                    "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+            if (response.body
+                .toString()
+                .toLowerCase()
+                .contains("sessionid is not valid")) {
               LandingPageController landingPageController = Get.find();
               landingPageController.showSignOutDialog_sessionExpired();
-
             } else
               return response.body;
           } else {
@@ -233,10 +268,15 @@ class ServerConnections {
         }
       } catch (e) {
         print("API_ERROR: $API_NAME: ${e.toString()}");
-        LogService.writeLog(message: "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nError: ${e.toString()}");
+        LogService.writeLog(
+            message:
+                "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nError: ${e.toString()}");
 
         // Get.snackbar("Error ", e.toString(), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
-        showErrorSnack(title: "Error!", message: e.toString(), show_errorSnackbar: show_errorSnackbar);
+        showErrorSnack(
+            title: "Error!",
+            message: e.toString(),
+            show_errorSnackbar: show_errorSnackbar);
       }
 
     return "";
@@ -265,7 +305,8 @@ class ServerConnections {
   //   }
   // }
 
-  getFromServer({String url = '', var header = '', var show_errorSnackbar = true}) async {
+  getFromServer(
+      {String url = '', var header = '', var show_errorSnackbar = true}) async {
     var API_NAME = url.substring(url.lastIndexOf("/") + 1, url.length);
     try {
       if (url == '') url = _baseUrl;
@@ -282,10 +323,15 @@ class ServerConnections {
 
       if (response.statusCode == 404) {
         if (API_NAME.toString().toLowerCase() == "ARMAppStatus".toLowerCase()) {
-          showErrorSnack(title: "Error!", message: "Invalid ARM URL", show_errorSnackbar: show_errorSnackbar);
+          showErrorSnack(
+              title: "Error!",
+              message: "Invalid ARM URL",
+              show_errorSnackbar: show_errorSnackbar);
         } else {
           showErrorSnack(
-              title: "Error " + response.statusCode.toString(), message: "Invalid Url", show_errorSnackbar: show_errorSnackbar);
+              title: "Error " + response.statusCode.toString(),
+              message: "Invalid Url",
+              show_errorSnackbar: show_errorSnackbar);
         }
       } else {
         // LogService.writeLog(message: "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nError: ${e.toString()}");
@@ -295,7 +341,9 @@ class ServerConnections {
             show_errorSnackbar: show_errorSnackbar);
       }
     } catch (e) {
-      LogService.writeLog(message: "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nError: ${e.toString()}");
+      LogService.writeLog(
+          message:
+              "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nError: ${e.toString()}");
       if (e.toString().contains("ClientException with SocketException")) {
         await Future.delayed(Duration(seconds: 4));
 
@@ -309,8 +357,12 @@ class ServerConnections {
           }
 
           if (reResponse.statusCode == 404) {
-            if (API_NAME.toString().toLowerCase() == "ARMAppStatus".toLowerCase()) {
-              showErrorSnack(title: "Error!", message: "Invalid ARM URL", show_errorSnackbar: show_errorSnackbar);
+            if (API_NAME.toString().toLowerCase() ==
+                "ARMAppStatus".toLowerCase()) {
+              showErrorSnack(
+                  title: "Error!",
+                  message: "Invalid ARM URL",
+                  show_errorSnackbar: show_errorSnackbar);
             } else {
               showErrorSnack(
                   title: "Error " + reResponse.statusCode.toString(),
@@ -325,11 +377,17 @@ class ServerConnections {
                 show_errorSnackbar: show_errorSnackbar);
           }
         } catch (err) {
-          showErrorSnack(title: "Error!", message: err.toString(), show_errorSnackbar: show_errorSnackbar);
+          showErrorSnack(
+              title: "Error!",
+              message: err.toString(),
+              show_errorSnackbar: show_errorSnackbar);
         }
       }
 
-      showErrorSnack(title: "Error!", message: e.toString(), show_errorSnackbar: show_errorSnackbar);
+      showErrorSnack(
+          title: "Error!",
+          message: e.toString(),
+          show_errorSnackbar: show_errorSnackbar);
       // LogService.writeLog(message: "getFromServer(): ${e.toString()}");
 
       // Get.snackbar("Error ", e.toString(), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);

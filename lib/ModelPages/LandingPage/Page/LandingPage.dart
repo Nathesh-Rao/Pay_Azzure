@@ -1,5 +1,7 @@
 import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplicationWebView.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Controllers/MenuHomePageController.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/controller/AttendanceController.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/controller/PayAndLeaveController.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/LandingPageController.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetBottomNavigation.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetDrawer.dart';
@@ -15,9 +17,12 @@ class LandingPage extends StatelessWidget {
   LandingPage({super.key});
 
   final LandingPageController landingPageController = Get.find();
-  final MenuHomePageController menuHomePageController = Get.put(MenuHomePageController());
+  final MenuHomePageController menuHomePageController =
+      Get.put(MenuHomePageController());
   final WebViewController webViewController = Get.find();
   final ActiveTaskListController _c = Get.put(ActiveTaskListController());
+  final PayAndLeaveController _p = Get.put(PayAndLeaveController());
+  final AttendanceController _a = Get.put(AttendanceController());
 
   @override
   Widget build(BuildContext context) {
@@ -49,20 +54,22 @@ class LandingPage extends StatelessWidget {
               bottomNavigationBar: AppBottomNavigation(),
               body: /*WillPopScope(
                 onWillPop: landingPageController.onWillPop,
-                child:*/ Obx(
-                  () => Stack(
-                    children: [
-                      landingPageController.getPage(),
-                    ],
-                  ),
+                child:*/
+                  Obx(
+                () => Stack(
+                  children: [
+                    landingPageController.getPage(),
+                  ],
                 ),
-                /* menuHomePageController.switchPage.value == true
+              ),
+              /* menuHomePageController.switchPage.value == true
                         ? InApplicationWebViewer(menuHomePageController.webUrl)
                         : landingPageController.getPage(),
                     ),*/
-              ),
-          //  ),
-            Obx(() => InApplicationWebViewer(webViewController.currentUrl.value)),
+            ),
+            //  ),
+            Obx(() =>
+                InApplicationWebViewer(webViewController.currentUrl.value)),
           ],
         ),
       ),
