@@ -12,8 +12,29 @@ class MyColors {
   static const Color baseYellow = Color(0xffF79E02);
   static const Color baseRed = Color(0xffDD2025);
   static const Color basegray = Color(0xffDEDEDE);
+  static const Color baseGray = Color(0xffDEDEDE);
+  static const taskClockInWidgetColorPurple = Color(0xff8371EC);
+  static const flatButtonColorBlue = Color(0xff2A79E4);
+  static const brownRed = Color(0xff4F0006);
+  static const flatButtonColorPurple = Color(0xff8371EC);
+  static const primaryTitleTextColorBlueGrey = Color(0xff505B77);
+  static const primarySubTitleTextColorBlueGreyLight = Color(0xff969DAD);
+  static const secondarySubTitleTextColorGreyLight = Color(0xffA2A2A2);
+  static const primaryActionColorDarkBlue = Color(0xff282D46);
+
+  static const Color historyCreated = Color(0xffFB6340);
+  static const Color historyAssigned = Color(0xff2A79E4);
+  static const Color historyCompleted = Color(0xff2DCE89);
+  static const primaryButtonBGColorViolet = Color(0xff544D80);
+  static const primaryButtonFGColorWhite = Color(0xffE9EDF2);
+  static const secondaryButtonBGColorWhite = Colors.white;
+  static const secondaryButtonFGColorViolet = primaryButtonBGColorViolet;
+  static const secondaryButtonBorderColorGrey = Color(0xffDDDDDD);
+  static const normalBoxBorderColorGrey = Color(0xffCCCCCC);
+  static const textFieldMainTextColorBlueGrey = Color(0xff757575);
   // static const Color blue2 = Color(0xFF2a2b8f);
   static const Color PayAzzureColor2 = Color(0xFFa81f2c);
+  // static const secondaryButtonBorderColorGrey = Color(0xffDDDDDD);
   static const Color blue3 = Color(0xFF4fc3f7);
   static const Color blue4 = Color(0xFF8591B0);
   static const Color blue5 = Color(0xFF0D47A1);
@@ -21,6 +42,7 @@ class MyColors {
   static const Color blue7 = Color(0xFF42A5F5);
   static const Color blue8 = Color(0xFFF7F8FA);
   static const Color blue9 = Color(0xFF0d297d);
+  static const Color blue10 = Color(0xff1F41BB);
   static const Color red = Color(0xFFed1c24);
   static const Color maroon = Color(0xFFc22121);
   static const Color orange = Color(0xFFff4500);
@@ -71,13 +93,30 @@ class MyColors {
   static const Color text2 = Color(0xff919191);
   static const Color AXMDark = Color(0xff363942);
   static const Color AXMGray = Color(0xff61677D);
-  static const LinearGradient updatedUIBackgroundGradient = LinearGradient(colors: [PayAzzureColor2, PayAzzureColor2]);
 
-  static const LinearGradient subBGGradientVertical =
-      LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [
-    Color(0xff3764FC),
-    Color(0xff9764DA),
-  ]);
+  static const chipCardWidgetColorViolet = Color(0xff8E61E9);
+  static const chipCardWidgetColorRed = Color(0xffE96161);
+  static const chipCardWidgetColorGreen = Color(0xff01916A);
+  static const chipCardWidgetColorBlue = Color(0xff2A79E4);
+  static const leaveWidgetColorSandal = Color(0xffE0A47A);
+  static const leaveWidgetColorGreen = Color(0xff379785);
+  static const leaveWidgetColorPink = Color(0xffDA5077);
+  static const leaveWidgetColorGreenLite = Color(0xff5BBBA9);
+  static const snackBarInfoColorGrey = Color(0xff9E9E9E);
+  static const snackBarNotificationColorBlue = Color(0xffA1BAFF);
+  static const snackBarSuccessColorGreen = Color(0xff80DCB9);
+  static const snackBarWarningColorYellow = Color(0xffFFC786);
+  static const snackBarErrorColorRed = Color(0xffF1AA9B);
+  static const LinearGradient updatedUIBackgroundGradient =
+      LinearGradient(colors: [PayAzzureColor2, PayAzzureColor2]);
+
+  static const LinearGradient subBGGradientVertical = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Color(0xff3764FC),
+        Color(0xff9764DA),
+      ]);
 
   static const LinearGradient subBGGradientHorizontal = LinearGradient(colors: [
     Color(0xff3764FC),
@@ -103,5 +142,51 @@ class MyColors {
       Colors.deepPurple,
     ];
     return colors[Random().nextInt(colors.length)];
+  }
+
+  static final List<Color> _colorPalette = [
+    // Color(0xFF8371EC),
+    // Color(0xFFFF9B00),
+    // Color(0xFF0271F2),
+    // Color(0xFF9764DA),
+    // Color(0xFF3764FC),
+    // Color(0xFF9C27B0),
+    // Color(0xFF9764DA),
+    // Color(0xFF0271F2),
+    // Color(0xFFFF9B00),
+    // Color(0xFF8371EC),
+    chipCardWidgetColorViolet,
+    chipCardWidgetColorGreen,
+    baseYellow,
+    baseBlue,
+    Colors.teal,
+    Colors.blue,
+    Colors.orange,
+    Colors.cyan,
+    Colors.lime,
+    Colors.brown,
+    Colors.pink,
+    Colors.deepOrange,
+    Colors.lightGreen,
+    Colors.deepPurple,
+  ];
+
+  static int _currentIndex = 0;
+
+  static var gradientBlue = Color(0xFF3764FC);
+
+  static var gradientViolet = Color(0xFF9764DA);
+
+  static var violetBorder = Color(0xff8371EC);
+
+  static Color getNextColor() {
+    if (_currentIndex >= _colorPalette.length) {
+      _currentIndex = 0;
+    }
+    return _colorPalette[_currentIndex++];
+  }
+
+  static void resetColorIndex() {
+    _currentIndex = 0;
   }
 }

@@ -12,7 +12,19 @@ class WebViewController extends GetxController {
   var isWebViewLoading = false.obs;
   var isProgressBarActive = true.obs;
   var inAppWebViewController = Rxn<InAppWebViewController>();
+//-------------On Index change------------------------
+  void Function(int)? onIndexChanged;
 
+  @override
+  void onInit() {
+    super.onInit();
+    ever(currentIndex, (index) {
+      if (onIndexChanged != null) {
+        onIndexChanged!(index);
+      }
+    });
+  }
+//-------------------------------------
   openWebView({required String url}) async {
     LandingPageController landingPageController = Get.find();
     if (!landingPageController.isAxpertConnectEstablished) {

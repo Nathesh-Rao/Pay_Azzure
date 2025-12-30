@@ -1,6 +1,9 @@
 import 'package:axpertflutter/ModelPages/AddConnection/page/AddNewConnections.dart';
 import 'package:axpertflutter/ModelPages/InApplicationWebView/page/InApplicationWebView.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Page/PendingListItemDetails.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/page/attendance/attendance_screen.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/page/leaves/leave_details_screen.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/page/payslip/payroll_details_page.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/Binding.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Page/LandingPage.dart';
 import 'package:axpertflutter/ModelPages/LoginPage/Page/ForgetPassword.dart';
@@ -11,6 +14,7 @@ import 'package:axpertflutter/ModelPages/ProjectListing/Page/ProjectListingPage.
 import 'package:axpertflutter/ModelPages/SettingsPage/Page/SettingsPage.dart';
 import 'package:axpertflutter/ModelPages/ShowLogs/Pages/ShowLog.dart';
 import 'package:axpertflutter/ModelPages/SpalshPage/page/SplashPageUI.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../ModelPages/LoginPage/Page/OtpPage.dart';
@@ -29,6 +33,10 @@ class Routes {
   static const String NotificationPage = "/LandingPage/Notifications";
   static const String SettingsPage = "/LandingPage/Settings";
   static const String ShowLogs = "/LandingPage/ShowLogs";
+
+  static const String attendance = '/attendance';
+  static const String leaveDetails = '/leaveDetails';
+  static const String payRollDetails = '/payRollDetails';
 }
 
 class RoutePages {
@@ -98,6 +106,24 @@ class RoutePages {
       name: Routes.ShowLogs,
       page: () => ShowLogs(),
       transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: Routes.leaveDetails,
+      page: () => LeaveDetailsScreen(),
+      transition: Transition.rightToLeft,
+      curve: Curves.decelerate,
+    ),
+    GetPage(
+      name: Routes.attendance,
+      page: () => AttendanceScreen(),
+      transition: Transition.rightToLeft,
+      curve: Curves.decelerate,
+    ),
+    GetPage(
+      name: Routes.payRollDetails,
+      page: () => PayrollDetailsPage(),
+      transition: Transition.rightToLeft,
+      curve: Curves.decelerate,
     ),
   ];
 }

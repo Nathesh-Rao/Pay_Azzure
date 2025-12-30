@@ -35,6 +35,7 @@ import 'package:text_scroll/text_scroll.dart';
 import '../../InApplicationWebView/controller/webview_controller.dart';
 import '../../LandingMenuPages/MenuActiveListPage/Page/UpdatedMenuListPage/ActiveListPage.dart';
 import '../../LandingMenuPages/MenuHomePagePage/Models/BannerModel.dart';
+import '../../LandingMenuPages/PayAndAttendacePage/page/PayAndAttendancePage.dart';
 import '../Widgets/EmptyWidget.dart';
 import '../Widgets/WidgetBanner.dart';
 
@@ -103,9 +104,9 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       pageList = [
         UpdatedHomePage(),
         // MenuActiveListPage(),
+        PayAndAttendancePage(),
         ActiveListPage(),
         MenuDashboardPage(),
-
         ///NOTE Pass a [ValueKey] with a unique identifier to force widget rebuilds.
         //NOTE to open the WebViewCalendar page
         EmptyWidget(), //NOTE to open the WebViewCalendar page handled in indexchange() method
@@ -833,13 +834,22 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
           indexChange(1);
         },
         leading: Icon(Icons.view_list_outlined),
-        title: Text("Active List"),
+        title: Text("Pay & Leaves"),
       ));
       menuList.add(ListTile(
         tileColor: Colors.white,
         onTap: () {
           Get.back();
           indexChange(2);
+        },
+        leading: Icon(Icons.view_list_outlined),
+        title: Text("Active List"),
+      ));
+      menuList.add(ListTile(
+        tileColor: Colors.white,
+        onTap: () {
+          Get.back();
+          indexChange(3);
         },
         leading: Icon(Icons.speed_outlined),
         title: Text("Dashboard"),
@@ -848,7 +858,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         tileColor: Colors.white,
         onTap: () {
           Get.back();
-          indexChange(3);
+          indexChange(4);
         },
         leading: Icon(Icons.calendar_month_outlined),
         title: Text("Calendar"),
@@ -857,7 +867,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         tileColor: Colors.white,
         onTap: () {
           Get.back();
-          indexChange(4);
+          indexChange(5);
         },
         leading: Icon(Icons.analytics_outlined),
         title: Text("Analytics"),
@@ -866,7 +876,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
         tileColor: Colors.white,
         onTap: () {
           Get.back();
-          indexChange(5);
+          // indexChange(6);
         },
         leading: Icon(Icons.dashboard_customize_outlined),
         title: Text("More"),

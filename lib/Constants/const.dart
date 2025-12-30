@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 final globalVariableController = Get.find<GlobalVariableController>();
 
 class Const {
+  static const String SCRIPT_PUNCH_INN = 'script1';
+  static const String SCRIPT_PUNCH_OUT = 'script2';
   static DateTime DEMO_END_DATE = DateTime(2025, 2, 8);
   static String APP_RELEASE_ID = "1";
   static String APP_RELEASE_DATE = "release170925";
