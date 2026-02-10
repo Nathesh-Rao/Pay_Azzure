@@ -22,21 +22,25 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
+class _SplashPageState extends State<SplashPage>
+    with SingleTickerProviderStateMixin {
   var _animationController;
   AppStorage appStorage = AppStorage();
   ProjectModel? projectModel;
-  final GlobalVariableController globalVariableController = Get.put(GlobalVariableController(), permanent: true);
+  final GlobalVariableController globalVariableController =
+      Get.put(GlobalVariableController(), permanent: true);
 
   @override
   void initState() {
     LogService.writeLog(message: "[>] SplashPage");
     super.initState();
-    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 800));
     _animationController.forward();
     VersionUpdateClearOldData.clearAllOldData();
     checkIfDeviceSupportBiometric();
     Future.delayed(Duration(milliseconds: 1800), () {
+      globalVariableController.currentEmployeeData = null;
       _animationController.stop();
       var cached = appStorage.retrieveValue(AppStorage.CACHED);
       LogService.writeLog(message: "[i] SplashPage Cached => $cached");
@@ -46,10 +50,12 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
           Get.offAllNamed(Routes.ProjectListingPage);
         else {
           var jsonProject = appStorage.retrieveValue(cached);
-          LogService.writeLog(message: "[i] SplashPage jsonProject => $jsonProject");
+          LogService.writeLog(
+              message: "[i] SplashPage jsonProject => $jsonProject");
 
           projectModel = ProjectModel.fromJson(jsonProject);
-          globalVariableController.PROJECT_NAME.value = projectModel!.projectname;
+          globalVariableController.PROJECT_NAME.value =
+              projectModel!.projectname;
           globalVariableController.WEB_URL.value = projectModel!.web_url;
           globalVariableController.ARM_URL.value = projectModel!.arm_url;
           Get.offAllNamed(Routes.Login);
@@ -107,12 +113,18 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   void checkIfDeviceSupportBiometric() async {
     final LocalAuthentication auth = LocalAuthentication();
     final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
-    final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
-    LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
+    final bool canAuthenticate =
+        canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+    LogService.writeLog(
+        message:
+            "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
     // LogService.writeOnConsole(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nCanAuthenticate: $canAuthenticate");
     if (canAuthenticate) {
-      final List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
-      LogService.writeLog(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
+      final List<BiometricType> availableBiometrics =
+          await auth.getAvailableBiometrics();
+      LogService.writeLog(
+          message:
+              "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
       // LogService.writeOnConsole(message: "[i] SplashPage\nScope:checkIfDeviceSupportBiometric()\nAvailable Biometrics: $availableBiometrics");
 
       if (availableBiometrics.isNotEmpty) {

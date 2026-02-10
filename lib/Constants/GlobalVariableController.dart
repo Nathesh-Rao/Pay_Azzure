@@ -8,6 +8,6 @@ class GlobalVariableController extends GetxController {
   var NICK_NAME = ''.obs;
   var USER_NAME = ''.obs;
   var USER_EMAIL = ''.obs;
-  Rxn<EmployeeData> currentEmployee = Rxn<EmployeeData>();
+  // Rxn<EmployeeData> currentEmployee = Rxn<EmployeeData>();
   EmployeeData? currentEmployeeData;
 }

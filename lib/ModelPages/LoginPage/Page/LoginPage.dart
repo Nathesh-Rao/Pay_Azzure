@@ -107,9 +107,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                  Obx(() => _projectNameWidget(projectName: loginController.currentProjectName.value)),
+                  Obx(() => _projectNameWidget(
+                      projectName: loginController.currentProjectName.value)),
                   Obx(
-                        () => WidgetLoginTextField(
+                    () => WidgetLoginTextField(
                       label: "Username",
                       isLoading: loginController.isUserDataLoading.value,
                       controller: loginController.userNameController,
@@ -117,12 +118,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   Obx(
-                        () => AnimatedSwitcher(
+                    () => AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       switchInCurve: Curves.easeOut,
                       switchOutCurve: Curves.easeIn,
                       transitionBuilder: (child, animation) {
-                        final fade = FadeTransition(opacity: animation, child: child);
+                        final fade =
+                            FadeTransition(opacity: animation, child: child);
                         return SizeTransition(
                           sizeFactor: animation,
                           axis: Axis.vertical,
@@ -131,13 +133,14 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: loginController.isPWD_auth.value
                           ? WidgetLoginTextField(
-                        key: const ValueKey("rotating"),
-                        label: "Password",
-                        hintText: "Enter Password",
-                        focusNode: loginController.passwordFocus,
-                        obscureText: loginController.showPassword.value,
-                        controller: loginController.userPasswordController,
-                      )
+                              key: const ValueKey("rotating"),
+                              label: "Password",
+                              hintText: "Enter Password",
+                              focusNode: loginController.passwordFocus,
+                              obscureText: loginController.showPassword.value,
+                              controller:
+                                  loginController.userPasswordController,
+                            )
                           : const SizedBox.shrink(key: ValueKey("empty")),
                     ),
                   ),
@@ -146,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 10,
                   ),
                   Obx(
-                        () => Padding(
+                    () => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,13 +162,15 @@ class _LoginPageState extends State<LoginPage> {
                               children: [
                                 Checkbox(
                                   value: loginController.rememberMe.value,
-                                  onChanged: (value) => {loginController.rememberMe.toggle()},
+                                  onChanged: (value) =>
+                                      {loginController.rememberMe.toggle()},
                                   checkColor: Colors.white,
                                   side: BorderSide(
                                     color: MyColors.PayAzzureColor2,
                                     width: 2,
                                   ),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5)),
                                   activeColor: MyColors.PayAzzureColor2,
                                 ),
                                 Text("Remember Me",
@@ -197,18 +202,23 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   Obx(
-                        () => WidgetLoginButton(
+                    () => WidgetLoginButton(
                       label: "Next",
-                      visible: loginController.authType.value == AuthType.none || loginController.authType.value == AuthType.otpOnly,
+                      visible: loginController.authType.value ==
+                              AuthType.none ||
+                          loginController.authType.value == AuthType.otpOnly,
                       onPressed: () {
                         loginController.startLoginProcess();
                       },
                     ),
                   ),
                   Obx(
-                        () => WidgetLoginButton(
+                    () => WidgetLoginButton(
                       label: _getLoginButtonLabel(),
-                      visible: loginController.authType.value == AuthType.both || loginController.authType.value == AuthType.passwordOnly,
+                      visible:
+                          loginController.authType.value == AuthType.both ||
+                              loginController.authType.value ==
+                                  AuthType.passwordOnly,
                       onPressed: () {
                         loginController.callSignInAPI();
                       },
@@ -224,15 +234,20 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.only(left: 30, right: 30),
                       child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                             foregroundColor: MyColors.buzzilyblack,
                             backgroundColor: MyColors.white1,
                             minimumSize: Size(double.infinity, 60),
                           ),
-                          icon: Icon(FontAwesomeIcons.google, color: MyColors.red),
+                          icon: Icon(FontAwesomeIcons.google,
+                              color: MyColors.red),
                           label: Text('Sign In With Google',
-                              style:
-                              GoogleFonts.poppins(textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: HexColor("#3E4153")))),
+                              style: GoogleFonts.poppins(
+                                  textStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      color: HexColor("#3E4153")))),
                           onPressed: () {
                             loginController.googleSignInClicked();
                           }),
@@ -270,7 +285,11 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       "By using the software, you agree to the",
                       style: GoogleFonts.poppins(
-                          textStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12, letterSpacing: 1, color: Colors.black)),
+                          textStyle: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              letterSpacing: 1,
+                              color: Colors.black)),
                     ),
                   ),
                   Row(
@@ -290,7 +309,11 @@ class _LoginPageState extends State<LoginPage> {
                       FittedBox(
                         child: Text(" and the",
                             style: GoogleFonts.poppins(
-                              textStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 12, color: Colors.black, letterSpacing: 1),
+                              textStyle: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  letterSpacing: 1),
                             )),
                       ),
                       FittedBox(
@@ -310,7 +333,11 @@ class _LoginPageState extends State<LoginPage> {
                   Text("Powered By",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        textStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: Colors.black, letterSpacing: 1),
+                        textStyle: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: Colors.black,
+                            letterSpacing: 1),
                       )),
                   Image.asset(
                     'assets/images/agilelabslogo.png',
@@ -346,6 +373,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: FutureBuilder(
                       future: loginController.getVersionName(),
                       builder: (context, snapshot) {
+                        return Text("");
                         if (snapshot.hasData) {
                           return Text(
                             "Version:${snapshot.data}_${Const.APP_RELEASE_DATE}",
@@ -353,7 +381,9 @@ class _LoginPageState extends State<LoginPage> {
                                 textStyle: TextStyle(
                                     color: MyColors.buzzilyblack,
                                     fontWeight: FontWeight.w700,
-                                    fontSize: MediaQuery.of(context).size.height * 0.012)),
+                                    fontSize:
+                                        MediaQuery.of(context).size.height *
+                                            0.012)),
                           );
                         } else {
                           return Text("");

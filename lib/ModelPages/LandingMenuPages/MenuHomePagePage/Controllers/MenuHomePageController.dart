@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
@@ -84,7 +85,7 @@ class MenuHomePageController extends GetxController {
     // getEmployeeDetails();
   }
 
-  getEmployeeDetails() async {
+  getEmployeeDetails1() async {
     String secretKey = await getEncryptedSecretKey("1979902755375700");
 
     LogService.writeLog(message: "getEmployeeDetails secret key: $secretKey");
@@ -101,10 +102,11 @@ class MenuHomePageController extends GetxController {
     var resp = await serverConnections.postToServer(
         url: url, body: jsonEncode(body), isBearer: false);
     // LogService.writeLog(message: "getEmployeeDetails : $resp");
-    LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
+    // LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
     var response = jsonDecode(resp);
     String jsonString =
         response["ds_get_employee_global_details"]["rows"][0]["jsondata"];
+
     List<EmployeeData> employees = parseEmployeeJsonData(jsonString);
     final emp = employees.first;
     globalVariableController.currentEmployeeData = emp;
@@ -235,6 +237,7 @@ class MenuHomePageController extends GetxController {
 
     var resp = await serverConnections.postToServer(
         url: url, body: jsonEncode(getCardsBody), isBearer: true);
+    LogService.writeLog(message: "getcardswithdata BODY : $getCardsBody");
     LogService.writeLog(message: "getcardswithdata : $resp");
     LogService.writeOnConsole(message: "getcardswithdata : $resp");
     var response = jsonDecode(resp);

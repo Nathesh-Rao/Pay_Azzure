@@ -8,7 +8,7 @@ class AttendanceReportModel {
   final String? workingHours;
 
   AttendanceReportModel({
-    this.punchDate,
+    this.punchDate, 
     this.status,
     this.punchInTime,
     this.punchOutTime,

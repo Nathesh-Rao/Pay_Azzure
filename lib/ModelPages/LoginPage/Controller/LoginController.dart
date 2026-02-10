@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:axpertflutter/Constants/AppStorage.dart';
@@ -314,7 +315,7 @@ class LoginController extends GetxController {
                   userNameController.text.trim());
           storeLastLoginData(_body);
           print(
-              "User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
+              "User_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD) ?? ''}");
           LogService.writeLog(
               message:
                   "[-] LoginController\nScope: loginButtonClicked()\nUser_change_password: ${appStorage.retrieveValue(AppStorage.USER_CHANGE_PASSWORD)}");
@@ -463,7 +464,8 @@ class LoginController extends GetxController {
     try {
       await getEmployeeDetails();
     } catch (e) {
-      LogService.writeLog(message: "Employee details failed $e");
+      LogService.writeLog(
+          message: "getEmployeeDetails Employee details failed $e");
     }
 
     Get.offAllNamed(Routes.LandingPage);
@@ -486,10 +488,15 @@ class LoginController extends GetxController {
     var resp = await serverConnections.postToServer(
         url: url, body: jsonEncode(body), isBearer: false);
     // LogService.writeLog(message: "getEmployeeDetails : $resp");
-    LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
+    // LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
     var response = jsonDecode(resp);
+    log("$url", name: "getEmployeeDetails url");
+    log("${jsonEncode(body)}", name: "getEmployeeDetails BODY");
+    log("$response", name: "getEmployeeDetails response");
     String jsonString =
         response["ds_get_employee_global_details"]["rows"][0]["jsondata"];
+
+    log("$jsonString", name: "getEmployeeDetails jsonString");
     List<EmployeeData> employees = parseEmployeeJsonData(jsonString);
     final emp = employees.first;
     globalVariableController.currentEmployeeData = emp;
@@ -514,31 +521,64 @@ class LoginController extends GetxController {
     }
   }
 
-  _callApiForMobileNotification() async {
-    var imei = '';
-    // var imei = await PlatformDeviceId.getDeviceId ?? '0';
+  // _callApiForMobileNotification() async {
+  //   var imei = '';
+  //   // var imei = await PlatformDeviceId.getDeviceId ?? '0';
 
-    final deviceInfoPlugin = DeviceInfoPlugin();
-    final deviceInfo = defaultTargetPlatform == TargetPlatform.android
-        ? await deviceInfoPlugin.androidInfo
-        : defaultTargetPlatform == TargetPlatform.iOS
-            ? await deviceInfoPlugin.iosInfo
-            : null;
-    if (deviceInfo == null) {
-      Const.DEVICE_ID = '';
-    } else {
-      final allInfo = deviceInfo.data;
-      imei = allInfo['id'];
+  //   final deviceInfoPlugin = DeviceInfoPlugin();
+  //   final deviceInfo = defaultTargetPlatform == TargetPlatform.android
+  //       ? await deviceInfoPlugin.androidInfo
+  //       : defaultTargetPlatform == TargetPlatform.iOS
+  //           ? await deviceInfoPlugin.iosInfo
+  //           : null;
+  //   if (deviceInfo == null) {
+  //     Const.DEVICE_ID = '';
+  //   } else {
+  //     final allInfo = deviceInfo.data;
+  //     imei = allInfo['id'] ?? '';
+  //   }
+  //   var connectBody = {
+  //     'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID),
+  //     'firebaseId': fcmId ?? "0",
+  //     'ImeiNo': imei,
+  //   };
+  //   var cUrl = Const.getFullARMUrl(ServerConnections.API_MOBILE_NOTIFICATION);
+  //   var connectResp = await serverConnections.postToServer(
+  //       url: cUrl, body: jsonEncode(connectBody), isBearer: true);
+  //   print("Mobile: " + connectResp);
+  // }
+
+  Future<void> _callApiForMobileNotification() async {
+    String deviceId = '';
+
+    final deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+
+      deviceId = androidInfo.id ?? androidInfo.device ?? 'android_unknown';
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+
+      deviceId = iosInfo.identifierForVendor ?? 'ios_unknown';
     }
+
     var connectBody = {
       'ARMSessionId': appStorage.retrieveValue(AppStorage.SESSIONID),
       'firebaseId': fcmId ?? "0",
-      'ImeiNo': imei,
+      'deviceId': deviceId,
+      'platform': Platform.isAndroid ? 'android' : 'ios',
     };
+
     var cUrl = Const.getFullARMUrl(ServerConnections.API_MOBILE_NOTIFICATION);
+
     var connectResp = await serverConnections.postToServer(
-        url: cUrl, body: jsonEncode(connectBody), isBearer: true);
-    print("Mobile: " + connectResp);
+      url: cUrl,
+      body: jsonEncode(connectBody),
+      isBearer: true,
+    );
+
+    print("Mobile: $connectResp");
   }
 
   getVersionName() async {

@@ -64,7 +64,7 @@ Future<void> main() async {
       Const.DEVICE_ID = '';
     } else {
       final allInfo = deviceInfo.data;
-      Const.DEVICE_ID = allInfo['id'];
+      Const.DEVICE_ID = allInfo['id']??"";
     }
   } on PlatformException {}
 }
