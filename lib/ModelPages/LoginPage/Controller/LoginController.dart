@@ -472,21 +472,22 @@ class LoginController extends GetxController {
   }
 
   getEmployeeDetails() async {
-    String secretKey = await getEncryptedSecretKey("1979902755375700");
-
-    LogService.writeLog(message: "getEmployeeDetails secret key: $secretKey");
-
-    var url = ServerConnections.API_PAYAZZURE_GLOBAL_ENDPOINT;
+    //String secretKey = await getEncryptedSecretKey("1979902755375700");
+    //String secretKey = await getEncryptedSecretKey("1554843051684240");
+    //LogService.writeLog(message: "getEmployeeDetails secret key: $secretKey");
+    //var url = ServerConnections.API_PAYAZZURE_GLOBAL_ENDPOINT;
+    var url = Const.getFullARMUrl(ServerConnections.ARM_EXECUTE_PUBLISHED_API);
     var body = {
-      "SecretKey": secretKey,
-      "PublicKey": "AXPKEY000000010013",
+      //"SecretKey": secretKey,
+      "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
+      "PublicKey": "GET_EMPLOYEE_GLOBAL_DETAILS",//"AXPKEY000000010013",
       "Project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
       "getsqldata": {"trace": true},
       "sqlparams": {"pusername": appStorage.retrieveValue(AppStorage.USER_NAME)}
     };
 
     var resp = await serverConnections.postToServer(
-        url: url, body: jsonEncode(body), isBearer: false);
+        url: url, body: jsonEncode(body), isBearer: true);
     // LogService.writeLog(message: "getEmployeeDetails : $resp");
     // LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
     var response = jsonDecode(resp);
