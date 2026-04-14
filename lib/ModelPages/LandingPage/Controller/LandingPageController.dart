@@ -123,7 +123,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   getClientInfo() async {
     // var dataSourceUrl = baseUrl + GlobalConfiguration().get("HomeCardDataResponse").toString();
     var dataSourceUrl =
-        Const.getFullARMUrl(ServerConnections.API_GET_HOMEPAGE_CARDSDATASOURCE);
+        Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "username": appStorage.retrieveValue(AppStorage.USER_NAME),
@@ -274,13 +274,13 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     bottomIndex.value = index;
 
     if (pageList[index] is EmptyWidget) {
-      if (index == 3) {
+      if (index == 4) {
         //NOTE to open the WebViewCalendar page
         await webViewController.openWebView(
           url: Const.getFullWebUrl(Const.BOTTOMBAR_CALENDAR) +
               AppStorage().retrieveValue(AppStorage.SESSIONID),
         );
-      } else if (index == 4) {
+      } else if (index == 5) {
         //NOTE to open the WebViewAnalytics page
         await webViewController.openWebView(
           url: Const.getFullWebUrl(Const.BOTTOMBAR_ANALYTICS) +

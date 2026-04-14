@@ -487,7 +487,7 @@ class LoginController extends GetxController {
     };
 
     var resp = await serverConnections.postToServer(
-        url: url, body: jsonEncode(body), isBearer: true);
+        url: url, body: jsonEncode(body), isBearer: true, show_errorSnackbar: false);
     // LogService.writeLog(message: "getEmployeeDetails : $resp");
     // LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
     var response = jsonDecode(resp);
@@ -512,7 +512,7 @@ class LoginController extends GetxController {
   }
 
   getEncryptedSecretKey(String key) async {
-    var url = Const.getFullARMUrl(ExecuteApi.API_GET_ENCRYPTED_SECRET_KEY);
+    var url = Const.getFullARMUrl(ServerConnections.API_GET_ENCRYPTED_SECRET_KEY);
     Map<String, dynamic> body = {"secretkey": key};
     var resp = await serverConnections.postToServer(
         url: url, body: jsonEncode(body), isBearer: true);
@@ -588,7 +588,7 @@ class LoginController extends GetxController {
     String packageName = packageInfo.packageName;
     var version = packageInfo.version;
     String buildNumber = packageInfo.buildNumber;
-    Const.APP_VERSION = version + "." + Const.APP_RELEASE_ID;
+    Const.APP_VERSION = version; //+ "." + Const.APP_RELEASE_ID;
     return Const.APP_VERSION;
   }
 

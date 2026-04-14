@@ -33,7 +33,7 @@ class PayAndLeaveController extends GetxController {
     payBreakupList.value = [];
     payrollOverviewLoading.value = true;
 
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,
@@ -115,7 +115,7 @@ class PayAndLeaveController extends GetxController {
   _getAllEvents() async {
     LogService.writeLog(message: "getAllEvents()");
     isEventsLoading.value = true;
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,
@@ -188,7 +188,7 @@ class PayAndLeaveController extends GetxController {
   Future<List<OffDaysModel>> getAllOffDays() async {
     List<OffDaysModel> offDaysList = [];
 
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,
@@ -310,7 +310,7 @@ class PayAndLeaveController extends GetxController {
   Future<void> _getLeaveOverview() async {
     isLeaveOverviewLoading.value = true;
 
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,
@@ -357,7 +357,7 @@ class PayAndLeaveController extends GetxController {
   _getLeaveDetails() async {
     isLeaveDetailsLoading.value = true;
 
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,
@@ -406,7 +406,7 @@ class PayAndLeaveController extends GetxController {
     // if (leaveHistoryList.isNotEmpty) return;
     isLeaveHistoryLoading.value = true;
     LogService.writeLog(message: "_getAllUserNames()");
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,

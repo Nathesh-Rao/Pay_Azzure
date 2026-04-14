@@ -373,10 +373,10 @@ class _LoginPageState extends State<LoginPage> {
                   child: FutureBuilder(
                       future: loginController.getVersionName(),
                       builder: (context, snapshot) {
-                        return Text("");
+                        //return Text("");
                         if (snapshot.hasData) {
                           return Text(
-                            "Version:${snapshot.data}_${Const.APP_RELEASE_DATE}",
+                            "Version:${snapshot.data}${Const.APP_RELEASE_DATE}",
                             style: GoogleFonts.poppins(
                                 textStyle: TextStyle(
                                     color: MyColors.buzzilyblack,

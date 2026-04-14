@@ -165,7 +165,7 @@ class AttendanceController extends GetxController {
     isAttendanceReportLoading.value = true;
 
     var reportList = [];
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,
@@ -226,7 +226,7 @@ class AttendanceController extends GetxController {
     if (attendanceDetails.value != null && !force) return;
     isAttendanceDetailsIsLoading.value = true;
     isAddrsFetchLoading.value = true;
-    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_DATASOURCE);
+    var dataSourceUrl = Const.getFullARMUrl(ServerConnections.API_GET_DATASOURCE_RESPONSE);
     var body = {
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
       "appname": globalVariableController.PROJECT_NAME.value,

@@ -11,7 +11,7 @@ class Const {
   static const String SCRIPT_PUNCH_OUT = 'script2';
   static DateTime DEMO_END_DATE = DateTime(2025, 2, 8);
   static String APP_RELEASE_ID = "1";
-  static String APP_RELEASE_DATE = "release170925";
+  static String APP_RELEASE_DATE = "";//"_testRelease230326";
   static String DEVICE_ID = "";
   static String GUID = "";
   static String APP_VERSION = "";

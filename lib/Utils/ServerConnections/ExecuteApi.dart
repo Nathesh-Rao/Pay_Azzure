@@ -6,9 +6,6 @@ import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 
 class ExecuteApi {
   static const String SECRETKEY_HomePage = "1965065173127450";
-  static const String API_GET_ENCRYPTED_SECRET_KEY = "api/v1/ARMGetEncryptedSecret";
-  static const String API_ARM_EXECUTE = "api/v1/ARMExecuteAPI";
-  static const String API_ARM_EXECUTE_PUBLISHED = "api/v1/ARMExecutePublishedAPI";
   static const String API_SECRETKEY_GET_PUNCHIN_DATA = "5246994904522510";
   static const String API_SECRETKEY_GET_DO_PUNCHIN = "1408279244140740";
   static const String API_SECRETKEY_GET_DO_PUNCHOUT = "1408279244140740";
@@ -28,7 +25,7 @@ class ExecuteApi {
   static const String API_PUBLICKEY_ATTENDANCE_LEAVEDETAILS = "AXM_API_GETLEAVEDETAILS";
 
   // var body;
-  var url = Const.getFullARMUrl(API_ARM_EXECUTE_PUBLISHED);
+  var url = Const.getFullARMUrl(ServerConnections.ARM_EXECUTE_PUBLISHED_API);
 
   CallFetchData_ExecuteAPI({body = '', isBearer = false, header = ''}) async {
     var resp = await ServerConnections()
