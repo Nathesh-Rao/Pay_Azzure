@@ -183,6 +183,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       pageList = [
         UpdatedHomePage(),
         // MenuActiveListPage(),
+        PayAndAttendancePage(),
         ActiveListPage(),
         MenuDashboardPage(),
         EmptyWidget(), //NOTE to open the WebViewCalendar page handled in indexchange() method
@@ -377,13 +378,13 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     bottomIndex.value = index;
 
     if (pageList[index] is EmptyWidget) {
-      if (index == 3) {
+      if (index == 4) {
         //NOTE to open the WebViewCalendar page
         await webViewController.openWebView(
           url: Const.getFullWebUrl(Const.BOTTOMBAR_CALENDAR) +
               AppStorage().retrieveValue(AppStorage.SESSIONID),
         );
-      } else if (index == 4) {
+      } else if (index == 5) {
         //NOTE to open the WebViewAnalytics page
         await webViewController.openWebView(
           url: Const.getFullWebUrl(Const.BOTTOMBAR_ANALYTICS) +
