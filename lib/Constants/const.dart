@@ -11,7 +11,7 @@ class Const {
   static const String SCRIPT_PUNCH_OUT = 'script2';
   static DateTime DEMO_END_DATE = DateTime(2025, 2, 8);
   static String APP_RELEASE_ID = "1";
-  static String APP_RELEASE_DATE = "";//"_testRelease230326";
+  static String APP_RELEASE_DATE = ""; //"_testRelease230326";
   static String DEVICE_ID = "";
   static String GUID = "";
   static String APP_VERSION = "";
@@ -19,9 +19,10 @@ class Const {
   static const String CLOUD_PROJECT = "axpmobileclient";
   static const String CLOUD_URL = "";
   static final String SEED_V = "1983";
+  static const String SEED = "1993";
   static String DUMMY_USER = "admin";
   static const String DUMMYUSER_PWD = "a5ca360e803b868680e2b6f7805fcb9e";
-
+  static String LOG_FILE_PATH = '';
   static final String URL_JSON_OBJECTGETCHOICE =
       "asbmenurest.dll/datasnap/rest/Tasbmenurest/getchoices";
   static final String SET_HYBRID_INFO = "/Webservice.asmx/SetHybridInfo";

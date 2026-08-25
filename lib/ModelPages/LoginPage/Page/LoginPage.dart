@@ -59,6 +59,42 @@ class _LoginPageState extends State<LoginPage> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
+        leading:  Obx(
+                () => !loginController.isOfflineLogin.value
+                    ? SizedBox.shrink()
+                    : Container(
+                        // margin: EdgeInsets.only(top: 5),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        decoration: BoxDecoration(
+                            color: loginController.isOfflineLogin.value
+                                ? MyColors.baseRed.withValues(alpha: 0.1)
+                                : MyColors.green.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Row(
+                          spacing: 8,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.circle,
+                              color: loginController.isOfflineLogin.value
+                                  ? MyColors.baseRed
+                                  : MyColors.green,
+                              size: 12,
+                            ),
+                            Text(
+                              loginController.isOfflineLogin.value
+                                  ? "Offline"
+                                  : "Online",
+                              style: GoogleFonts.poppins(
+                                  color: MyColors.AXMDark,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        ),
+                      ),
+              ),
         title: Hero(
           tag: 'axpertImage',
           child: Image.asset(
@@ -425,4 +461,7 @@ class _LoginPageState extends State<LoginPage> {
     if (loginController.authType.value == AuthType.both) return "Get OTP";
     return "Login";
   }
+
+
+
 }

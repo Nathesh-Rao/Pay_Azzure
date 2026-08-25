@@ -10,3 +10,5 @@ enum AttendanceState {
 }
 
 enum AttendancePendingAction { punchIn, punchOut, leave, none }
+
+enum LogType { API_POST, API_GET, API_ERROR, INFO, NAVIGATION, REGULAR }

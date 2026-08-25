@@ -7,6 +7,8 @@ class MyColors {
   static const Color white1 = Color(0xFFFFFFFF);
   static const Color white2 = Color(0xFFFFFFFF);
   static const Color blue1 = Color(0xFF006cff);
+  static const Color blue2 = Color(0xFF2a2b8f);
+
   static const Color yellow_background = Color(0xFFe498a0);
   static const Color baseBlue = Color(0xff3764FC);
   static const Color baseYellow = Color(0xffF79E02);
@@ -188,5 +190,25 @@ class MyColors {
 
   static void resetColorIndex() {
     _currentIndex = 0;
+  }
+
+  static Color getOfflineColorByIndex(int index) {
+    const List<Color> colors = [
+      Colors.deepPurple,
+      Colors.green,
+      Colors.orange,
+      Colors.pink,
+      Colors.indigo,
+      Colors.red,
+      Colors.blue,
+      Colors.orange,
+      Colors.teal,
+      Colors.brown,
+      Colors.pink,
+      Colors.deepOrange,
+      Colors.deepPurple,
+    ];
+
+    return colors[index % colors.length];
   }
 }

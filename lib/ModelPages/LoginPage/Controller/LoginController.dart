@@ -9,7 +9,10 @@ import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuHomePagePage/Models/EmployeeData.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/auto_sync/offline_config_service.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/db/offline_db_module.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ExecuteApi.dart';
+import 'package:axpertflutter/Utils/ServerConnections/InternetConnectivity.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,6 +36,7 @@ import '../Page/LoginPage.dart';
 class LoginController extends GetxController {
   GlobalVariableController globalVariableController = Get.find();
   ServerConnections serverConnections = ServerConnections();
+  var isOfflineLogin = false.obs;
   // final googleLoginIn = GoogleSignIn();
   AppStorage appStorage = AppStorage();
   var rememberMe = false.obs;
@@ -60,7 +64,17 @@ class LoginController extends GetxController {
   var otpLoginKey = ''.obs;
   var otpErrorText = ''.obs;
   bool isDuplicate_session = false;
-
+  bool _isAuthFromBiometric = false;
+  var willBio_userAuthenticate = false.obs;
+  TextEditingController oPassCtrl = TextEditingController();
+  TextEditingController nPassCtrl = TextEditingController();
+  TextEditingController cnPassCtrl = TextEditingController();
+  var errOPass = ''.obs;
+  var errNPass = ''.obs;
+  var errCNPass = ''.obs;
+  var showOldPass = false.obs;
+  var showNewPass = false.obs;
+  var showConNewPass = false.obs;
   LoginController() {
     _askLocationPermission();
     // fetchUserTypeList();
@@ -75,6 +89,11 @@ class LoginController extends GetxController {
 
     // 16_KB_AMR
     _initializeGoogleSignIn();
+  }
+  @override
+  void onInit() {
+    super.onInit();
+    listenInternetState();
   }
 
   _askLocationPermission() async {
@@ -178,7 +197,23 @@ class LoginController extends GetxController {
     return rxMsg.value == "" ? null : rxMsg.value;
   }
 
+  // bool validateForm() {
+  //   errPassword.value = errUserName.value = "";
+  //   if (userNameController.text.toString().trim() == "") {
+  //     errUserName.value = "Enter User Name";
+  //     return false;
+  //   }
+  //   if (isPWD_auth.value) {
+  //     if (userPasswordController.text.toString().trim() == "") {
+  //       errPassword.value = "Enter Password";
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }
+
   bool validateForm() {
+    if (_isAuthFromBiometric) return true;
     errPassword.value = errUserName.value = "";
     if (userNameController.text.toString().trim() == "") {
       errUserName.value = "Enter User Name";
@@ -186,7 +221,7 @@ class LoginController extends GetxController {
     }
     if (isPWD_auth.value) {
       if (userPasswordController.text.toString().trim() == "") {
-        errPassword.value = "Enter Password";
+        errPassword.value = "Password is required";
         return false;
       }
     }
@@ -339,6 +374,18 @@ class LoginController extends GetxController {
     }
   }
 
+  void listenInternetState() async {
+    final InternetConnectivity net = Get.find<InternetConnectivity>();
+
+    // Set initial value
+    isOfflineLogin.value = !await net.check();
+
+    // Listen to future changes
+    ever<bool>(net.isConnected, (connected) {
+      isOfflineLogin.value = !connected;
+    });
+  }
+
   _initializeGoogleSignIn() async {
     await GoogleSignIn.instance.initialize();
     // GoogleSignIn.instance.authenticationEvents.listen((event) async {
@@ -480,14 +527,17 @@ class LoginController extends GetxController {
     var body = {
       //"SecretKey": secretKey,
       "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
-      "PublicKey": "GET_EMPLOYEE_GLOBAL_DETAILS",//"AXPKEY000000010013",
+      "PublicKey": "GET_EMPLOYEE_GLOBAL_DETAILS", //"AXPKEY000000010013",
       "Project": appStorage.retrieveValue(AppStorage.PROJECT_NAME),
       "getsqldata": {"trace": true},
       "sqlparams": {"pusername": appStorage.retrieveValue(AppStorage.USER_NAME)}
     };
 
     var resp = await serverConnections.postToServer(
-        url: url, body: jsonEncode(body), isBearer: true, show_errorSnackbar: false);
+        url: url,
+        body: jsonEncode(body),
+        isBearer: true,
+        show_errorSnackbar: false);
     // LogService.writeLog(message: "getEmployeeDetails : $resp");
     // LogService.writeOnConsole(message: "getEmployeeDetails : $resp");
     var response = jsonDecode(resp);
@@ -512,7 +562,8 @@ class LoginController extends GetxController {
   }
 
   getEncryptedSecretKey(String key) async {
-    var url = Const.getFullARMUrl(ServerConnections.API_GET_ENCRYPTED_SECRET_KEY);
+    var url =
+        Const.getFullARMUrl(ServerConnections.API_GET_ENCRYPTED_SECRET_KEY);
     Map<String, dynamic> body = {"secretkey": key};
     var resp = await serverConnections.postToServer(
         url: url, body: jsonEncode(body), isBearer: true);
@@ -658,10 +709,30 @@ class LoginController extends GetxController {
     }
   }
 
+  // void displayAuthenticationDialog() async {
+  //   if (willAuthenticate == true) {
+  //     try {
+  //       if (await showBiometricDialog()) {
+  //         loginButtonClicked(bodyArgs: retrieveLastLoginData());
+  //       }
+  //     } catch (e) {
+  //       print(e.toString());
+  //       if (e.toString().contains('NotAvailable') &&
+  //           e.toString().contains('Authentication failure'))
+  //         showErrorSnack(title: "Oops!", message: "Only Biometric is allowed.");
+  //     }
+  //   }
+  // }
+
   void displayAuthenticationDialog() async {
-    if (willAuthenticate == true) {
+    LogService.writeLog(
+        message:
+            "[^] LoginController\nScope: displayAuthenticationDialog()\n Fingerprint Clicked");
+
+    if (willBio_userAuthenticate == true) {
       try {
         if (await showBiometricDialog()) {
+          _isAuthFromBiometric = true;
           loginButtonClicked(bodyArgs: retrieveLastLoginData());
         }
       } catch (e) {
@@ -669,7 +740,11 @@ class LoginController extends GetxController {
         if (e.toString().contains('NotAvailable') &&
             e.toString().contains('Authentication failure'))
           showErrorSnack(title: "Oops!", message: "Only Biometric is allowed.");
+      } finally {
+        _isAuthFromBiometric = false;
       }
+    } else {
+      print("willAuthenticate => $willBio_userAuthenticate");
     }
   }
 
@@ -691,30 +766,53 @@ class LoginController extends GetxController {
   //// New Login Flow Methods and vars
 
   startLoginProcess() async {
-    authType.value = await getLoginUserDetailsAndAuthType();
+    if (isOfflineLogin.value) {
+      startLoginProcessOffline();
+    } else {
+      authType.value = await getLoginUserDetailsAndAuthType();
 
-    if (authType.value == AuthType.otpOnly) {
-      await callSignInAPI();
+      if (authType.value == AuthType.otpOnly || _isAuthFromBiometric) {
+        await callSignInAPI();
+      }
+
+      if (isPWD_auth.value) {
+        FocusScope.of(Get.context!).requestFocus(passwordFocus);
+      }
+
+      switch (authType.value) {
+        case AuthType.both:
+          print("✅ Both Password and OTP authentication are required.");
+          break;
+        case AuthType.passwordOnly:
+          print("🔐 Only Password authentication is required.");
+          break;
+        case AuthType.otpOnly:
+          print("📲 Only OTP authentication is required.");
+          break;
+        case AuthType.none:
+          print("❌ No authentication required.");
+          break;
+      }
     }
+  }
 
-    if (isPWD_auth.value) {
+  startLoginProcessOffline() async {
+    if (!validateForm()) return;
+    isUserDataLoading.value = true;
+    var isUserAvailable = await OfflineDbModule.hasOfflineUser(
+        projectName: globalVariableController.PROJECT_NAME.value,
+        username: userNameController.text.toString().trim());
+    isUserDataLoading.value = false;
+
+    if (isUserAvailable) {
+      userPasswordController.text = '';
+      authType.value = AuthType.passwordOnly;
+      isPWD_auth.value = true;
       FocusScope.of(Get.context!).requestFocus(passwordFocus);
+    } else {
+      errUserName.value = "This account isn’t available offline.";
     }
-
-    switch (authType.value) {
-      case AuthType.both:
-        print("✅ Both Password and OTP authentication are required.");
-        break;
-      case AuthType.passwordOnly:
-        print("🔐 Only Password authentication is required.");
-        break;
-      case AuthType.otpOnly:
-        print("📲 Only OTP authentication is required.");
-        break;
-      case AuthType.none:
-        print("❌ No authentication required.");
-        break;
-    }
+    debugPrint("User Exist in offline => $isUserAvailable");
   }
 
   getLoginUserDetailsAndAuthType() async {
@@ -754,20 +852,136 @@ class LoginController extends GetxController {
     return AuthType.none;
   }
 
+  // callSignInAPI() async {
+  //   if (validateForm()) {
+  //     var signInBody = {
+  //       "appname": globalVariableController.PROJECT_NAME.value,
+  //       "username": userNameController.text.toString().trim(),
+  //       "password": generateMd5(userPasswordController.text.toString().trim()),
+  //       "Language": "English",
+  //       "SessionId": getGUID(), //GUID
+  //       "Globalvars": false
+  //     };
+
+  //     signInBody.addIf(isDuplicate_session, "ClearPreviousSession", true);
+
+  //     // signInBody.addIf(isPWD_auth.value, "password", generateMd5(userPasswordController.text.toString().trim()));
+  //     signInBody.addIf(isOTP_auth.value, "OtpAuth", "T");
+  //     FocusManager.instance.primaryFocus?.unfocus();
+  //     LoadingScreen.show();
+  //     var _url = Const.getFullARMUrl(ServerConnections.API_SIGNIN);
+
+  //     var response = await serverConnections.postToServer(
+  //         url: _url, body: jsonEncode(signInBody));
+  //     // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
+
+  //     if (response != "") {
+  //       var json = jsonDecode(response);
+  //       if (json["result"]["success"].toString().toLowerCase() == "true") {
+  //         if (json["result"]["message"].toString() == "Login Successful.") {
+  //           await processSignInDataResponse(json["result"]);
+  //         } else if (json["result"]?.containsKey("OTPLoginKey")) {
+  //           // OTPPage
+  //           otpMsg.value = json["result"]["message"].toString();
+  //           otpLoginKey.value = json["result"]["OTPLoginKey"].toString();
+  //           print("Otpmsg: ${otpMsg.value} \nOtpkey: ${otpLoginKey.value}");
+  //           Get.toNamed(Routes.OtpPage);
+  //         }
+  //       } else if (json["result"]["success"].toString().toLowerCase() ==
+  //               "false" &&
+  //           json["result"].containsKey('duplicate_session')) {
+  //         isDuplicate_session = true;
+  //         showDialog_duplicateSession(json["result"]["message"].toString());
+  //       } else {
+  //         if (Get.isDialogOpen ?? false) {
+  //           Get.back(); // closes the dialog
+  //         }
+  //         Get.snackbar("Error ", json["result"]["message"],
+  //             snackPosition: SnackPosition.BOTTOM,
+  //             backgroundColor: Colors.redAccent,
+  //             colorText: Colors.white);
+  //       }
+  //     }
+  //     LoadingScreen.dismiss();
+  //   }
+  // }
+
+  // callVerifyOTP() async {
+  //   if (validateOTPField()) {
+  //     LoadingScreen.show();
+  //     isOtpLoading.value = true;
+  //     var _url = Const.getFullARMUrl(ServerConnections.API_VALIDATE_OTP);
+  //     var body = {
+  //       "OtpLoginKey": otpLoginKey.value,
+  //       "OTP": otpFieldController.text.toString().trim(),
+  //     };
+
+  //     var response = await serverConnections.postToServer(
+  //         url: _url, body: jsonEncode(body));
+  //     isOtpLoading.value = false;
+  //     if (response != "") {
+  //       var json = jsonDecode(response);
+  //       if (json["result"]["success"].toString().toLowerCase() == "true") {
+  //         await processSignInDataResponse(json["result"]);
+  //       } else {
+  //         otpErrorText.value = json["result"]["message"].toString();
+  //         /* Get.snackbar("Error ", json["result"]["message"],
+  //             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);*/
+  //       }
+  //     }
+  //   }
+  //   LoadingScreen.dismiss();
+  // }
+
+  callSignInOffline() async {
+    if (!validateForm()) return;
+    isUserDataLoading.value = true;
+
+    var isUserAuthenticated = await OfflineDbModule.validateOfflineLogin(
+        projectName: globalVariableController.PROJECT_NAME.value,
+        username: userNameController.text.toString().trim(),
+        passwordHash: userPasswordController.text.toString().trim());
+
+    isUserDataLoading.value = false;
+    debugPrint("User Offline Authenticated? => $isUserAuthenticated");
+
+    if (isUserAuthenticated) {
+      globalVariableController.USER_NAME.value =
+          userNameController.text.toString().trim();
+      await OfflineDbModule.logAudit(
+        action: "LOGIN_OFFLINE",
+        response: "Local Validation Success",
+        remarks:
+            "User [${userNameController.text.toString().trim()}] logged in via local database cache (No Internet).",
+      );
+      Get.offAllNamed(Routes.LandingPage);
+    } else {
+      errPassword.value = "Incorrect Password";
+    }
+  }
+
   callSignInAPI() async {
-    if (validateForm()) {
+    if (isOfflineLogin.value) {
+      await callSignInOffline();
+    } else if (validateForm()) {
+      var _username = _isAuthFromBiometric
+          ? retrieveLastLoginData()["username"]
+          : userNameController.text.toString().trim();
+      var _password = _isAuthFromBiometric
+          ? retrieveLastLoginData()["password"]
+          : generateMd5(Const.SEED +
+              generateMd5(userPasswordController.text.toString().trim()));
       var signInBody = {
         "appname": globalVariableController.PROJECT_NAME.value,
-        "username": userNameController.text.toString().trim(),
-        "password": generateMd5(userPasswordController.text.toString().trim()),
+        "username": _username,
+        "Seed": Const.SEED,
+        "password": _password,
         "Language": "English",
         "SessionId": getGUID(), //GUID
         "Globalvars": false
       };
 
       signInBody.addIf(isDuplicate_session, "ClearPreviousSession", true);
-
-      // signInBody.addIf(isPWD_auth.value, "password", generateMd5(userPasswordController.text.toString().trim()));
       signInBody.addIf(isOTP_auth.value, "OtpAuth", "T");
       FocusManager.instance.primaryFocus?.unfocus();
       LoadingScreen.show();
@@ -775,13 +989,54 @@ class LoginController extends GetxController {
 
       var response = await serverConnections.postToServer(
           url: _url, body: jsonEncode(signInBody));
-      // LogService.writeLog(message: "[-] LoginController => loginButtonClicked() => LoginResponse : $response");
 
       if (response != "") {
-        var json = jsonDecode(response);
-        if (json["result"]["success"].toString().toLowerCase() == "true") {
-          if (json["result"]["message"].toString() == "Login Successful.") {
+        final json = jsonDecode(response);
+        final result = json["result"];
+
+        final bool isSuccess =
+            result["success"].toString().toLowerCase() == "true";
+
+        if (isSuccess) {
+          storeLastLoginData(signInBody);
+          if (result["message"] == "Login Successful.") {
+            globalVariableController.USER_ROLE.value =
+                json["result"]["role"].toString().toLowerCase();
+            globalVariableController.USER_NAME.value =
+                json["result"]["username"].toString().toLowerCase();
+            await OfflineDbModule.logAudit(
+              action: "LOGIN_ONLINE",
+              response: "LOGIN SUCCESS",
+              remarks:
+                  "User [${userNameController.text.toString().trim()}] logged in successfully via Server.",
+            );
+            await OfflineDbModule.saveUser(
+                projectName: globalVariableController.PROJECT_NAME.value,
+                username: userNameController.text.toString().trim(),
+                passwordHash: userPasswordController.text.toString().trim(),
+                loginResult: json);
             await processSignInDataResponse(json["result"]);
+
+            if (AppStorage().retrieveValue(AppStorage.AUTO_SYNC) == null) {
+              globalVariableController.autoSyncEnabled.value = false;
+              await AppStorage().storeValue(AppStorage.AUTO_SYNC, false);
+            } else {
+              globalVariableController.autoSyncEnabled.value =
+                  await AppStorage().retrieveValue(AppStorage.AUTO_SYNC);
+            }
+
+            if (await AppStorage().retrieveValue(AppStorage.AUTO_SYNC_MASTER) ==
+                null) {
+              AppStorage().storeValue(AppStorage.AUTO_SYNC_MASTER, true);
+              OfflineDbModule.autoSyncMaster =
+                  globalVariableController.autoSyncMasterEnabled.value = true;
+            } else {
+              OfflineDbModule.autoSyncMaster = globalVariableController
+                      .autoSyncMasterEnabled.value =
+                  await AppStorage().retrieveValue(AppStorage.AUTO_SYNC_MASTER);
+            }
+            await OfflineConfigService.fetchAndStore();
+            // await OfflineBackgroundSyncService.instance.start();
           } else if (json["result"]?.containsKey("OTPLoginKey")) {
             // OTPPage
             otpMsg.value = json["result"]["message"].toString();
@@ -789,23 +1044,191 @@ class LoginController extends GetxController {
             print("Otpmsg: ${otpMsg.value} \nOtpkey: ${otpLoginKey.value}");
             Get.toNamed(Routes.OtpPage);
           }
-        } else if (json["result"]["success"].toString().toLowerCase() ==
-                "false" &&
-            json["result"].containsKey('duplicate_session')) {
-          isDuplicate_session = true;
-          showDialog_duplicateSession(json["result"]["message"].toString());
         } else {
-          if (Get.isDialogOpen ?? false) {
-            Get.back(); // closes the dialog
+          //  if (json["result"]["success"].toString().toLowerCase() ==
+          //         "false" &&
+          //     json["result"].containsKey('duplicate_session')) {
+          //   isDuplicate_session = true;
+          //   showDialog_duplicateSession(json["result"]["message"].toString());
+          // }
+          // if (Get.isDialogOpen ?? false) {
+          //   Get.back(); // closes the dialog
+          // }
+          // await OfflineDbModule.logAudit(
+          //   action: "LOGIN_ONLINE",
+          //   response: json["result"]["message"],
+          //   isError: true,
+          //   remarks:
+          //       "User [${userNameController.text.toString().trim()}] logging in failed",
+          // );
+          // Get.snackbar("Error ", json["result"]["message"],
+          //     snackPosition: SnackPosition.BOTTOM,
+          //     backgroundColor: Colors.redAccent,
+          //     colorText: Colors.white);
+
+          if (result.containsKey("duplicate_session") &&
+              result["duplicate_session"] == true) {
+            isDuplicate_session = true;
+            showDialog_duplicateSession(result["message"].toString());
+          } else if (result.containsKey("change_password") &&
+              result["change_password"] == true) {
+            showDialog_changePassword();
+          } else {
+            if (Get.isDialogOpen ?? false) {
+              Get.back(); // closes the dialog
+            }
+            await OfflineDbModule.logAudit(
+              action: "LOGIN_ONLINE",
+              response: json["result"]["message"],
+              isError: true,
+              remarks:
+                  "User [${userNameController.text.toString().trim()}] logging in failed",
+            );
+            Get.snackbar("Error ", json["result"]["message"],
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.redAccent,
+                colorText: Colors.white);
           }
-          Get.snackbar("Error ", json["result"]["message"],
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.redAccent,
-              colorText: Colors.white);
         }
       }
       LoadingScreen.dismiss();
     }
+  }
+
+  void showDialog_changePassword() {
+    // Prevent opening multiple dialogs
+    if (Get.isDialogOpen ?? false) {
+      Get.back(); // closes the dialog
+    }
+
+    // Clear fields
+    oPassCtrl.clear();
+    nPassCtrl.clear();
+    cnPassCtrl.clear();
+
+    // Clear errors
+    errOPass.value = "";
+    errNPass.value = "";
+    errCNPass.value = "";
+
+    // Reset password visibility
+    showOldPass.value = false;
+    showNewPass.value = false;
+    showConNewPass.value = false;
+
+    Get.dialog(
+      barrierDismissible: false,
+      PopScope(
+        canPop: false,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: Get.height * 0.85,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Obx(() {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      "assets/images/axpert_03.png",
+                      height: 45,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Reset Password",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: MyColors.blue2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Please enter your existing password and choose a new password.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    buildPasswordField(
+                      controller: oPassCtrl,
+                      label: "Existing Password",
+                      hint: "Enter existing password",
+                      showPassword: showOldPass,
+                      error: errOPass.value,
+                    ),
+                    const SizedBox(height: 18),
+                    buildPasswordField(
+                      controller: nPassCtrl,
+                      label: "New Password",
+                      hint: "Enter new password",
+                      showPassword: showNewPass,
+                      error: errNPass.value,
+                    ),
+                    const SizedBox(height: 18),
+                    buildPasswordField(
+                      controller: cnPassCtrl,
+                      label: "Confirm Password",
+                      hint: "Re-enter new password",
+                      showPassword: showConNewPass,
+                      error: errCNPass.value,
+                    ),
+                    const SizedBox(height: 30),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: const Text("Cancel"),
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(50),
+                              backgroundColor: MyColors.blue2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {
+                              changePasswordCalled();
+                            },
+                            child: const Text(
+                              "Save",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   callVerifyOTP() async {
@@ -833,6 +1256,118 @@ class LoginController extends GetxController {
       }
     }
     LoadingScreen.dismiss();
+  }
+
+  void changePasswordCalled() async {
+    //change Password
+    if (validForm()) {
+      FocusManager.instance.primaryFocus!.unfocus();
+      var passBody = {
+        "appname": globalVariableController.PROJECT_NAME.value,
+        "username": globalVariableController.USER_NAME.value,
+        "OldPassword": generateMd5(oPassCtrl.text.trim()),
+        "NewPassword": nPassCtrl.text.trim(),
+      };
+      var url = Const.getFullARMUrl(ServerConnections.API_CHANGE_PASSWORD);
+      var resp = await serverConnections.postToServer(
+          url: url, body: jsonEncode(passBody), isBearer: true);
+      if (resp.toString() != "") {
+        var jsonResp = jsonDecode(resp);
+        if (jsonResp['result']['success'].toString() == 'false') {
+          error(jsonResp['result']['message'].toString());
+        } else {
+          Get.defaultDialog(
+              title: "Success!",
+              middleText: jsonResp['result']['message'].toString(),
+              confirm: ElevatedButton(
+                  onPressed: () {
+                    userPasswordController.clear();
+                    Get.close(2);
+                  },
+                  child: Text("Ok")));
+        }
+      }
+      print(resp);
+    }
+    // if success
+    // closeProfileDialog();
+  }
+  Widget buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required RxBool showPassword,
+    required String error,
+  }) {
+    return Obx(
+      () => TextField(
+        controller: controller,
+        obscureText: !showPassword.value,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          errorText: error.isEmpty ? null : error,
+          filled: true,
+          fillColor: MyColors.color_grey,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: MyColors.blue2),
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              showPassword.value ? Icons.visibility_off : Icons.visibility,
+            ),
+            onPressed: showPassword.toggle,
+          ),
+        ),
+      ),
+    );
+  }
+
+  evaluteError(String value) {
+    if (value.trim() == '')
+      return null;
+    else
+      return value;
+  }
+
+  error(var msg) {
+    Get.snackbar("Error!", msg,
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red);
+  }
+
+  bool validForm() {
+    errOPass.value = '';
+    errNPass.value = '';
+    errCNPass.value = '';
+
+    if (oPassCtrl.text.trim().isEmpty) {
+      errOPass.value = "Enter Existing password";
+      return false;
+    }
+
+    if (nPassCtrl.text.trim().isEmpty) {
+      errNPass.value = "Enter New password";
+      return false;
+    }
+
+    if (cnPassCtrl.text.trim().isEmpty) {
+      errCNPass.value = "Enter Confirm password";
+      return false;
+    }
+
+    if (nPassCtrl.text.trim() != cnPassCtrl.text.trim()) {
+      errCNPass.value = "New password and Confirm password do not match";
+      return false;
+    }
+
+    return true;
   }
 
   processSignInDataResponse(json) async {

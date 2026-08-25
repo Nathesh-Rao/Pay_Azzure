@@ -27,8 +27,7 @@ class _SplashPageState extends State<SplashPage>
   var _animationController;
   AppStorage appStorage = AppStorage();
   ProjectModel? projectModel;
-  final GlobalVariableController globalVariableController =
-      Get.put(GlobalVariableController(), permanent: true);
+  final GlobalVariableController globalVariableController = Get.find();
 
   @override
   void initState() {

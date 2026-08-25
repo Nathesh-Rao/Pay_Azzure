@@ -87,6 +87,10 @@ dependencies:
   flutter_expanded_tile: ^0.4.0
   app_settings: ^7.0.0
   cupertino_icons: ^1.0.8
+  flutter_foreground_task: ^10.0.0
+  flutter_image_compress: ^2.5.1
+  file_picker: ^10.3.8
+  share_plus: ^12.0.2
   #  simple_downloader: ^0.0.3+1
   #  background_location_tracker: ^1.4.3
   # platform_device_id:

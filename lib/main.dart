@@ -4,10 +4,13 @@ import 'dart:io';
 import 'package:axpertflutter/Constants/MyColors.dart';
 import 'package:axpertflutter/Constants/Routes.dart';
 import 'package:axpertflutter/Constants/const.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/auto_sync/offline_background_sync_service.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/db/offline_db_module.dart';
 import 'package:axpertflutter/Services/LocationServiceManager/LocationServiceManager.dart';
 import 'package:axpertflutter/Utils/FirebaseHandler/FirebaseMessagesHandler.dart';
 import 'package:axpertflutter/Utils/LogServices/LogService.dart';
 import 'package:axpertflutter/Utils/ServerConnections/InternetConnectivity.dart';
+import 'package:axpertflutter/Utils/Utility/initial_bindings.dart';
 import 'package:axpertflutter/firebase_options.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,13 +20,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 // import 'package:platform_device_id/platform_device_id.dart';
 
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 NotificationDetails notificationDetails = NotificationDetails(
     android: AndroidNotificationDetails('Default', 'Default',
@@ -51,10 +56,35 @@ Future<void> main() async {
   if (Platform.isAndroid) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
-  runApp(MyApp());
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.black38));
   try {
-        final deviceInfoPlugin = DeviceInfoPlugin();
+    await OfflineDbModule.init();
+    // await OfflineBackgroundSyncService.instance.initWorkManager();
+
+    OfflineBackgroundSyncService.initCommunicationPort();
+
+    LogService.writeLog(
+      message: "[OFFLINE_DB_INIT_001][SUCCESS] Offline DB initialized",
+    );
+  } catch (e, st) {
+    LogService.writeLog(
+      message: "[OFFLINE_DB_INIT_001][FAILED] Offline DB init failed => $e",
+    );
+    LogService.writeLog(message: "[OFFLINE_DB_INIT_001][STACK] $st");
+  }
+  // GoogleFonts.config.allowRuntimeFetching = false;
+  // testAssets();
+  final bool staleService = await FlutterForegroundTask.isRunningService;
+  if (staleService) {
+    await FlutterForegroundTask.stopService();
+    await Future.delayed(const Duration(milliseconds: 500));
+    await LogService.writeLog(
+        message: '[MAIN] Stale background isolate killed on fresh launch.');
+  }
+  runApp(MyApp());
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: Colors.black38));
+  try {
+    final deviceInfoPlugin = DeviceInfoPlugin();
     final deviceInfo = defaultTargetPlatform == TargetPlatform.android
         ? await deviceInfoPlugin.androidInfo
         : defaultTargetPlatform == TargetPlatform.iOS
@@ -64,7 +94,7 @@ Future<void> main() async {
       Const.DEVICE_ID = '';
     } else {
       final allInfo = deviceInfo.data;
-      Const.DEVICE_ID = allInfo['id']??"";
+      Const.DEVICE_ID = allInfo['id'] ?? "";
     }
   } on PlatformException {}
 }
@@ -84,7 +114,8 @@ void configureEasyLoading() {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
 
-  final InternetConnectivity internetConnectivity = Get.put(InternetConnectivity());
+  final InternetConnectivity internetConnectivity =
+      Get.put(InternetConnectivity());
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +127,7 @@ class MyApp extends StatelessWidget {
       theme: Const.THEMEDATA,
       initialRoute: Routes.SplashScreen,
       // initialRoute: Routes.SettingsPage,
+      initialBinding: InitialBindings(),
       getPages: RoutePages.pages,
       // builder: EasyLoading.init(),
       builder: EasyLoading.init(
@@ -104,7 +136,8 @@ class MyApp extends StatelessWidget {
                 body: Center(
                   child: InkWell(
                       onTap: () => Get.toNamed(Routes.ProjectListingPage),
-                      child: Text("Some Error occurred. \n ${errorDetails.exception.toString()}")),
+                      child: Text(
+                          "Some Error occurred. \n ${errorDetails.exception.toString()}")),
                 ),
               );
           if (child != null) return child;

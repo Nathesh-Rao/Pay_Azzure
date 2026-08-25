@@ -4,6 +4,8 @@ import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuActiveListPage/Pag
 import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/page/attendance/attendance_screen.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/page/leaves/leave_details_screen.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/PayAndAttendacePage/page/payslip/payroll_details_page.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/pages/offline_form_page.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/pages/offline_listing_page.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Controller/Binding.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Page/LandingPage.dart';
 import 'package:axpertflutter/ModelPages/LoginPage/Page/ForgetPassword.dart';
@@ -37,6 +39,8 @@ class Routes {
   static const String attendance = '/attendance';
   static const String leaveDetails = '/leaveDetails';
   static const String payRollDetails = '/payRollDetails';
+  static const String OfflineListingPage = "/OfflineListingPage";
+  static const String OfflineFormPage = "/OffLineFormPage";
 }
 
 class RoutePages {
@@ -124,6 +128,16 @@ class RoutePages {
       page: () => PayrollDetailsPage(),
       transition: Transition.rightToLeft,
       curve: Curves.decelerate,
+    ),
+    GetPage(
+      name: Routes.OfflineFormPage,
+      page: () => OfflineFormPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: Routes.OfflineListingPage,
+      page: () => OfflineListingPage(),
+      transition: Transition.rightToLeft,
     ),
   ];
 }

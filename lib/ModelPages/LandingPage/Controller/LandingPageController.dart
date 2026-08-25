@@ -15,8 +15,12 @@ import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Controlle
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Models/MenuItemModel.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/MenuMorePage/Page/MenuMorePage.dart';
 import 'package:axpertflutter/ModelPages/LandingMenuPages/UpdatedHomePage/Page/UpdatedHomePage.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/db/offline_db_module.dart';
+import 'package:axpertflutter/ModelPages/LandingMenuPages/offline_form_pages/pages/offline_listing_page.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Models/FirebaseMessageModel.dart';
 import 'package:axpertflutter/ModelPages/LandingPage/Widgets/WidgetNotification.dart';
+import 'package:axpertflutter/Utils/LogServices/LogService.dart';
+import 'package:axpertflutter/Utils/ServerConnections/InternetConnectivity.dart';
 import 'package:axpertflutter/Utils/ServerConnections/ServerConnections.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,6 +44,7 @@ import '../Widgets/EmptyWidget.dart';
 import '../Widgets/WidgetBanner.dart';
 
 class LandingPageController extends GetxController with WidgetsBindingObserver {
+  static LandingPageController get to => Get.find();
   final globalVariableController = Get.find<GlobalVariableController>();
   final webViewController = Get.find<WebViewController>();
   final MenuMorePageController menuMorePageController =
@@ -85,6 +90,80 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   var list = [WidgetNotification(FirebaseMessageModel("Title 1", "Body 1"))];
   var list_bannerItem = [].obs;
   bool isAxpertConnectEstablished = false;
+  var isOffline = false.obs;
+  @override
+  void onInit() {
+    super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+    initController();
+    listenInternetState();
+    globalVariableController.OFFLINE_FORMS_COUNT.listen((count) {
+      if (count == 0) {
+        bottomIndex.value = 0;
+      }
+    });
+  }
+
+  void listenInternetState() async {
+    final InternetConnectivity net = Get.find<InternetConnectivity>();
+
+    isOffline.value = !await net.check();
+
+    ever<bool>(net.isConnected, (connected) {
+      isOffline.value = !connected;
+      if (!isOffline.value) {
+        initController();
+      }
+    });
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+
+    _startPostLoginSync();
+  }
+
+  var isDataSourcefetchingOnStart = false.obs;
+  var totalDsCountOnStart = 0.obs;
+  var completedDsCountOnStart = 0.obs;
+
+  void _startPostLoginSync() async {
+    const String tag = "[OFFLINE_POSTLOGIN_001]";
+
+    try {
+      final isOnline = Get.find<InternetConnectivity>().isConnected.value;
+
+      LogService.writeLog(
+        message:
+            "$tag[START] Post-login offline sync started. isOnline=$isOnline",
+      );
+      isDataSourcefetchingOnStart.value = true;
+      await OfflineDbModule.handlePostLogin(
+        // username: await appStorage.retrieveValue(AppStorage.USER_NAME) ?? "",
+        // projectName: globalVariableController.PROJECT_NAME.value,
+        isInternetAvailable: isOnline,
+      ).then((_) {
+        isDataSourcefetchingOnStart.value = false;
+        totalDsCountOnStart.value = 0;
+        completedDsCountOnStart.value = 0;
+      });
+
+      // await OfflineBackgroundSyncService.instance.start();
+      LogService.writeLog(
+        message: "$tag[SUCCESS] Post-login offline sync finished",
+      );
+    } catch (e, st) {
+      LogService.writeLog(
+        message: "$tag[FAILED] Post-login sync failed => $e",
+      );
+      LogService.writeLog(
+        message: "$tag[STACK] $st",
+      );
+    }
+  }
+
+///////////////////////////////////////////////////////////
 
   getPage() {
     if (bottomIndex.value == 0) {
@@ -94,7 +173,7 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     return pageList[bottomIndex.value];
   }
 
-  LandingPageController() {
+  initController() {
     var dt = DateTime.now();
     toDay = DateFormat('dd-MMM-yyyy, EEEE').format(dt);
     userName.value =
@@ -104,20 +183,44 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
       pageList = [
         UpdatedHomePage(),
         // MenuActiveListPage(),
-        PayAndAttendancePage(),
         ActiveListPage(),
         MenuDashboardPage(),
-        ///NOTE Pass a [ValueKey] with a unique identifier to force widget rebuilds.
-        //NOTE to open the WebViewCalendar page
         EmptyWidget(), //NOTE to open the WebViewCalendar page handled in indexchange() method
-        EmptyWidget(), //NOTE to open the WebViewAnalytics page handled in indexchange() method
-        //MenuMorePage(),
+
+        EmptyWidget(),
+        OfflineListingPage()
       ];
     });
     showChangePassword_PopUp();
-    // getBiometricStatus();
+    //getBiometricStatus();
     getClientInfo();
-    // getBannerDetailList();
+  }
+
+  LandingPageController() {
+    // var dt = DateTime.now();
+    // toDay = DateFormat('dd-MMM-yyyy, EEEE').format(dt);
+    // userName.value =
+    //     appStorage.retrieveValue(AppStorage.USER_NAME) ?? userName.value;
+    // userCtrl.text = userName.value;
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   pageList = [
+    //     UpdatedHomePage(),
+    //     // MenuActiveListPage(),
+    //     PayAndAttendancePage(),
+    //     ActiveListPage(),
+    //     MenuDashboardPage(),
+
+    //     ///NOTE Pass a [ValueKey] with a unique identifier to force widget rebuilds.
+    //     //NOTE to open the WebViewCalendar page
+    //     EmptyWidget(), //NOTE to open the WebViewCalendar page handled in indexchange() method
+    //     EmptyWidget(), //NOTE to open the WebViewAnalytics page handled in indexchange() method
+    //     //MenuMorePage(),
+    //   ];
+    // });
+    // showChangePassword_PopUp();
+    // // getBiometricStatus();
+    // getClientInfo();
+    // // getBannerDetailList();
   }
 
   getClientInfo() async {
@@ -274,13 +377,13 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     bottomIndex.value = index;
 
     if (pageList[index] is EmptyWidget) {
-      if (index == 4) {
+      if (index == 3) {
         //NOTE to open the WebViewCalendar page
         await webViewController.openWebView(
           url: Const.getFullWebUrl(Const.BOTTOMBAR_CALENDAR) +
               AppStorage().retrieveValue(AppStorage.SESSIONID),
         );
-      } else if (index == 5) {
+      } else if (index == 4) {
         //NOTE to open the WebViewAnalytics page
         await webViewController.openWebView(
           url: Const.getFullWebUrl(Const.BOTTOMBAR_ANALYTICS) +
@@ -1052,12 +1155,6 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    WidgetsBinding.instance.addObserver(this);
   }
 
   @override

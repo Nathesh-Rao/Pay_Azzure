@@ -25,6 +25,13 @@ class AppStorage {
   static const String SHAREDPREF_NAME = "BackgroundMessages";
   static const String isShowNotifyEnabled = "isShowNotifyEnabled";
   static const String isLogEnabled = "isLogEnabled";
+
+  static const String AUTO_SYNC = "auto_sync";
+  static const String AUTO_SYNC_MASTER = "auto_sync_master";
+  static const String OFFLINE_SYNC_INTERVAL = 'sync_interval_minutes';
+  // batch cached save
+  static const String CACHED_BATCH_SIZE = 'cached_batch_size';
+
   late final box;
 
   AppStorage() {
