@@ -40,6 +40,7 @@ import '../../InApplicationWebView/controller/webview_controller.dart';
 import '../../LandingMenuPages/MenuActiveListPage/Page/UpdatedMenuListPage/ActiveListPage.dart';
 import '../../LandingMenuPages/MenuHomePagePage/Models/BannerModel.dart';
 import '../../LandingMenuPages/PayAndAttendacePage/page/PayAndAttendancePage.dart';
+import '../../LoginPage/Page/LoginPage.dart';
 import '../Widgets/EmptyWidget.dart';
 import '../Widgets/WidgetBanner.dart';
 
@@ -609,16 +610,19 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     if (validForm()) {
       FocusManager.instance.primaryFocus!.unfocus();
       var passBody = {
-        "ARMSessionId": appStorage.retrieveValue(AppStorage.SESSIONID),
-        "CurrentPassword": oPassCtrl.text.trim(),
-        "UpdatedPassword": nPassCtrl.text.trim(),
+        "appname": globalVariableController.PROJECT_NAME.value,
+        "username": globalVariableController.USER_NAME.value,
+        "OldPassword": generateMd5(oPassCtrl.text.trim()),
+        "NewPassword": nPassCtrl.text.trim(),
       };
+      print("Error from changepassword11122");
       var url = Const.getFullARMUrl(ServerConnections.API_CHANGE_PASSWORD);
       var resp = await serverConnections.postToServer(
           url: url, body: jsonEncode(passBody), isBearer: true);
       if (resp.toString() != "") {
         var jsonResp = jsonDecode(resp);
         if (jsonResp['result']['success'].toString() == 'false') {
+          print("Error from changepassword111");
           error(jsonResp['result']['message'].toString());
         } else {
           Get.defaultDialog(
@@ -630,6 +634,10 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
                     Get.back();
                   },
                   child: Text("Ok")));
+          clearPassword(
+              projectName: globalVariableController.PROJECT_NAME.value,
+              username: globalVariableController.USER_NAME.value);
+          Get.offAll(LoginPage());
         }
       }
       print(resp);
@@ -638,7 +646,27 @@ class LandingPageController extends GetxController with WidgetsBindingObserver {
     // closeProfileDialog();
   }
 
+  void clearPassword({
+    required String projectName,
+    required String username,
+  }) {
+    try {
+      final users = Map<String, dynamic>.from(
+          appStorage.retrieveValue(AppStorage.USERID) ?? {});
+      final passwords = Map<String, dynamic>.from(
+          appStorage.retrieveValue(AppStorage.USER_PASSWORD) ?? {});
+
+      if (users[projectName] == username) {
+        passwords[projectName] = "";
+        appStorage.storeValue(AppStorage.USER_PASSWORD, passwords);
+      }
+    } catch (e) {
+      debugPrint("Failed to clear password: $e");
+    }
+  }
+
   error(var msg) {
+    print("Error from changepassword");
     Get.snackbar("Error!", msg,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,

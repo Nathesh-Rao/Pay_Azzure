@@ -718,6 +718,93 @@ class ServerConnections {
 
   postToServer(
       {String url = '',
+        var header = '',
+        String body = '',
+        String ClientID = '',
+        bool isBearer = false,
+        var show_errorSnackbar = true}) async {
+    var API_NAME = url.substring(url.lastIndexOf("/") + 1, url.length);
+    if (await internetConnectivity.connectionStatus)
+      try {
+        if (ClientID != '') _baseBody = _generateBody(ClientID.toLowerCase());
+        if (url == '') url = _baseUrl;
+        if (header == '') header = {"Content-Type": "application/json"};
+        if (body == '') body = _baseBody;
+        if (isBearer)
+          header = {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + appStorage.retrieveValue(AppStorage.TOKEN).toString() ?? "",
+          };
+        print("API_POST_URL: $url");
+        // print("Post header: $header");
+        print("API_POST_BODY:" + body);
+        var response = await client.post(Uri.parse(url), headers: header, body: body);
+
+        // print("API_RESPONSE_DATA: $API_NAME: ${response.body}\n");
+        // print("");
+        if (response.statusCode == 200) {
+          LogService.writeLog(
+              message:
+              "[^] [POST] URL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+          return response.body;
+        }
+        ;
+        if (response.statusCode == 404) {
+          print("API_ERROR: $API_NAME: ${response.body}");
+          LogService.writeLog(
+              message:
+              "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+
+          Get.snackbar("Error " + response.statusCode.toString(), "Invalid Url",
+              snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+          showErrorSnack(title: "Error!", message: response.statusCode.toString(), show_errorSnackbar: show_errorSnackbar);
+        } else {
+          if (response.statusCode == 400 || response.statusCode == 401) {
+            LogService.writeLog(
+                message:
+                "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+            if (response.body.toString().toLowerCase().contains("sessionid is not valid")) {
+              LandingPageController landingPageController = Get.find();
+              landingPageController.showSignOutDialog_sessionExpired();
+            } else
+              return response.body;
+          } else {
+            print("API_ERROR: $API_NAME: ${response.body}");
+            LogService.writeLog(
+                message:
+                "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nStatusCode: ${response.statusCode}\nResponse: ${response.body}");
+
+            // Get.snackbar("Error " + response.statusCode.toString(), "Internal server error",
+            //     snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+            var msg = response.body.toString();
+            if (response.body.toString().contains("message")) {
+              try {
+                var jsonResp = jsonDecode(response.body);
+                // print(jsonResp);
+                msg = jsonResp['result']['message'].toString();
+              } catch (e) {
+                print(e);
+              }
+            }
+            showErrorSnack(
+                title: "Error! ${response.statusCode.toString()}",
+                message: API_NAME + ": " + msg,
+                show_errorSnackbar: show_errorSnackbar);
+          }
+        }
+      } catch (e) {
+        print("API_ERROR: $API_NAME: ${e.toString()}");
+        LogService.writeLog(message: "[ERROR] API_ERROR\nURL:$url\nAPI_NAME: $API_NAME\nBody: $body\nError: ${e.toString()}");
+
+        // Get.snackbar("Error ", e.toString(), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.redAccent, colorText: Colors.white);
+        showErrorSnack(title: "Error!", message: e.toString(), show_errorSnackbar: show_errorSnackbar);
+      }
+
+    return "";
+  }
+
+ /* postToServer(
+      {String url = '',
       var header = '',
       String body = '',
       String ClientID = '',
@@ -839,7 +926,7 @@ class ServerConnections {
       }
 
     return "";
-  }
+  }*/
 
   /// Dedicated POST method for datasource/list-view calls (ARMGetDataResponse
   /// and similar). Kept separate from postToServer so existing call sites

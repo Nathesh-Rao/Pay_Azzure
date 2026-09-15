@@ -818,17 +818,21 @@ class LoginController extends GetxController {
   getLoginUserDetailsAndAuthType() async {
     isUserDataLoading.value = true;
     var _url = Const.getFullARMUrl(ServerConnections.API_GET_LOGINUSER_DETAILS);
+    var _username = _isAuthFromBiometric
+        ? retrieveLastLoginData()["username"]
+        : userNameController.text.toString().trim();
     var body = {
       "appname": globalVariableController.PROJECT_NAME.value,
-      "UserName": userNameController.text.toString().trim(),
+      "UserName": _username,
     };
 
     var response =
-        await serverConnections.postToServer(url: _url, body: jsonEncode(body));
+    await serverConnections.postToServer(url: _url, body: jsonEncode(body));
     isUserDataLoading.value = false;
     if (response != "") {
       var json = jsonDecode(response);
       if (json["result"]["success"].toString().toLowerCase() == "true") {
+        globalVariableController.USER_NAME.value = _username;
         FocusManager.instance.primaryFocus?.unfocus();
         final authUserdetails = AuthUserDetailsModel.fromJson(json["result"]);
         isPWD_auth.value = authUserdetails.pwdauth!;
